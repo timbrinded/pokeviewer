@@ -1,0 +1,83 @@
+{
+  "schema_version": 1,
+  "renderer_version": 1,
+  "cases": [
+    {
+      "case": "monday-001",
+      "dex_id": 1,
+      "name": "Bulbasaur",
+      "weekday": "Monday",
+      "framebuffer_file": "cards/monday-001.bin",
+      "png_file": "cards/monday-001.png",
+      "framebuffer_crc32": "47f8d834",
+      "framebuffer_sha256": "e1f5271e860f3c13750bc0c36cf86e0b1f4a907a8860a2801d53bd1b2dad18ba",
+      "png_sha256": "22e0f5d8171479eb08342890b0dc9ab89b235a533db7c245a4756f88f1dfbf8b"
+    },
+    {
+      "case": "tuesday-006",
+      "dex_id": 6,
+      "name": "Charizard",
+      "weekday": "Tuesday",
+      "framebuffer_file": "cards/tuesday-006.bin",
+      "png_file": "cards/tuesday-006.png",
+      "framebuffer_crc32": "944c4e30",
+      "framebuffer_sha256": "fea6e487dc1579168d9e85b7b0519155a93b7f4e3cd282f406b8180af3783009",
+      "png_sha256": "1ccb59254f69cbcf75fe00277c36f3bdf42c979f743315e154b50cd412ae15ae"
+    },
+    {
+      "case": "wednesday-142",
+      "dex_id": 142,
+      "name": "Aerodactyl",
+      "weekday": "Wednesday",
+      "framebuffer_file": "cards/wednesday-142.bin",
+      "png_file": "cards/wednesday-142.png",
+      "framebuffer_crc32": "d68d8ba9",
+      "framebuffer_sha256": "43d4d23aabec0c9090b66976688285a14b4dac88cef7eb616c330c3b4857f4f3",
+      "png_sha256": "3fe2e6e71c095fef7d6398e2b023a6e903e82a5d29b5c6e69a2a10c10c1fd610"
+    },
+    {
+      "case": "thursday-029",
+      "dex_id": 29,
+      "name": "Nidoran♀",
+      "weekday": "Thursday",
+      "framebuffer_file": "cards/thursday-029.bin",
+      "png_file": "cards/thursday-029.png",
+      "framebuffer_crc32": "148de2c2",
+      "framebuffer_sha256": "b41e1c9b92bd5cae9df67b87e5207ff6f5efca73ca03c5a0e9e03fbce2564fa7",
+      "png_sha256": "4ac870ff3b33016d2fac0da6fa1c1d84a5e79c368a5db3c954b0d59cdbc58679"
+    },
+    {
+      "case": "friday-122",
+      "dex_id": 122,
+      "name": "Mr. Mime",
+      "weekday": "Friday",
+      "framebuffer_file": "cards/friday-122.bin",
+      "png_file": "cards/friday-122.png",
+      "framebuffer_crc32": "d6356e9b",
+      "framebuffer_sha256": "f27642edcfa5f99042fefe926e51b6824465ad0b23c7a805641517bbd1ea93ed",
+      "png_sha256": "4a4923f7eef668304940afa50c20995befb19149ff244463a9ad86b90d2f826d"
+    },
+    {
+      "case": "saturday-025",
+      "dex_id": 25,
+      "name": "Pikachu",
+      "weekday": "Saturday",
+      "framebuffer_file": "cards/saturday-025.bin",
+      "png_file": "cards/saturday-025.png",
+      "framebuffer_crc32": "eecccd3b",
+      "framebuffer_sha256": "604e5738d67098c6ceb1ca803cc869449545a7f026aa0ff563ee5140676e1d0f",
+      "png_sha256": "cd5b7064ec4826e6d6df6fd93e3210406a80bf254d4bd0e40f720875006b9ec6"
+    },
+    {
+      "case": "sunday-151",
+      "dex_id": 151,
+      "name": "Mew",
+      "weekday": "Sunday",
+      "framebuffer_file": "cards/sunday-151.bin",
+      "png_file": "cards/sunday-151.png",
+      "framebuffer_crc32": "451233cf",
+      "framebuffer_sha256": "583a9009a72ece15d13d5c1c9d96204ed6692e9852f8d79334e3e153ffd6e943",
+      "png_sha256": "7994a183ebb6b7a2203427bb2346a16259192ff6acc54aeffc43cd9155117318"
+    }
+  ]
+}

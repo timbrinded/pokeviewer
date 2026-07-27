@@ -8,15 +8,20 @@ push to `main`.
 | `Host checks` | host quality and policy | `host-check-logs` |
 | `ESP32-S3 release` | target build and size | `esp32s3-release` |
 
-Host quality covers formatting, Clippy, tests, a locked build, dependency
-policy, and workflow syntax. Target validation installs pinned Xtensa Rust,
-performs locked release builds of the application and sleep diagnostic, and
-reports the linked application-firmware size.
+Host quality covers formatting, exact visual-golden comparison, Clippy, tests,
+a locked build, dependency policy, and workflow syntax. Target validation
+installs pinned Xtensa Rust, performs locked release builds of the application
+and sleep diagnostic, and reports the linked application-firmware size.
 
 Host commands do not set or inherit an embedded default target. The firmware
 job selects `xtensa-esp32s3-none-elf` through `cargo xtask firmware-build` and
 `cargo xtask sleep-diagnostic-build`. Neither job runs the content generator,
 so normal CI makes no PokéAPI request.
+
+The visual check uses only the committed content pack, renderer, raw 5,000-byte
+goldens, and manifest. If a frame changes, `visual-golden-diff` contains the
+expected, actual, and exact XOR PNG plus a coordinate/hash report for every
+changed case.
 
 Third-party actions are pinned to full commit SHAs. The comments beside action
 references record the reviewed release tag where one exists. Tool inputs also
@@ -49,6 +54,7 @@ cargo test --workspace --locked
 cargo check --workspace --all-targets --locked
 cargo deny --locked check
 actionlint
+cargo xtask golden-check target/visual-diff
 cargo xtask firmware-build
 cargo xtask sleep-diagnostic-build
 ```

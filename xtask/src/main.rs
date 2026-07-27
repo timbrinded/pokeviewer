@@ -5,6 +5,7 @@ use std::env;
 use std::process::{Command, ExitCode};
 
 mod content;
+mod golden;
 mod render;
 
 const ESP_TOOLCHAIN: &str = "esp-1.95.0.0";
@@ -48,6 +49,26 @@ fn main() -> ExitCode {
                 return fail("render-contact-sheet accepts at most one output file");
             }
             task_result(render::contact_sheet_command(output_file.as_deref()))
+        }
+        Some("golden-update") => {
+            if arguments.next().is_some() {
+                return fail("golden-update accepts no arguments");
+            }
+            task_result(golden::update_command())
+        }
+        Some("golden-check") => {
+            let diff_dir = arguments.next();
+            if arguments.next().is_some() {
+                return fail("golden-check accepts at most one diff directory");
+            }
+            task_result(golden::check_command(diff_dir.as_deref()))
+        }
+        Some("golden-demo-failure") => {
+            let output_dir = arguments.next();
+            if arguments.next().is_some() {
+                return fail("golden-demo-failure accepts at most one output directory");
+            }
+            task_result(golden::demo_failure_command(output_dir.as_deref()))
         }
         Some(command) => {
             eprintln!("unknown xtask command: {command}");
@@ -118,6 +139,11 @@ COMMANDS:
                       Render representative panel-native PBM and PNG evidence
     render-contact-sheet [OUTPUT_FILE]
                       Render all 151 cards into one actual-pixel PNG
+    golden-update     Explicitly regenerate reviewed raw and PNG goldens
+    golden-check [DIFF_DIR]
+                      Compare exact frames and emit failure artifacts
+    golden-demo-failure [OUTPUT_DIR]
+                      Capture a deterministic one-pixel failure example
     help              Print this help"
     );
 }

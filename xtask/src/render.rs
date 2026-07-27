@@ -33,18 +33,7 @@ pub(crate) fn samples_command(output_dir: Option<&str>) -> TaskResult {
         let record = pack
             .record(dex_id)
             .map_err(|error| format!("invalid record {dex_id}: {error:?}"))?;
-        let mut framebuffer = Framebuffer::default();
-        render_daily_card(
-            &mut framebuffer,
-            DailyCard {
-                weekday,
-                name: record.name,
-                primary_type: record.primary_type,
-                secondary_type: record.secondary_type,
-                sprite: record.sprite,
-            },
-        )
-        .map_err(|error| format!("record {dex_id} did not render: {error:?}"))?;
+        let framebuffer = render_record(&pack, dex_id, weekday)?;
 
         let stem = format!("{dex_id:03}");
         write_pbm(&output_dir.join(format!("{stem}.pbm")), &framebuffer)?;
@@ -72,21 +61,7 @@ pub(crate) fn contact_sheet_command(output_file: Option<&str>) -> TaskResult {
         ContentPack::parse(PACK).map_err(|error| format!("invalid content pack: {error:?}"))?;
     let mut sheet = vec![u8::MAX; SHEET_ROW_BYTES * SHEET_HEIGHT];
     for dex_id in 1..=151 {
-        let record = pack
-            .record(dex_id)
-            .map_err(|error| format!("invalid record {dex_id}: {error:?}"))?;
-        let mut framebuffer = Framebuffer::default();
-        render_daily_card(
-            &mut framebuffer,
-            DailyCard {
-                weekday: weekday_for_id(dex_id),
-                name: record.name,
-                primary_type: record.primary_type,
-                secondary_type: record.secondary_type,
-                sprite: record.sprite,
-            },
-        )
-        .map_err(|error| format!("record {dex_id} did not render: {error:?}"))?;
+        let framebuffer = render_record(&pack, dex_id, weekday_for_id(dex_id))?;
 
         let card_index = usize::from(dex_id - 1);
         let cell_x_bytes = card_index % COLUMNS * ((DISPLAY_WIDTH + GUTTER) / 8);
@@ -126,7 +101,35 @@ fn write_png(path: &Path, framebuffer: &Framebuffer) -> TaskResult {
     write_one_bit_png(path, DISPLAY_WIDTH, DISPLAY_HEIGHT, framebuffer.as_bytes())
 }
 
-fn write_one_bit_png(path: &Path, width: usize, height: usize, pixels: &[u8]) -> TaskResult {
+pub(crate) fn render_record(
+    pack: &ContentPack<'_>,
+    dex_id: u8,
+    weekday: Weekday,
+) -> Result<Framebuffer, String> {
+    let record = pack
+        .record(dex_id)
+        .map_err(|error| format!("invalid record {dex_id}: {error:?}"))?;
+    let mut framebuffer = Framebuffer::default();
+    render_daily_card(
+        &mut framebuffer,
+        DailyCard {
+            weekday,
+            name: record.name,
+            primary_type: record.primary_type,
+            secondary_type: record.secondary_type,
+            sprite: record.sprite,
+        },
+    )
+    .map_err(|error| format!("record {dex_id} did not render: {error:?}"))?;
+    Ok(framebuffer)
+}
+
+pub(crate) fn write_one_bit_png(
+    path: &Path,
+    width: usize,
+    height: usize,
+    pixels: &[u8],
+) -> TaskResult {
     create_parent(path)?;
     let file = fs::File::create(path)
         .map_err(|error| format!("failed to create {}: {error}", path.display()))?;

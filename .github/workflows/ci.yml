@@ -56,6 +56,22 @@ jobs:
           set -o pipefail
           cargo fmt --all --check 2>&1 | tee artifacts/host/format.log
 
+      - name: Verify visual goldens
+        id: visual_goldens
+        run: |
+          set -o pipefail
+          cargo xtask golden-check artifacts/visual-diff \
+            2>&1 | tee artifacts/host/visual-goldens.log
+
+      - name: Upload visual diff
+        if: ${{ failure() && steps.visual_goldens.outcome == 'failure' }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: visual-golden-diff
+          path: artifacts/visual-diff
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Lint
         run: |
           set -o pipefail
