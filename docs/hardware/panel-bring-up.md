@@ -42,9 +42,14 @@ panel rail.
 Expected terminal output is one of:
 
 ```text
-display diagnostics complete; panel rail off
-display diagnostics failed: <bounded reason>
+hardware diagnostics complete; RTC=<sanitized local datetime>; alarm_was_pending=<bool>; panel rail off
+hardware diagnostics failed: <bounded reason>
 ```
+
+The combined diagnostic validates the RTC before reporting success. Provision a
+valid RTC datetime first; an oscillator-stop indication is intentionally a
+failure. The panel sequence still runs if RTC validation fails so one hardware
+fault does not hide evidence about the other subsystem.
 
 ## Qualification evidence
 

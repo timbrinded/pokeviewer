@@ -9,7 +9,9 @@ the [v1.0.0 delivery issue](https://github.com/timbrinded/pokeviewer/issues/1).
 Firmware supports only the
 [documented V2 board contract](docs/hardware/v2-board-contract.md).
 Panel diagnostics follow the
-[e-paper bring-up procedure](docs/hardware/panel-bring-up.md).
+[e-paper bring-up procedure](docs/hardware/panel-bring-up.md), and RTC
+qualification follows the
+[PCF85063 bring-up procedure](docs/hardware/rtc-bring-up.md).
 
 ## V1 experience
 

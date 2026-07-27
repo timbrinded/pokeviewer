@@ -1,5 +1,6 @@
 //! Boundary around the pinned ESP HAL and supported V2 board.
 
+use embassy_futures::block_on;
 use embedded_graphics::{
     Drawable,
     mono_font::{MonoTextStyle, ascii::FONT_6X10},
@@ -16,6 +17,7 @@ use epd_waveshare::{
 use esp_hal::{
     delay::Delay,
     gpio::{Input, InputConfig, Level, Output, OutputConfig},
+    i2c::master::{Config as I2cConfig, I2c},
     spi::{
         Mode,
         master::{Config, Spi},
@@ -23,20 +25,43 @@ use esp_hal::{
     time::Rate,
 };
 
-use crate::bounded_busy::{BoundedBusy, BusyState};
+use crate::{
+    LocalDateTime, Pcf85063Rtc, Rtc,
+    bounded_busy::{BoundedBusy, BusyState},
+};
 
 const BUSY_POLL_US: u32 = 10_000;
 const BUSY_MAX_POLLS: u32 = 500;
 static PANEL_BUSY_STATE: BusyState = BusyState::new();
 
-/// Run the five panel bring-up frames, leaving the text frame visible.
-pub fn run_display_diagnostics() -> Result<(), &'static str> {
+/// Successful RTC observations from the combined hardware diagnostic.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct HardwareDiagnosticReport {
+    /// RTC value read back after writing the same valid value.
+    pub rtc_datetime: LocalDateTime,
+    /// Whether an alarm was pending before it was cleared and reconfigured.
+    pub alarm_was_pending: bool,
+}
+
+/// Run RTC and panel bring-up diagnostics while enforcing board power states.
+pub fn run_hardware_diagnostics() -> Result<HardwareDiagnosticReport, &'static str> {
     let peripherals = esp_hal::init(esp_hal::Config::default());
+    let _power_latch = Output::new(peripherals.GPIO17, Level::High, OutputConfig::default());
     let mut panel_power = Output::new(peripherals.GPIO6, Level::High, OutputConfig::default());
     let _audio_power = Output::new(peripherals.GPIO42, Level::High, OutputConfig::default());
 
+    let i2c = I2c::new(
+        peripherals.I2C0,
+        I2cConfig::default().with_frequency(Rate::from_khz(100)),
+    )
+    .map_err(|_| "invalid I2C configuration")?
+    .with_sda(peripherals.GPIO47)
+    .with_scl(peripherals.GPIO48)
+    .into_async();
+    let rtc_result = run_rtc_diagnostics(Pcf85063Rtc::new(i2c));
+
     panel_power.set_low();
-    let result = (|| {
+    let panel_result = (|| {
         let busy = BoundedBusy::new(
             Input::new(peripherals.GPIO8, InputConfig::default()),
             BUSY_MAX_POLLS,
@@ -100,7 +125,55 @@ pub fn run_display_diagnostics() -> Result<(), &'static str> {
         check_busy()
     })();
     panel_power.set_high();
-    result
+    panel_result?;
+    rtc_result
+}
+
+fn run_rtc_diagnostics<I2cBus>(
+    mut rtc: Pcf85063Rtc<I2cBus>,
+) -> Result<HardwareDiagnosticReport, &'static str>
+where
+    I2cBus: embedded_hal_async::i2c::I2c,
+{
+    block_on(async {
+        let datetime = rtc
+            .read_datetime()
+            .await
+            .map_err(|_| "RTC read or oscillator validation failed")?;
+        rtc.set_datetime(datetime)
+            .await
+            .map_err(|_| "RTC write failed")?;
+        let readback = rtc
+            .read_datetime()
+            .await
+            .map_err(|_| "RTC readback failed")?;
+        if readback != datetime {
+            return Err("RTC set/read mismatch");
+        }
+
+        let alarm_was_pending = rtc
+            .alarm_pending()
+            .await
+            .map_err(|_| "RTC alarm flag read failed")?;
+        rtc.clear_alarm()
+            .await
+            .map_err(|_| "RTC alarm flag clear failed")?;
+        if rtc
+            .alarm_pending()
+            .await
+            .map_err(|_| "RTC cleared flag readback failed")?
+        {
+            return Err("RTC alarm flag remained asserted");
+        }
+        rtc.configure_daily_alarm()
+            .await
+            .map_err(|_| "RTC alarm configuration failed")?;
+
+        Ok(HardwareDiagnosticReport {
+            rtc_datetime: readback,
+            alarm_was_pending,
+        })
+    })
 }
 
 fn refresh<SpiDeviceType, BusyPin, DcPin, ResetPin, DelayType>(

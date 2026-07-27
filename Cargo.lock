@@ -1040,6 +1040,7 @@ dependencies = [
 name = "pokeviewer-firmware"
 version = "0.1.0"
 dependencies = [
+ "embassy-futures",
  "embedded-graphics",
  "embedded-hal 1.0.0",
  "embedded-hal-async",
@@ -1051,6 +1052,7 @@ dependencies = [
  "esp-println",
  "pcf85063a",
  "pokeviewer-core",
+ "time",
 ]
 
 [[package]]
