@@ -97,7 +97,11 @@ jobs:
             'release/**/*.md' \
             2>&1 | tee artifacts/host/markdownlint.log
           git ls-files -z '*.md' \
-            | xargs -0 lychee --no-progress \
+            | xargs -0 lychee \
+              --no-progress \
+              --max-concurrency 32 \
+              --max-retries 6 \
+              --retry-wait-time 2 \
             2>&1 | tee artifacts/host/links.log
 
       - name: Check dependency policy
