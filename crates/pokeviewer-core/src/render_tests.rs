@@ -1,7 +1,7 @@
 use super::{
     DailyCard, Framebuffer, NAME_SCALE, NAME_Y, PRIMARY_TYPE_Y, RenderError, SECONDARY_TYPE_Y,
     SINGLE_TYPE_Y, SPRITE_SCALE, SPRITE_Y, TYPE_SCALE, WEEKDAY_SCALE, WEEKDAY_Y, render_daily_card,
-    text_width, type_label,
+    render_setup_screen, text_width, type_label,
 };
 use crate::{CONTENT_SPRITE_BYTES, ContentPack, FRAMEBUFFER_BYTES, PokemonType, Weekday};
 
@@ -144,4 +144,15 @@ fn fixed_layout_bands_are_disjoint_and_fit_every_label() {
             assert!(text_width(type_label(secondary).chars().count(), TYPE_SCALE) <= 200);
         }
     }
+}
+
+#[test]
+fn setup_screen_is_deterministic_and_identifies_the_recovery_tool() {
+    let mut first = Framebuffer::default();
+    let mut second = Framebuffer::default();
+    render_setup_screen(&mut first);
+    render_setup_screen(&mut second);
+
+    assert_eq!(first, second);
+    assert_eq!(crc32fast::hash(first.as_bytes()), 0x063c_ff9d);
 }

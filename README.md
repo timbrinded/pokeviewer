@@ -84,3 +84,5 @@ Exact framebuffer regressions are covered by the
 [visual-golden workflow](docs/development/visual-testing.md).
 Wired RTC provisioning uses the versioned
 [USB protocol](docs/usb-protocol-v1.md) and Linux `pokeviewerctl` utility.
+Invalid clocks are governed by the
+[RTC setup and recovery contract](docs/rtc-recovery.md).

@@ -147,6 +147,15 @@ pub fn render_daily_card(
     Ok(())
 }
 
+/// Render the fixed adult-facing invalid-RTC recovery screen.
+pub fn render_setup_screen(framebuffer: &mut Framebuffer) {
+    framebuffer.clear_white();
+    draw_centered_text(framebuffer, "SET TIME", 18, 3);
+    draw_centered_text(framebuffer, "CONNECT USB", 79, 2);
+    draw_centered_text(framebuffer, "RUN", 112, 2);
+    draw_centered_text(framebuffer, "POKEVIEWERCTL", 143, 2);
+}
+
 fn validate_card(card: DailyCard<'_>) -> Result<(), RenderError> {
     if card.name.is_empty() {
         return Err(RenderError::EmptyName);

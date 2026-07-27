@@ -8,6 +8,7 @@ use std::{
 
 use pokeviewer_core::{
     ContentPack, DISPLAY_HEIGHT, DISPLAY_WIDTH, DailyCard, Framebuffer, Weekday, render_daily_card,
+    render_setup_screen,
 };
 
 type TaskResult = Result<(), String>;
@@ -15,6 +16,7 @@ type TaskResult = Result<(), String>;
 const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v1.pack");
 const DEFAULT_OUTPUT: &str = "target/render-samples";
 const DEFAULT_CONTACT_SHEET: &str = "target/all-cards-contact-sheet.png";
+const DEFAULT_SETUP_SCREEN: &str = "target/setup-screen.png";
 const SAMPLES: [(u8, Weekday); 4] = [
     (25, Weekday::Monday),
     (6, Weekday::Tuesday),
@@ -81,6 +83,19 @@ pub(crate) fn contact_sheet_command(output_file: Option<&str>) -> TaskResult {
         output_file.display(),
         SHEET_WIDTH,
         SHEET_HEIGHT
+    );
+    Ok(())
+}
+
+pub(crate) fn setup_screen_command(output_file: Option<&str>) -> TaskResult {
+    let output_file = PathBuf::from(output_file.unwrap_or(DEFAULT_SETUP_SCREEN));
+    let mut framebuffer = Framebuffer::default();
+    render_setup_screen(&mut framebuffer);
+    write_png(&output_file, &framebuffer)?;
+    println!(
+        "{}: setup screen (CRC-32 {:08x})",
+        output_file.display(),
+        crc32fast::hash(framebuffer.as_bytes())
     );
     Ok(())
 }

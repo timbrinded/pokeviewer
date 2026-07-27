@@ -5,6 +5,7 @@
 mod content;
 mod font;
 mod protocol;
+mod recovery;
 mod render;
 mod schedule;
 
@@ -13,7 +14,8 @@ pub use protocol::{
     Command, EncodedFrame, FrameAccumulator, FrameError, FrameKind, ProtocolFrame, Status,
     decode_datetime, encode_datetime,
 };
-pub use render::{DailyCard, Framebuffer, RenderError, render_daily_card};
+pub use recovery::{RecoveryState, SetupReason, assess_rtc};
+pub use render::{DailyCard, Framebuffer, RenderError, render_daily_card, render_setup_screen};
 pub use schedule::{
     DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,
     select_daily_pokemon,

@@ -53,6 +53,13 @@ fn main() -> ExitCode {
             }
             task_result(render::contact_sheet_command(output_file.as_deref()))
         }
+        Some("render-setup-screen") => {
+            let output_file = arguments.next();
+            if arguments.next().is_some() {
+                return fail("render-setup-screen accepts at most one output file");
+            }
+            task_result(render::setup_screen_command(output_file.as_deref()))
+        }
         Some("golden-update") => {
             if arguments.next().is_some() {
                 return fail("golden-update accepts no arguments");
@@ -146,6 +153,8 @@ COMMANDS:
                       Render representative panel-native PBM and PNG evidence
     render-contact-sheet [OUTPUT_FILE]
                       Render all 151 cards into one actual-pixel PNG
+    render-setup-screen [OUTPUT_FILE]
+                      Render the adult invalid-RTC recovery screen
     golden-update     Explicitly regenerate reviewed raw and PNG goldens
     golden-check [DIFF_DIR]
                       Compare exact frames and emit failure artifacts
