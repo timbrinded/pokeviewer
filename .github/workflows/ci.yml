@@ -56,22 +56,6 @@ jobs:
           set -o pipefail
           cargo fmt --all --check 2>&1 | tee artifacts/host/format.log
 
-      - name: Verify visual goldens
-        id: visual_goldens
-        run: |
-          set -o pipefail
-          cargo xtask golden-check artifacts/visual-diff \
-            2>&1 | tee artifacts/host/visual-goldens.log
-
-      - name: Upload visual diff
-        if: ${{ failure() && steps.visual_goldens.outcome == 'failure' }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
-        with:
-          name: visual-golden-diff
-          path: artifacts/visual-diff
-          if-no-files-found: warn
-          retention-days: 14
-
       - name: Lint
         run: |
           set -o pipefail
@@ -89,6 +73,12 @@ jobs:
           cargo check --workspace --all-targets --locked \
             2>&1 | tee artifacts/host/check.log
 
+      - name: Check documentation
+        run: |
+          set -o pipefail
+          RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked \
+            2>&1 | tee artifacts/host/docs.log
+
       - name: Check dependency policy
         run: |
           set -o pipefail
@@ -99,12 +89,112 @@ jobs:
           set -o pipefail
           actionlint 2>&1 | tee artifacts/host/actionlint.log
 
+      - name: Verify Linux CLI reproducibility
+        run: |
+          export SOURCE_DATE_EPOCH
+          SOURCE_DATE_EPOCH=$(git show -s --format=%ct)
+          cargo build -p pokeviewerctl --release --locked
+          sha256sum target/release/pokeviewerctl \
+            | awk '{ print $1 }' > artifacts/host/cli-first.sha256
+          cargo clean -p pokeviewerctl
+          cargo build -p pokeviewerctl --release --locked
+          sha256sum target/release/pokeviewerctl \
+            | awk '{ print $1 }' > artifacts/host/cli-second.sha256
+          diff -u \
+            artifacts/host/cli-first.sha256 \
+            artifacts/host/cli-second.sha256
+
       - name: Upload host logs
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
         with:
           name: host-check-logs
           path: artifacts/host
+          if-no-files-found: warn
+          retention-days: 14
+
+  content:
+    name: Offline content integrity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install host Rust
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: 1.96.0
+
+      - name: Rebuild committed content without network
+        run: |
+          cargo xtask content-build
+          git diff --exit-code -- content/generated
+          sha256sum \
+            content/generated/pokeviewer-v1.pack \
+            content/generated/pokeviewer-v1.json \
+            > content-hashes.txt
+
+      - name: Upload content proof
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: content-integrity
+          path: content-hashes.txt
+          retention-days: 14
+
+  protocol:
+    name: Protocol compatibility
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install host Rust
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: 1.96.0
+
+      - name: Test protocol codec and command handling
+        run: |
+          cargo test -p pokeviewer-core protocol:: --locked
+          cargo test -p pokeviewer-firmware protocol:: --locked
+          cargo test -p pokeviewerctl --locked
+
+  visual:
+    name: Visual and recovery goldens
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install host Rust
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: 1.96.0
+
+      - name: Verify visual goldens
+        id: visual_goldens
+        run: |
+          cargo xtask golden-check artifacts/visual-diff
+          cargo xtask render-recovery-screens artifacts/recovery-screens
+          for image in rtc pack panel alarm wake; do
+            cmp "artifacts/recovery-screens/$image.png" \
+              "docs/evidence/recovery-screens/$image.png"
+          done
+          cargo xtask golden-demo-failure artifacts/golden-failure-demo
+          sha256sum \
+            tests/goldens/cards/*.bin \
+            docs/evidence/recovery-screens/*.png \
+            > artifacts/visual-hashes.txt
+
+      - name: Upload visual proof
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: visual-proof
+          path: |
+            artifacts/visual-diff
+            artifacts/golden-failure-demo
+            artifacts/visual-hashes.txt
           if-no-files-found: warn
           retention-days: 14
 
@@ -142,6 +232,9 @@ jobs:
       - name: Prepare logs
         run: mkdir -p artifacts/firmware
 
+      - name: Fix reproducible build timestamp
+        run: echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct)" >> "$GITHUB_ENV"
+
       - name: Build locked release firmware
         run: |
           set -o pipefail
@@ -151,16 +244,30 @@ jobs:
           cargo xtask usb-provisioning-build \
             2>&1 | tee artifacts/firmware/usb-provisioning-build.log
 
-      - name: Report firmware size
+      - name: Verify firmware entry point, budgets, and deterministic sections
         run: |
           set -o pipefail
           firmware=target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
-          xtensa-esp-elf-size "$firmware" \
-            2>&1 | tee artifacts/firmware/size.txt
+          scripts/check-firmware-artifact.sh \
+            "$firmware" artifacts/firmware/first
+          if FIRMWARE_TEXT_MAX=1 scripts/check-firmware-artifact.sh \
+            "$firmware" artifacts/firmware/expected-size-failure; then
+            echo "size-budget failure demonstration unexpectedly passed" >&2
+            exit 1
+          fi
+          cargo clean -p pokeviewer-firmware --target xtensa-esp32s3-none-elf
+          cargo xtask firmware-build
+          scripts/check-firmware-artifact.sh \
+            "$firmware" artifacts/firmware/second
+          cargo xtask sleep-diagnostic-build
+          cargo xtask usb-provisioning-build
+          diff -u \
+            artifacts/firmware/first/section-hashes.txt \
+            artifacts/firmware/second/section-hashes.txt
           {
-            echo "## ESP32-S3 firmware size"
+            echo "## ESP32-S3 firmware budgets"
             echo '```text'
-            cat artifacts/firmware/size.txt
+            cat artifacts/firmware/second/budgets.txt
             echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
 
@@ -176,3 +283,20 @@ jobs:
             target/xtensa-esp32s3-none-elf/release/pokeviewer-usb-provisioning
           if-no-files-found: warn
           retention-days: 14
+
+  release-gate:
+    name: Release matrix
+    if: always()
+    needs:
+      - host
+      - content
+      - protocol
+      - visual
+      - firmware
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require every release-grade job
+        env:
+          RESULTS: ${{ join(needs.*.result, ' ') }}
+        run: |
+          test "$RESULTS" = "success success success success success"

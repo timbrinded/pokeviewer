@@ -56,15 +56,15 @@ The 2026-07-27 release build reports:
 
 | Region or allocation | Bytes | Interpretation |
 | --- | ---: | --- |
-| linked text | 144,117 | code plus read-only payload reported by `llvm-size` |
-| linked data | 7,156 | initialized RAM |
+| linked text | 157,957 | code plus read-only payload reported by `llvm-size` |
+| linked data | 7,340 | initialized RAM |
 | explicit `.bss` | 40 | zero-initialized statics |
-| linker `.stack` region | 328,392 | remaining reserved DRAM region, not measured use |
+| linker `.stack` region | 328,208 | remaining reserved DRAM region, not measured use |
 | application framebuffer | 5,000 | fixed stack allocation, included in stack use |
 | offline pack source | 61,390 | flash-resident input before section/link packing |
-| complete debug ELF | 2,818,948 | not the flashed payload size |
+| complete debug ELF | 2,991,924 | not the flashed payload size |
 
-The linker leaves a 328,392-byte stack region after static placement, while the
+The linker leaves a 328,208-byte stack region after static placement, while the
 largest application-owned working buffer is 5,000 bytes. This is substantial
 static headroom for the fixed no-heap path. A hardware high-water measurement
 and panel photographs remain pending serial permission; the linker region must
