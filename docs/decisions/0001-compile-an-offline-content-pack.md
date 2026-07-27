@@ -75,5 +75,6 @@ byte-identical.
 ## More Information
 
 - [V1 product contract](../product-contract.md)
+- [Content-pack and daily-schedule contract v1](../content-pack-v1.md)
 - [PokéAPI v2 fair-use policy](https://pokeapi.co/docs/v2)
 - [Decision issue #2](https://github.com/timbrinded/pokeviewer/issues/2)

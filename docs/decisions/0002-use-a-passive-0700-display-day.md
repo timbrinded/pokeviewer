@@ -71,4 +71,5 @@ before the alarm and changes exactly once after it.
 ## More Information
 
 - [V1 product contract](../product-contract.md)
+- [Content-pack and daily-schedule contract v1](../content-pack-v1.md)
 - [Decision issue #2](https://github.com/timbrinded/pokeviewer/issues/2)
