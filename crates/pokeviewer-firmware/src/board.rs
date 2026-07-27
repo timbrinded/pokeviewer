@@ -19,6 +19,7 @@ use esp_hal::{
 use crate::{
     LocalDateTime, Pcf85063Rtc, Rtc,
     panel::{PanelDiagnostic, run_panel_diagnostics},
+    usb_protocol::UsbProtocolTransport,
 };
 
 struct SleepResources {
@@ -75,6 +76,35 @@ pub fn run_sleep_diagnostic() -> ! {
                 core::hint::spin_loop();
             }
         }
+    }
+}
+
+/// Run the bounded wired provisioning server without enabling wireless radios.
+pub fn run_usb_provisioning() -> ! {
+    let peripherals = esp_hal::init(esp_hal::Config::default());
+    let _power_latch = Output::new(peripherals.GPIO17, Level::High, OutputConfig::default());
+    let _panel_power = Output::new(peripherals.GPIO6, Level::High, OutputConfig::default());
+    let _audio_power = Output::new(peripherals.GPIO42, Level::High, OutputConfig::default());
+    let i2c = match I2c::new(
+        peripherals.I2C0,
+        I2cConfig::default().with_frequency(Rate::from_khz(100)),
+    ) {
+        Ok(i2c) => i2c
+            .with_sda(peripherals.GPIO47)
+            .with_scl(peripherals.GPIO48)
+            .into_async(),
+        Err(_) => loop {
+            core::hint::spin_loop();
+        },
+    };
+    let mut rtc = Pcf85063Rtc::new(i2c);
+    let mut transport = UsbProtocolTransport::new(peripherals.USB_DEVICE);
+    let mut delay = Delay::new();
+    loop {
+        if block_on(transport.poll(&mut rtc, 0)).is_err() {
+            transport.reset_partial_frame();
+        }
+        delay.delay_ms(1);
     }
 }
 

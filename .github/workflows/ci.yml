@@ -148,6 +148,8 @@ jobs:
           cargo xtask firmware-build 2>&1 | tee artifacts/firmware/build.log
           cargo xtask sleep-diagnostic-build \
             2>&1 | tee artifacts/firmware/sleep-diagnostic-build.log
+          cargo xtask usb-provisioning-build \
+            2>&1 | tee artifacts/firmware/usb-provisioning-build.log
 
       - name: Report firmware size
         run: |
@@ -171,5 +173,6 @@ jobs:
             artifacts/firmware
             target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
             target/xtensa-esp32s3-none-elf/release/pokeviewer-sleep-diagnostic
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-usb-provisioning
           if-no-files-found: warn
           retention-days: 14

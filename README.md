@@ -82,3 +82,5 @@ The selected [v1 daily-card design](docs/design/daily-card-v1.md) fixes the
 four-element visual hierarchy and indexes the complete 151-card review sheet.
 Exact framebuffer regressions are covered by the
 [visual-golden workflow](docs/development/visual-testing.md).
+Wired RTC provisioning uses the versioned
+[USB protocol](docs/usb-protocol-v1.md) and Linux `pokeviewerctl` utility.

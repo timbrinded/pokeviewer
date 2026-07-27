@@ -15,8 +15,8 @@ and sleep diagnostic, and reports the linked application-firmware size.
 
 Host commands do not set or inherit an embedded default target. The firmware
 job selects `xtensa-esp32s3-none-elf` through `cargo xtask firmware-build` and
-`cargo xtask sleep-diagnostic-build`. Neither job runs the content generator,
-so normal CI makes no PokéAPI request.
+the sleep-diagnostic and USB-provisioning build commands. Neither job runs the
+content generator, so normal CI makes no PokéAPI request.
 
 The visual check uses only the committed content pack, renderer, raw 5,000-byte
 goldens, and manifest. If a frame changes, `visual-golden-diff` contains the
@@ -57,6 +57,7 @@ actionlint
 cargo xtask golden-check target/visual-diff
 cargo xtask firmware-build
 cargo xtask sleep-diagnostic-build
+cargo xtask usb-provisioning-build
 ```
 
 The final command requires the embedded setup in the

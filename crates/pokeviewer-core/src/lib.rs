@@ -4,10 +4,15 @@
 
 mod content;
 mod font;
+mod protocol;
 mod render;
 mod schedule;
 
 pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
+pub use protocol::{
+    Command, EncodedFrame, FrameAccumulator, FrameError, FrameKind, ProtocolFrame, Status,
+    decode_datetime, encode_datetime,
+};
 pub use render::{DailyCard, Framebuffer, RenderError, render_daily_card};
 pub use schedule::{
     DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,

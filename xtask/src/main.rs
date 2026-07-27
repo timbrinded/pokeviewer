@@ -13,6 +13,7 @@ const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
 const ESP_TARGET: &str = "xtensa-esp32s3-none-elf";
 const RELEASE_FIRMWARE: &str = "pokeviewer-firmware";
 const SLEEP_DIAGNOSTIC: &str = "pokeviewer-sleep-diagnostic";
+const USB_PROVISIONING: &str = "pokeviewer-usb-provisioning";
 
 fn main() -> ExitCode {
     let mut arguments = env::args().skip(1);
@@ -25,6 +26,8 @@ fn main() -> ExitCode {
         Some("firmware-flash") => run_cargo(&firmware_args("run", RELEASE_FIRMWARE)),
         Some("sleep-diagnostic-build") => run_cargo(&firmware_args("build", SLEEP_DIAGNOSTIC)),
         Some("sleep-diagnostic-flash") => run_cargo(&firmware_args("run", SLEEP_DIAGNOSTIC)),
+        Some("usb-provisioning-build") => run_cargo(&firmware_args("build", USB_PROVISIONING)),
+        Some("usb-provisioning-flash") => run_cargo(&firmware_args("run", USB_PROVISIONING)),
         Some("content-fetch") => {
             let cache_dir = arguments.next();
             if arguments.next().is_some() {
@@ -131,6 +134,10 @@ COMMANDS:
                       Build RTC wake/deep-sleep diagnostic firmware
     sleep-diagnostic-flash
                       Build, flash, and monitor sleep diagnostic firmware
+    usb-provisioning-build
+                      Build the bounded wired RTC provisioning firmware
+    usb-provisioning-flash
+                      Build, flash, and monitor wired provisioning firmware
     content-fetch [CACHE_DIR]
                       Explicitly fetch IDs 1-151 into a new review cache
     content-build [CACHE_DIR] [PACK_FILE] [MANIFEST_FILE]
@@ -150,7 +157,7 @@ COMMANDS:
 
 #[cfg(test)]
 mod tests {
-    use super::{ESP_TARGET, RELEASE_FIRMWARE, SLEEP_DIAGNOSTIC, firmware_args};
+    use super::{ESP_TARGET, RELEASE_FIRMWARE, SLEEP_DIAGNOSTIC, USB_PROVISIONING, firmware_args};
 
     #[test]
     fn firmware_commands_select_the_embedded_target() {
@@ -167,5 +174,13 @@ mod tests {
 
         assert_eq!(args[1], "run");
         assert!(args.contains(&SLEEP_DIAGNOSTIC));
+    }
+
+    #[test]
+    fn usb_provisioning_selects_its_own_binary() {
+        let args = firmware_args("build", USB_PROVISIONING);
+
+        assert_eq!(args[1], "build");
+        assert!(args.contains(&USB_PROVISIONING));
     }
 }
