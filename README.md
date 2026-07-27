@@ -39,3 +39,25 @@ Public project evidence must follow the
 
 Significant decisions are recorded in the
 [architecture decision log](docs/decisions/README.md).
+
+## Development
+
+The repository is a Cargo workspace:
+
+| Package | Responsibility |
+| --- | --- |
+| `pokeviewer-core` | deterministic `no_std` domain and rendering logic |
+| `pokeviewer-firmware` | supported-board hardware integration |
+| `pokeviewerctl` | Linux USB provisioning and diagnostics |
+| `xtask` | repository-local automation |
+
+From the repository root:
+
+```console
+cargo fmt --all --check
+cargo clippy --workspace --all-targets -- -D warnings
+cargo test --workspace
+cargo run -p xtask -- help
+```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for development and review rules.

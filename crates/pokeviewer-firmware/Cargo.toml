@@ -1,0 +1,15 @@
+[package]
+name = "pokeviewer-firmware"
+description = "Board-specific no_std firmware for Pokeviewer"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[dependencies]
+pokeviewer-core = { path = "../pokeviewer-core" }
+
+[lints]
+workspace = true

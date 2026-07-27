@@ -1,0 +1,24 @@
+#![no_std]
+#![forbid(unsafe_code)]
+#![doc = "Deterministic domain and rendering logic shared by firmware and host tests."]
+
+/// Width of the supported e-paper panel in pixels.
+pub const DISPLAY_WIDTH: usize = 200;
+
+/// Height of the supported e-paper panel in pixels.
+pub const DISPLAY_HEIGHT: usize = 200;
+
+/// Bytes required for a one-bit full-screen framebuffer.
+pub const FRAMEBUFFER_BYTES: usize = DISPLAY_WIDTH * DISPLAY_HEIGHT / 8;
+
+#[cfg(test)]
+mod tests {
+    use super::{DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES};
+
+    #[test]
+    fn framebuffer_matches_board_contract() {
+        assert_eq!(DISPLAY_WIDTH, 200);
+        assert_eq!(DISPLAY_HEIGHT, 200);
+        assert_eq!(FRAMEBUFFER_BYTES, 5_000);
+    }
+}
