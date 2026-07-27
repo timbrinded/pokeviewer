@@ -49,3 +49,9 @@ contains Pikachu, Charizard, Farfetch’d, and Nidoran♀. These exercise
 single/dual types, short/long names, punctuation, a non-ASCII glyph, and
 different source-sprite dimensions. Visual styling is reviewed and locked by
 the separate daily-card design issue.
+
+Generate the full row-major 151-card review sheet with:
+
+```console
+cargo xtask render-contact-sheet target/all-cards-contact-sheet.png
+```

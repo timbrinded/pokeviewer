@@ -42,6 +42,13 @@ fn main() -> ExitCode {
             }
             task_result(render::samples_command(output_dir.as_deref()))
         }
+        Some("render-contact-sheet") => {
+            let output_file = arguments.next();
+            if arguments.next().is_some() {
+                return fail("render-contact-sheet accepts at most one output file");
+            }
+            task_result(render::contact_sheet_command(output_file.as_deref()))
+        }
         Some(command) => {
             eprintln!("unknown xtask command: {command}");
             ExitCode::from(2)
@@ -109,6 +116,8 @@ COMMANDS:
                       Build a deterministic pack without network access
     render-samples [OUTPUT_DIR]
                       Render representative panel-native PBM and PNG evidence
+    render-contact-sheet [OUTPUT_FILE]
+                      Render all 151 cards into one actual-pixel PNG
     help              Print this help"
     );
 }

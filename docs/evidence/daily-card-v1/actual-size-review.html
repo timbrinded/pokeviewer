@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pokeviewer v1 actual-size card review</title>
+  <style>
+    @page { margin: 15mm; }
+    body { color: #000; font: 12pt sans-serif; }
+    p { max-width: 150mm; }
+    .cards { display: grid; grid-template-columns: repeat(2, 39.1mm); gap: 12mm; }
+    figure { margin: 0; }
+    img {
+      display: block;
+      width: 39.1mm;
+      height: 39.1mm;
+      image-rendering: pixelated;
+    }
+    figcaption { font-size: 8pt; margin-top: 2mm; text-align: center; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Pokeviewer v1 actual-size review</h1>
+    <p>
+      Print at 100% or “actual size”; disable fit-to-page scaling. Measure each
+      image as 39.1 mm square before assessing handheld readability.
+    </p>
+    <section class="cards" aria-label="Representative daily cards">
+      <figure>
+        <img src="../renderer-baseline/025.png" alt="Pikachu card" width="200" height="200">
+        <figcaption>Pikachu — single type</figcaption>
+      </figure>
+      <figure>
+        <img src="../renderer-baseline/006.png" alt="Charizard card" width="200" height="200">
+        <figcaption>Charizard — dual type</figcaption>
+      </figure>
+      <figure>
+        <img src="../renderer-baseline/083.png" alt="Farfetch’d card" width="200" height="200">
+        <figcaption>Farfetch’d — widest name</figcaption>
+      </figure>
+      <figure>
+        <img src="../renderer-baseline/029.png" alt="Nidoran female card" width="200" height="200">
+        <figcaption>Nidoran♀ — symbol glyph</figcaption>
+      </figure>
+    </section>
+  </main>
+</body>
+</html>

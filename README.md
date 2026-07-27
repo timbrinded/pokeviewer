@@ -78,3 +78,5 @@ cache refresh and offline pack conversion are documented in the
 [content tooling guide](docs/development/content-tooling.md).
 The [shared-renderer guide](docs/development/rendering.md) documents the exact
 panel buffer, host evidence command, and renderer memory budget.
+The selected [v1 daily-card design](docs/design/daily-card-v1.md) fixes the
+four-element visual hierarchy and indexes the complete 151-card review sheet.
