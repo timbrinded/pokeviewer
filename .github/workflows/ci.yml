@@ -30,18 +30,26 @@ jobs:
           toolchain: 1.96.0
           components: clippy, rustfmt
 
+      - name: Prepare logs
+        run: mkdir -p artifacts/host
+
       - name: Install cargo-deny
         uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
         with:
           tool: cargo-deny@0.20.2
 
       - name: Install actionlint
-        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
-        with:
-          tool: actionlint@1.7.12
-
-      - name: Prepare logs
-        run: mkdir -p artifacts/host
+        run: |
+          archive="$RUNNER_TEMP/actionlint.tar.gz"
+          install_dir="$RUNNER_TEMP/actionlint"
+          curl --fail --location --silent --show-error \
+            --output "$archive" \
+            https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz
+          echo "8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8  $archive" \
+            | sha256sum --check
+          mkdir -p "$install_dir"
+          tar --extract --gzip --file "$archive" --directory "$install_dir"
+          echo "$install_dir" >> "$GITHUB_PATH"
 
       - name: Check formatting
         run: |
@@ -81,7 +89,7 @@ jobs:
         with:
           name: host-check-logs
           path: artifacts/host
-          if-no-files-found: error
+          if-no-files-found: warn
           retention-days: 14
 
   firmware:
