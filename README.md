@@ -93,3 +93,5 @@ Battery operation follows the
 capacity must be calculated from [measured current](docs/hardware/battery-sizing.md).
 Expected faults follow the
 [bounded failure and recovery contract](docs/hardware/failure-recovery.md).
+Hardware releases must pass the
+[V2 qualification procedure](docs/hardware/release-qualification.md).
