@@ -86,3 +86,5 @@ Wired RTC provisioning uses the versioned
 [USB protocol](docs/usb-protocol-v1.md) and Linux `pokeviewerctl` utility.
 Invalid clocks are governed by the
 [RTC setup and recovery contract](docs/rtc-recovery.md).
+The normal V2 firmware composition and current memory budget are documented in
+[on-device integration](docs/development/on-device-integration.md).

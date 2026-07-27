@@ -17,10 +17,11 @@ use esp_hal::{
 };
 
 use crate::{
-    LocalDateTime, Pcf85063Rtc, Rtc,
-    panel::{PanelDiagnostic, run_panel_diagnostics},
+    LocalDateTime, Pcf85063Rtc, Pcf85063RtcError, Rtc, Screen,
+    panel::{PanelDiagnostic, refresh_panel_frame, run_panel_diagnostics},
     usb_protocol::UsbProtocolTransport,
 };
+use pokeviewer_core::{Framebuffer, RecoveryState, SetupReason, assess_rtc};
 
 struct SleepResources {
     rtc_interrupt: GPIO5<'static>,
@@ -42,6 +43,36 @@ pub struct HardwareDiagnosticReport {
 /// Run RTC and panel bring-up diagnostics while enforcing board power states.
 pub fn run_hardware_diagnostics() -> Result<HardwareDiagnosticReport, &'static str> {
     run_board_diagnostics(PanelDiagnostic::Full, true).map(|(report, _)| report)
+}
+
+/// Render one complete offline application frame on the supported V2 board.
+///
+/// A valid RTC produces a daily card. An invalid RTC produces the retained
+/// setup screen and starts bounded wired provisioning; a successful set and
+/// read-back restarts into the normal boot path.
+pub fn run_pokeviewer() -> ! {
+    match run_application_once() {
+        Ok(ApplicationRun::Daily { crc32 }) => {
+            esp_println::println!("daily card retained; framebuffer_crc32={crc32:08x}");
+            loop {
+                core::hint::spin_loop();
+            }
+        }
+        Ok(ApplicationRun::Setup {
+            crc32,
+            mut rtc,
+            usb_device,
+        }) => {
+            esp_println::println!("RTC setup required; framebuffer_crc32={crc32:08x}");
+            serve_setup(&mut rtc, usb_device);
+        }
+        Err(error) => {
+            esp_println::println!("application failed: {error}");
+            loop {
+                core::hint::spin_loop();
+            }
+        }
+    }
 }
 
 /// Refresh one frame, validate RTC state, and enter active-low RTC deep sleep.
@@ -105,6 +136,92 @@ pub fn run_usb_provisioning() -> ! {
             transport.reset_partial_frame();
         }
         delay.delay_ms(1);
+    }
+}
+
+type BoardI2c = esp_hal::i2c::master::I2c<'static, esp_hal::Async>;
+type BoardRtc = Pcf85063Rtc<BoardI2c>;
+
+enum ApplicationRun {
+    Daily {
+        crc32: u32,
+    },
+    Setup {
+        crc32: u32,
+        rtc: BoardRtc,
+        usb_device: esp_hal::peripherals::USB_DEVICE<'static>,
+    },
+}
+
+fn run_application_once() -> Result<ApplicationRun, &'static str> {
+    let peripherals = esp_hal::init(esp_hal::Config::default());
+    let _power_latch = Output::new(peripherals.GPIO17, Level::High, OutputConfig::default());
+    let mut panel_power = Output::new(peripherals.GPIO6, Level::High, OutputConfig::default());
+    let _audio_power = Output::new(peripherals.GPIO42, Level::High, OutputConfig::default());
+    let i2c = I2c::new(
+        peripherals.I2C0,
+        I2cConfig::default().with_frequency(Rate::from_khz(100)),
+    )
+    .map_err(|_| "invalid I2C configuration")?
+    .with_sda(peripherals.GPIO47)
+    .with_scl(peripherals.GPIO48)
+    .into_async();
+    let mut rtc = Pcf85063Rtc::new(i2c);
+    let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
+    let mut framebuffer = Framebuffer::default();
+    let rendered = crate::render_rtc_frame(reading, &mut framebuffer)
+        .map_err(|_| "offline content or rendering failed")?;
+
+    panel_power.set_low();
+    let panel_result = refresh_panel_frame(
+        peripherals.SPI2,
+        peripherals.GPIO8,
+        peripherals.GPIO9,
+        peripherals.GPIO10,
+        peripherals.GPIO11,
+        peripherals.GPIO12,
+        peripherals.GPIO13,
+        &framebuffer,
+    );
+    panel_power.set_high();
+    panel_result?;
+
+    match rendered.screen {
+        Screen::Daily(_) => Ok(ApplicationRun::Daily {
+            crc32: rendered.crc32,
+        }),
+        Screen::Setup(_) => Ok(ApplicationRun::Setup {
+            crc32: rendered.crc32,
+            rtc,
+            usb_device: peripherals.USB_DEVICE,
+        }),
+    }
+}
+
+fn serve_setup(rtc: &mut BoardRtc, usb_device: esp_hal::peripherals::USB_DEVICE<'static>) -> ! {
+    let mut transport = UsbProtocolTransport::new(usb_device);
+    let mut delay = Delay::new();
+    loop {
+        match block_on(transport.poll(rtc, 0)) {
+            Ok(handled) if handled > 0 => {
+                let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
+                if matches!(assess_rtc(reading), RecoveryState::Ready(_)) {
+                    delay.delay_ms(100);
+                    esp_hal::system::software_reset();
+                }
+            }
+            Ok(_) => {}
+            Err(_) => transport.reset_partial_frame(),
+        }
+        delay.delay_ms(1);
+    }
+}
+
+fn map_rtc_error<BusError>(error: Pcf85063RtcError<BusError>) -> SetupReason {
+    match error {
+        Pcf85063RtcError::OscillatorStopped => SetupReason::OscillatorStopped,
+        Pcf85063RtcError::InvalidDateTime => SetupReason::InvalidCalendar,
+        Pcf85063RtcError::Driver(_) => SetupReason::ReadFailure,
     }
 }
 

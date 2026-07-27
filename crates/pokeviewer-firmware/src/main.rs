@@ -11,25 +11,7 @@ esp_bootloader_esp_idf::esp_app_desc!();
 #[cfg(target_arch = "xtensa")]
 #[esp_hal::main]
 fn main() -> ! {
-    match pokeviewer_firmware::run_hardware_diagnostics() {
-        Ok(report) => {
-            esp_println::println!(
-                "hardware diagnostics complete; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending={}; panel rail off",
-                report.rtc_datetime.year,
-                report.rtc_datetime.month,
-                report.rtc_datetime.day,
-                report.rtc_datetime.hour,
-                report.rtc_datetime.minute,
-                report.rtc_datetime.second,
-                report.alarm_was_pending,
-            );
-        }
-        Err(error) => esp_println::println!("hardware diagnostics failed: {error}"),
-    }
-
-    loop {
-        core::hint::spin_loop();
-    }
+    pokeviewer_firmware::run_pokeviewer()
 }
 
 #[cfg(not(target_arch = "xtensa"))]

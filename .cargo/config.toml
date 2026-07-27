@@ -5,7 +5,7 @@ xtask = "run -p xtask --"
 
 [target.xtensa-esp32s3-none-elf]
 runner = "espflash flash --monitor --chip esp32s3"
-rustflags = ["-C", "link-arg=-nostartfiles"]
+rustflags = ["-C", "link-arg=-nostartfiles", "-C", "link-arg=-Tlinkall.x"]
 
 [unstable]
 build-std = ["core"]

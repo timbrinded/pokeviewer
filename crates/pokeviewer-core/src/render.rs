@@ -81,6 +81,12 @@ impl Framebuffer {
         &self.bytes
     }
 
+    /// Compute the trace identifier used by host goldens and device logs.
+    #[must_use]
+    pub fn crc32(&self) -> u32 {
+        crc32fast::hash(&self.bytes)
+    }
+
     /// Report one pixel for host evidence and tests.
     #[must_use]
     pub fn is_black(&self, x: usize, y: usize) -> Option<bool> {
