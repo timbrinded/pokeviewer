@@ -13,8 +13,8 @@ use esp_hal::{
 use pokeviewer_core::{Framebuffer, RecoveryState, SetupReason, assess_rtc};
 
 use crate::{
-    LocalDateTime, Pcf85063Rtc, Pcf85063RtcError, RetainedCard, Rtc, Screen,
-    panel::refresh_panel_frame, plan_wake, sleep::SleepResources,
+    FailureKind, LocalDateTime, Pcf85063Rtc, Pcf85063RtcError, RetainedCard, Rtc, Screen,
+    panel::refresh_panel_frame, plan_wake, render_failure_screen, sleep::SleepResources,
     usb_protocol::UsbProtocolTransport,
 };
 
@@ -33,17 +33,21 @@ enum ApplicationRun {
         rtc: BoardRtc,
         usb_device: esp_hal::peripherals::USB_DEVICE<'static>,
     },
+    Failure {
+        failure: FailureKind,
+        resources: SleepResources,
+    },
 }
 
 /// Run the complete passive application and enter its terminal low-power state.
 pub fn run_pokeviewer() -> ! {
     match run_application_once() {
-        Ok(ApplicationRun::Daily {
+        ApplicationRun::Daily {
             crc32,
             next_wake,
             refreshed,
             resources,
-        }) => {
+        } => {
             esp_println::println!(
                 "daily card ready; framebuffer_crc32={crc32:08x}; refreshed={refreshed}; next_wake={:04}-{:02}-{:02} 07:00:00; rails_off=true",
                 next_wake.year,
@@ -52,24 +56,28 @@ pub fn run_pokeviewer() -> ! {
             );
             resources.sleep();
         }
-        Ok(ApplicationRun::Setup {
+        ApplicationRun::Setup {
             crc32,
             mut rtc,
             usb_device,
-        }) => {
+        } => {
             esp_println::println!("RTC setup required; framebuffer_crc32={crc32:08x}");
             serve_setup(&mut rtc, usb_device);
         }
-        Err(error) => {
-            esp_println::println!("application failed: {error}");
-            loop {
-                core::hint::spin_loop();
-            }
+        ApplicationRun::Failure { failure, resources } => {
+            let policy = failure.policy();
+            esp_println::println!(
+                "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; rails_off=true",
+                policy.code,
+                policy.diagnostic_flag,
+                policy.max_attempts,
+            );
+            resources.sleep_without_wake();
         }
     }
 }
 
-fn run_application_once() -> Result<ApplicationRun, &'static str> {
+fn run_application_once() -> ApplicationRun {
     let cause = wakeup_cause();
     let peripherals = esp_hal::init(esp_hal::Config::default());
     let mut power_latch_pin = peripherals.GPIO17;
@@ -93,27 +101,87 @@ fn run_application_once() -> Result<ApplicationRun, &'static str> {
         OutputConfig::default(),
     );
 
-    let i2c = I2c::new(
+    macro_rules! terminal {
+        ($failure:expr) => {{
+            drop(panel_power);
+            drop(power_latch);
+            drop(audio_power);
+            return ApplicationRun::Failure {
+                failure: $failure,
+                resources: SleepResources {
+                    rtc_interrupt: peripherals.GPIO5,
+                    panel_power: panel_power_pin,
+                    power_latch: power_latch_pin,
+                    audio_power: audio_power_pin,
+                    low_power: peripherals.LPWR,
+                },
+            };
+        }};
+    }
+
+    let i2c = match I2c::new(
         peripherals.I2C0,
         I2cConfig::default().with_frequency(Rate::from_khz(100)),
-    )
-    .map_err(|_| "invalid I2C configuration")?
-    .with_sda(peripherals.GPIO47)
-    .with_scl(peripherals.GPIO48)
-    .into_async();
+    ) {
+        Ok(i2c) => i2c
+            .with_sda(peripherals.GPIO47)
+            .with_scl(peripherals.GPIO48)
+            .into_async(),
+        Err(_) => {
+            let mut framebuffer = Framebuffer::default();
+            render_failure_screen(&mut framebuffer, FailureKind::InvalidRtc)
+                .expect("fixed recovery labels must render");
+            panel_power.set_low();
+            let _ = refresh_panel_frame(
+                peripherals.SPI2,
+                peripherals.GPIO8,
+                peripherals.GPIO9,
+                peripherals.GPIO10,
+                peripherals.GPIO11,
+                peripherals.GPIO12,
+                peripherals.GPIO13,
+                &framebuffer,
+            );
+            panel_power.set_high();
+            terminal!(FailureKind::InvalidRtc);
+        }
+    };
     let mut rtc = Pcf85063Rtc::new(i2c);
     let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
     let mut framebuffer = Framebuffer::default();
-    let rendered = crate::render_rtc_frame(reading, &mut framebuffer)
-        .map_err(|_| "offline content or rendering failed")?;
+    let mut frame_failure = None;
+    let rendered = match crate::render_rtc_frame(reading, &mut framebuffer) {
+        Ok(rendered) => Some(rendered),
+        Err(_) => {
+            render_failure_screen(&mut framebuffer, FailureKind::Content)
+                .expect("fixed recovery labels must render");
+            frame_failure = Some(FailureKind::Content);
+            None
+        }
+    };
+    if rendered.is_some_and(|rendered| matches!(rendered.screen, Screen::Daily(_)))
+        && !matches!(cause, SleepSource::Undefined | SleepSource::Ext0)
+    {
+        render_failure_screen(&mut framebuffer, FailureKind::UnexpectedWake)
+            .expect("fixed recovery labels must render");
+        frame_failure = Some(FailureKind::UnexpectedWake);
+    }
 
-    let alarm_pending = if matches!(rendered.screen, Screen::Daily(_)) {
-        block_on(rtc.alarm_pending()).map_err(|_| "RTC alarm flag read failed")?
+    let alarm_pending = if rendered.is_some_and(|value| matches!(value.screen, Screen::Daily(_))) {
+        match block_on(rtc.alarm_pending()) {
+            Ok(pending) => pending,
+            Err(_) => {
+                render_failure_screen(&mut framebuffer, FailureKind::Alarm)
+                    .expect("fixed recovery labels must render");
+                frame_failure = Some(FailureKind::Alarm);
+                false
+            }
+        }
     } else {
         false
     };
-    let retained = match rendered.screen {
-        Screen::Daily(selection) if matches!(cause, SleepSource::Ext0) && !alarm_pending => {
+    let retained = match rendered.map(|value| value.screen) {
+        Some(Screen::Daily(selection)) if matches!(cause, SleepSource::Ext0) && !alarm_pending => {
             Some(RetainedCard {
                 display_date: selection.display_date,
             })
@@ -124,10 +192,18 @@ fn run_application_once() -> Result<ApplicationRun, &'static str> {
         .ok()
         .map(|now| plan_wake(now, retained))
         .transpose()
-        .map_err(|_| "next 07:00 wake is outside the RTC range")?;
-    let refreshed = match rendered.screen {
-        Screen::Setup(_) => true,
-        Screen::Daily(_) => wake_plan.is_none_or(|plan| plan.refresh_required),
+        .ok()
+        .flatten();
+    if reading.is_ok() && wake_plan.is_none() {
+        render_failure_screen(&mut framebuffer, FailureKind::Alarm)
+            .expect("fixed recovery labels must render");
+        frame_failure = Some(FailureKind::Alarm);
+    }
+    let refreshed = match rendered.map(|value| value.screen) {
+        Some(Screen::Daily(_)) if frame_failure.is_none() => {
+            wake_plan.is_none_or(|plan| plan.refresh_required)
+        }
+        _ => true,
     };
     if refreshed {
         panel_power.set_low();
@@ -142,23 +218,31 @@ fn run_application_once() -> Result<ApplicationRun, &'static str> {
             &framebuffer,
         );
         panel_power.set_high();
-        panel_result?;
+        if panel_result.is_err() {
+            terminal!(FailureKind::Panel);
+        }
+    }
+    if let Some(failure) = frame_failure {
+        terminal!(failure);
     }
 
+    let rendered = rendered.expect("successful frame has a rendered state");
     let Screen::Daily(_) = rendered.screen else {
-        return Ok(ApplicationRun::Setup {
+        return ApplicationRun::Setup {
             crc32: rendered.crc32,
             rtc,
             usb_device: peripherals.USB_DEVICE,
-        });
+        };
     };
-    let wake_plan = wake_plan.ok_or("valid daily card has no wake plan")?;
-    block_on(rtc.configure_daily_alarm()).map_err(|_| "RTC alarm configuration failed")?;
+    let wake_plan = wake_plan.expect("daily frame has a validated wake plan");
+    if block_on(rtc.configure_daily_alarm()).is_err() {
+        terminal!(FailureKind::Alarm);
+    }
     drop(rtc);
     drop(panel_power);
     drop(power_latch);
     drop(audio_power);
-    Ok(ApplicationRun::Daily {
+    ApplicationRun::Daily {
         crc32: rendered.crc32,
         next_wake: wake_plan.next_wake,
         refreshed,
@@ -169,14 +253,14 @@ fn run_application_once() -> Result<ApplicationRun, &'static str> {
             audio_power: audio_power_pin,
             low_power: peripherals.LPWR,
         },
-    })
+    }
 }
 
 fn serve_setup(rtc: &mut BoardRtc, usb_device: esp_hal::peripherals::USB_DEVICE<'static>) -> ! {
     let mut transport = UsbProtocolTransport::new(usb_device);
     let mut delay = Delay::new();
     loop {
-        match block_on(transport.poll(rtc, 0)) {
+        match block_on(transport.poll(rtc, FailureKind::InvalidRtc.policy().diagnostic_flag)) {
             Ok(handled) if handled > 0 => {
                 let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
                 if matches!(assess_rtc(reading), RecoveryState::Ready(_)) {

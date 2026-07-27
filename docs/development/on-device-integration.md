@@ -34,7 +34,7 @@ single/dual type, short/long name, punctuation, and sprite variation and
 compare all 5,000 bytes against the reviewed visual goldens. The published epoch vector
 `2026-01-01 07:00:00` resolves to cycle `0`, Pokédex `1`, Thursday.
 
-Invalid RTC input compares against the setup-screen CRC-32 `063cff9d`. Each
+Invalid RTC input compares against the setup-screen CRC-32 `34e31d2e`. Each
 successful device boot logs only the exact framebuffer CRC-32, not the local
 date, device identifier, or host path.
 

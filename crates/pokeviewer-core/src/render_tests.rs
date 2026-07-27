@@ -1,7 +1,7 @@
 use super::{
     DailyCard, Framebuffer, NAME_SCALE, NAME_Y, PRIMARY_TYPE_Y, RenderError, SECONDARY_TYPE_Y,
     SINGLE_TYPE_Y, SPRITE_SCALE, SPRITE_Y, TYPE_SCALE, WEEKDAY_SCALE, WEEKDAY_Y, render_daily_card,
-    render_setup_screen, text_width, type_label,
+    render_recovery_screen, render_setup_screen, text_width, type_label,
 };
 use crate::{CONTENT_SPRITE_BYTES, ContentPack, FRAMEBUFFER_BYTES, PokemonType, Weekday};
 
@@ -154,5 +154,18 @@ fn setup_screen_is_deterministic_and_identifies_the_recovery_tool() {
     render_setup_screen(&mut second);
 
     assert_eq!(first, second);
-    assert_eq!(crc32fast::hash(first.as_bytes()), 0x063c_ff9d);
+    assert_eq!(crc32fast::hash(first.as_bytes()), 0x34e3_1d2e);
+}
+
+#[test]
+fn recovery_screen_validation_is_atomic_and_deterministic() {
+    let mut framebuffer = Framebuffer::default();
+    render_recovery_screen(&mut framebuffer, "PACK", "REFLASH").unwrap();
+    assert_eq!(framebuffer.crc32(), 0xee18_1690);
+    let before = framebuffer.clone();
+    assert_eq!(
+        render_recovery_screen(&mut framebuffer, "PACK", "@"),
+        Err(RenderError::UnsupportedGlyph)
+    );
+    assert_eq!(framebuffer, before);
 }

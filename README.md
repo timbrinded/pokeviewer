@@ -91,3 +91,5 @@ The normal V2 firmware composition and current memory budget are documented in
 Battery operation follows the
 [07:00 wake-refresh-sleep state machine](docs/hardware/wake-sleep-state-machine.md);
 capacity must be calculated from [measured current](docs/hardware/battery-sizing.md).
+Expected faults follow the
+[bounded failure and recovery contract](docs/hardware/failure-recovery.md).

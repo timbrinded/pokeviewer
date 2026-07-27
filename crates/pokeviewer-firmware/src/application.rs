@@ -83,13 +83,21 @@ pub fn render_rtc_frame(
     reading: Result<LocalDateTime, SetupReason>,
     framebuffer: &mut Framebuffer,
 ) -> Result<RenderedFrame, ApplicationError> {
+    render_rtc_frame_from_pack(reading, PACK, framebuffer)
+}
+
+fn render_rtc_frame_from_pack(
+    reading: Result<LocalDateTime, SetupReason>,
+    pack_bytes: &[u8],
+    framebuffer: &mut Framebuffer,
+) -> Result<RenderedFrame, ApplicationError> {
     let screen = match assess_rtc(reading) {
         RecoveryState::SetupRequired(reason) => {
             render_setup_screen(framebuffer);
             Screen::Setup(reason)
         }
         RecoveryState::Ready(selection) => {
-            let pack = ContentPack::parse(PACK).map_err(ApplicationError::Content)?;
+            let pack = ContentPack::parse(pack_bytes).map_err(ApplicationError::Content)?;
             render_selection(&pack, selection, framebuffer)?;
             Screen::Daily(selection)
         }
@@ -130,7 +138,10 @@ mod tests {
         ContentPack, DailySelection, DisplayDate, Framebuffer, LocalDateTime, SetupReason, Weekday,
     };
 
-    use super::{PACK, RetainedCard, Screen, plan_wake, render_rtc_frame, render_selection};
+    use super::{
+        ApplicationError, PACK, RetainedCard, Screen, plan_wake, render_rtc_frame,
+        render_rtc_frame_from_pack, render_selection,
+    };
 
     const MONDAY_BULBASAUR: &[u8; 5_000] =
         include_bytes!("../../../tests/goldens/cards/monday-001.bin");
@@ -211,7 +222,28 @@ mod tests {
             render_rtc_frame(Err(SetupReason::OscillatorStopped), &mut framebuffer).unwrap();
 
         assert_eq!(result.screen, Screen::Setup(SetupReason::OscillatorStopped));
-        assert_eq!(result.crc32, 0x063c_ff9d);
+        assert_eq!(result.crc32, 0x34e3_1d2e);
+    }
+
+    #[test]
+    fn corrupt_pack_cannot_mutate_a_frame_into_a_plausible_card() {
+        let mut framebuffer = Framebuffer::default();
+        let before = framebuffer.clone();
+        let result = render_rtc_frame_from_pack(
+            Ok(LocalDateTime {
+                year: 2026,
+                month: 1,
+                day: 1,
+                hour: 7,
+                minute: 0,
+                second: 0,
+            }),
+            b"corrupt",
+            &mut framebuffer,
+        );
+
+        assert!(matches!(result, Err(ApplicationError::Content(_))));
+        assert_eq!(framebuffer, before);
     }
 
     #[test]

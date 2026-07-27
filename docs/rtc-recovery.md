@@ -21,13 +21,13 @@ The static [actual-pixel setup screen][screen] says:
 ```text
 SET TIME
 CONNECT USB
-RUN
+RTC RUN
 POKEVIEWERCTL
 ```
 
 It is rendered by the same bounded 5,000-byte framebuffer used for daily cards.
-Its CRC-32 is `063cff9d`; the committed one-bit PNG SHA-256 is
-`f199eac36fa80ae07719bb115b3e6d14d31eb3bb2cd877811711e36df693d27e`.
+Its CRC-32 is `34e31d2e`; the committed one-bit PNG SHA-256 is
+`7b38717e64138f684cae1119a64530d632de6ed97ffafadc2826c543d575f268`.
 The e-paper retains this useful adult instruction while firmware waits or
 sleeps; there is no child-facing menu and no network recovery path.
 

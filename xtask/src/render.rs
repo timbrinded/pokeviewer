@@ -10,6 +10,7 @@ use pokeviewer_core::{
     ContentPack, DISPLAY_HEIGHT, DISPLAY_WIDTH, DailyCard, Framebuffer, Weekday, render_daily_card,
     render_setup_screen,
 };
+use pokeviewer_firmware::{FailureKind, render_failure_screen};
 
 type TaskResult = Result<(), String>;
 
@@ -17,6 +18,7 @@ const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v1.pack")
 const DEFAULT_OUTPUT: &str = "target/render-samples";
 const DEFAULT_CONTACT_SHEET: &str = "target/all-cards-contact-sheet.png";
 const DEFAULT_SETUP_SCREEN: &str = "target/setup-screen.png";
+const DEFAULT_RECOVERY_SCREENS: &str = "target/recovery-screens";
 const SAMPLES: [(u8, Weekday); 4] = [
     (25, Weekday::Monday),
     (6, Weekday::Tuesday),
@@ -97,6 +99,32 @@ pub(crate) fn setup_screen_command(output_file: Option<&str>) -> TaskResult {
         output_file.display(),
         crc32fast::hash(framebuffer.as_bytes())
     );
+    Ok(())
+}
+
+pub(crate) fn recovery_screens_command(output_dir: Option<&str>) -> TaskResult {
+    let output_dir = PathBuf::from(output_dir.unwrap_or(DEFAULT_RECOVERY_SCREENS));
+    fs::create_dir_all(&output_dir)
+        .map_err(|error| format!("failed to create {}: {error}", output_dir.display()))?;
+    for (slug, failure) in [
+        ("rtc", FailureKind::InvalidRtc),
+        ("pack", FailureKind::Content),
+        ("panel", FailureKind::Panel),
+        ("alarm", FailureKind::Alarm),
+        ("wake", FailureKind::UnexpectedWake),
+    ] {
+        let mut framebuffer = Framebuffer::default();
+        render_failure_screen(&mut framebuffer, failure)
+            .map_err(|error| format!("failed to render {slug}: {error:?}"))?;
+        let output_file = output_dir.join(format!("{slug}.png"));
+        write_png(&output_file, &framebuffer)?;
+        println!(
+            "{}: {} (CRC-32 {:08x})",
+            output_file.display(),
+            failure.policy().code,
+            framebuffer.crc32()
+        );
+    }
     Ok(())
 }
 

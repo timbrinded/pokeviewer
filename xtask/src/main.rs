@@ -60,6 +60,13 @@ fn main() -> ExitCode {
             }
             task_result(render::setup_screen_command(output_file.as_deref()))
         }
+        Some("render-recovery-screens") => {
+            let output_dir = arguments.next();
+            if arguments.next().is_some() {
+                return fail("render-recovery-screens accepts at most one output directory");
+            }
+            task_result(render::recovery_screens_command(output_dir.as_deref()))
+        }
         Some("golden-update") => {
             if arguments.next().is_some() {
                 return fail("golden-update accepts no arguments");
@@ -155,6 +162,8 @@ COMMANDS:
                       Render all 151 cards into one actual-pixel PNG
     render-setup-screen [OUTPUT_FILE]
                       Render the adult invalid-RTC recovery screen
+    render-recovery-screens [OUTPUT_DIR]
+                      Render every classified adult recovery screen
     golden-update     Explicitly regenerate reviewed raw and PNG goldens
     golden-check [DIFF_DIR]
                       Compare exact frames and emit failure artifacts

@@ -15,7 +15,10 @@ pub use protocol::{
     decode_datetime, encode_datetime,
 };
 pub use recovery::{RecoveryState, SetupReason, assess_rtc};
-pub use render::{DailyCard, Framebuffer, RenderError, render_daily_card, render_setup_screen};
+pub use render::{
+    DailyCard, Framebuffer, RenderError, render_daily_card, render_recovery_screen,
+    render_setup_screen,
+};
 pub use schedule::{
     DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,
     next_rollover, select_daily_pokemon,

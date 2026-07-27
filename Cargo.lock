@@ -1669,6 +1669,7 @@ dependencies = [
  "crc32fast",
  "png",
  "pokeviewer-core",
+ "pokeviewer-firmware",
  "serde",
  "serde_json",
  "sha2",

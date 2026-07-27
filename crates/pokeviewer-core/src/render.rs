@@ -158,8 +158,29 @@ pub fn render_setup_screen(framebuffer: &mut Framebuffer) {
     framebuffer.clear_white();
     draw_centered_text(framebuffer, "SET TIME", 18, 3);
     draw_centered_text(framebuffer, "CONNECT USB", 79, 2);
-    draw_centered_text(framebuffer, "RUN", 112, 2);
+    draw_centered_text(framebuffer, "RTC RUN", 112, 2);
     draw_centered_text(framebuffer, "POKEVIEWERCTL", 143, 2);
+}
+
+/// Render a fixed adult-facing failure code and recovery action.
+///
+/// # Errors
+///
+/// Returns [`RenderError`] without changing the framebuffer if either supplied
+/// line cannot be represented by the fixed font and layout.
+pub fn render_recovery_screen(
+    framebuffer: &mut Framebuffer,
+    code: &str,
+    action: &str,
+) -> Result<(), RenderError> {
+    validate_text(code, 3)?;
+    validate_text(action, 2)?;
+    framebuffer.clear_white();
+    draw_centered_text(framebuffer, "POKEVIEWER", 18, 2);
+    draw_centered_text(framebuffer, "ERROR", 61, 2);
+    draw_centered_text(framebuffer, code, 95, 3);
+    draw_centered_text(framebuffer, action, 151, 2);
+    Ok(())
 }
 
 fn validate_card(card: DailyCard<'_>) -> Result<(), RenderError> {

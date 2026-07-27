@@ -52,4 +52,25 @@ impl SleepResources {
         Delay::new().delay_ms(100);
         low_power.sleep_deep(&[&wake]);
     }
+
+    /// Enter indefinite deep sleep after a terminal failure.
+    ///
+    /// Reset, reflashing, or external power cycling is then required; firmware
+    /// cannot create an automatic failure loop.
+    pub(crate) fn sleep_without_wake(self) -> ! {
+        let mut panel_power = self.panel_power;
+        let panel_output =
+            Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
+        drop(panel_output);
+        panel_power.rtcio_pad_hold(true);
+        let mut power_latch = self.power_latch;
+        let latch_output =
+            Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
+        drop(latch_output);
+        power_latch.rtcio_pad_hold(true);
+        let _audio_power = Output::new(self.audio_power, Level::High, OutputConfig::default());
+        let mut low_power = HalRtc::new(self.low_power);
+        Delay::new().delay_ms(100);
+        low_power.sleep_deep(&[]);
+    }
 }

@@ -11,6 +11,7 @@ mod application;
 mod board;
 #[cfg(any(target_arch = "xtensa", test))]
 mod bounded_busy;
+mod failure;
 #[cfg(target_arch = "xtensa")]
 mod panel;
 #[cfg(target_arch = "xtensa")]
@@ -31,6 +32,7 @@ pub use application::{
 pub use board::{
     HardwareDiagnosticReport, run_hardware_diagnostics, run_sleep_diagnostic, run_usb_provisioning,
 };
+pub use failure::{FailureKind, FailurePolicy, RecoveryAction, render_failure_screen};
 #[cfg(target_arch = "xtensa")]
 pub use pcf85063::{Pcf85063Rtc, Pcf85063RtcError};
 pub use protocol::handle_protocol_request;
