@@ -58,8 +58,9 @@ The command reads only local files and writes:
   manifest mapping every packed entry to its three source hashes.
 
 It validates all 151 IDs in order, exact URLs and paths, every source digest,
-name/type rules, the 56 × 56 PNG contract, schedule v1, section bounds, and the
-64 KiB pack limit. It builds twice in memory and fails if the bytes differ.
+name/type rules, bounded native PNG dimensions, deterministic centering on the
+56 × 56 output canvas, schedule v1, section bounds, and the 64 KiB pack limit.
+It builds twice in memory and fails if the bytes differ.
 
 Optional positional arguments select a reviewed cache and separate output
 files:

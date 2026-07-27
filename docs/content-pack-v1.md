@@ -43,21 +43,23 @@ and secondary types, and missing or extra IDs invalidate the complete pack.
 
 ### Sprite conversion
 
-The source is the unmodified 56 × 56 Pokémon Yellow front PNG from the explicit
+The source is the unmodified Pokémon Yellow front PNG from the explicit
 maintainer cache. Conversion:
 
-1. keeps the source canvas and pixel coordinates without scaling, cropping, or
-   interpolation;
-2. treats alpha values below 128 as white;
-3. calculates integer luminance for other pixels as
+1. requires a non-empty source no larger than 56 × 56;
+2. centers the native source pixels on a transparent 56 × 56 output canvas
+   without scaling, cropping, or interpolation; an odd spare pixel is placed
+   on the right or bottom;
+3. treats alpha values below 128 as white;
+4. calculates integer luminance for other pixels as
    `(299 * red + 587 * green + 114 * blue + 500) / 1000`;
-4. writes black when luminance is below 128 and white otherwise; and
-5. applies no dithering.
+5. writes black when luminance is below 128 and white otherwise; and
+6. applies no dithering.
 
-Pixels serialize by row from top to bottom and within each row from left to
-right. The most-significant bit is the leftmost pixel, `1` is black, and `0`
-is white. Seven bytes encode each 56-pixel row, so every sprite is exactly 392
-bytes.
+Output-canvas pixels serialize by row from top to bottom and within each row
+from left to right. The most-significant bit is the leftmost pixel, `1` is
+black, and `0` is white. Seven bytes encode each 56-pixel row, so every sprite
+is exactly 392 bytes.
 
 ## Binary format
 

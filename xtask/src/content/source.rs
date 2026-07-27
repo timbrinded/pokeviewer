@@ -210,11 +210,17 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<Vec<u8>> {
     let info = reader
         .next_frame(&mut decoded_buffer)
         .map_err(|error| format!("Pokémon ID {id}: sprite PNG: {error}"))?;
-    if usize::try_from(info.width).ok() != Some(SPRITE_WIDTH)
-        || usize::try_from(info.height).ok() != Some(SPRITE_HEIGHT)
+    let source_width = usize::try_from(info.width)
+        .map_err(|_| format!("Pokémon ID {id}: sprite width exceeds usize"))?;
+    let source_height = usize::try_from(info.height)
+        .map_err(|_| format!("Pokémon ID {id}: sprite height exceeds usize"))?;
+    if source_width == 0
+        || source_height == 0
+        || source_width > SPRITE_WIDTH
+        || source_height > SPRITE_HEIGHT
     {
         return Err(format!(
-            "Pokémon ID {id}: sprite dimensions: expected {SPRITE_WIDTH}x{SPRITE_HEIGHT}, found {}x{}",
+            "Pokémon ID {id}: sprite dimensions: expected non-empty dimensions no larger than {SPRITE_WIDTH}x{SPRITE_HEIGHT}, found {}x{}",
             info.width, info.height
         ));
     }
@@ -224,19 +230,34 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<Vec<u8>> {
         ));
     }
 
-    let pixels = rgba_pixels(id, info.color_type, &decoded_buffer[..info.buffer_size()])?;
+    let pixels = rgba_pixels(
+        id,
+        info.color_type,
+        &decoded_buffer[..info.buffer_size()],
+        source_width * source_height,
+    )?;
     let mut output = vec![0; SPRITE_BYTES];
-    for (index, [red, green, blue, alpha]) in pixels.into_iter().enumerate() {
+    let x_offset = (SPRITE_WIDTH - source_width) / 2;
+    let y_offset = (SPRITE_HEIGHT - source_height) / 2;
+    for (source_index, [red, green, blue, alpha]) in pixels.into_iter().enumerate() {
         let luminance =
             (299 * u32::from(red) + 587 * u32::from(green) + 114 * u32::from(blue) + 500) / 1000;
         if alpha >= 128 && luminance < 128 {
-            output[index / 8] |= 1 << (7 - index % 8);
+            let source_x = source_index % source_width;
+            let source_y = source_index / source_width;
+            let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
+            output[output_index / 8] |= 1 << (7 - output_index % 8);
         }
     }
     Ok(output)
 }
 
-fn rgba_pixels(id: u16, color: ColorType, bytes: &[u8]) -> TaskResult<Vec<[u8; 4]>> {
+fn rgba_pixels(
+    id: u16,
+    color: ColorType,
+    bytes: &[u8],
+    expected_pixels: usize,
+) -> TaskResult<Vec<[u8; 4]>> {
     let pixels: Vec<[u8; 4]> = match color {
         ColorType::Rgba => bytes
             .chunks_exact(4)
@@ -260,7 +281,7 @@ fn rgba_pixels(id: u16, color: ColorType, bytes: &[u8]) -> TaskResult<Vec<[u8; 4
             ));
         }
     };
-    if pixels.len() != SPRITE_WIDTH * SPRITE_HEIGHT {
+    if pixels.len() != expected_pixels {
         return Err(format!(
             "Pokémon ID {id}: sprite PNG: decoded pixel count mismatch"
         ));
@@ -310,10 +331,19 @@ mod tests {
     #[test]
     fn invalid_sprite_dimensions_report_id_and_rule() {
         let error =
-            parse_source(1, POKEMON, SPECIES, &fixture_png_with_dimensions(55, 56)).unwrap_err();
+            parse_source(1, POKEMON, SPECIES, &fixture_png_with_dimensions(57, 56)).unwrap_err();
 
         assert!(error.contains("Pokémon ID 1"));
         assert!(error.contains("sprite dimensions"));
+    }
+
+    #[test]
+    fn native_sprite_is_centered_without_scaling() {
+        let record =
+            parse_source(1, POKEMON, SPECIES, &fixture_png_with_dimensions(40, 40)).unwrap();
+
+        assert!(record.sprite[..57].iter().all(|byte| *byte == 0));
+        assert_eq!(record.sprite[57], 0b1010_1010);
     }
 
     fn fixture_png() -> Vec<u8> {
