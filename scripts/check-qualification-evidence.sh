@@ -2,7 +2,10 @@
 set -euo pipefail
 
 evidence_dir=${1:?usage: check-qualification-evidence.sh EVIDENCE_DIR}
-required=(metadata.env checklist.md measurements.csv capacity.txt)
+required=(
+  metadata.env checklist.md measurements.csv capacity.txt
+  seven-day.csv photos.csv
+)
 
 for filename in "${required[@]}"; do
   if [[ ! -s "$evidence_dir/$filename" ]]; then
@@ -55,6 +58,22 @@ END {
 }
 ' "$evidence_dir/capacity.txt" || {
   echo "battery capacity evidence failed" >&2
+  exit 1
+}
+awk -F, '
+NR == 1 { next }
+NF != 7 || $1 != NR - 1 || $7 != "PASS" { exit 1 }
+END { if (NR != 8) exit 1 }
+' "$evidence_dir/seven-day.csv" || {
+  echo "seven-day schedule evidence is incomplete" >&2
+  exit 1
+}
+awk -F, '
+NR == 1 { next }
+NF != 5 || $5 != "PASS" || length($4) != 64 { exit 1 }
+END { if (NR != 15) exit 1 }
+' "$evidence_dir/photos.csv" || {
+  echo "seven-day photo manifest is incomplete" >&2
   exit 1
 }
 if grep -EIRq \

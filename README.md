@@ -95,3 +95,5 @@ Expected faults follow the
 [bounded failure and recovery contract](docs/hardware/failure-recovery.md).
 Hardware releases must pass the
 [V2 qualification procedure](docs/hardware/release-qualification.md).
+The unattended acceptance run follows the
+[seven-day physical protocol](docs/hardware/seven-day-run.md).
