@@ -11,6 +11,7 @@
 | fresh Linux walkthrough | clean-host rehearsal | evidence validator | blocked |
 | sanitized screenshots and physical logs | qualification evidence | owned by #24 | blocked |
 | licence and media exclusions | licence and third-party notices | repository review | complete |
+| final public release audit | publishing guide and workflow | closed blocker enforcement | blocked |
 
 Documentation warnings, Markdown structure, and live links are checked in CI.
 Literal copy/paste validation of final release filenames and checksums belongs

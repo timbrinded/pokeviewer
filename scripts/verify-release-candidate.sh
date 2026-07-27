@@ -42,6 +42,7 @@ expected=(
   "BUILD-METADATA.txt"
   "FLASHING.md"
   "RELEASE-NOTES.md"
+  "CANDIDATE-STATUS.md"
   "USER-GUIDE.md"
   "SAFETY.md"
   "TROUBLESHOOTING.md"
