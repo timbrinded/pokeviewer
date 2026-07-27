@@ -12,7 +12,7 @@ authors = ["Pokeviewer contributors"]
 edition = "2024"
 license = "MIT"
 repository = "https://github.com/timbrinded/pokeviewer"
-rust-version = "1.96"
+rust-version = "1.95"
 version = "0.1.0"
 
 [workspace.lints.rust]
@@ -22,3 +22,12 @@ unsafe_code = "forbid"
 [workspace.lints.clippy]
 all = { level = "deny", priority = -1 }
 pedantic = { level = "warn", priority = -1 }
+
+[profile.dev]
+opt-level = "s"
+
+[profile.release]
+codegen-units = 1
+debug = 2
+lto = "fat"
+opt-level = "s"

@@ -1,0 +1,11 @@
+# Keep host development as the default. Embedded commands select the target explicitly.
+
+[alias]
+xtask = "run -p xtask --"
+
+[target.xtensa-esp32s3-none-elf]
+runner = "espflash flash --monitor --chip esp32s3"
+rustflags = ["-C", "link-arg=-nostartfiles"]
+
+[unstable]
+build-std = ["core"]

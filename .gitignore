@@ -1,4 +1,7 @@
 /target/
+/.cargo-cache/
+/.rustup-cache/
+/.tools/
 /.idea/
 /.vscode/
 *.swp

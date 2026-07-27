@@ -55,9 +55,11 @@ From the repository root:
 
 ```console
 cargo fmt --all --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-cargo run -p xtask -- help
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+cargo xtask help
 ```
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and review rules.
+Embedded setup, builds, flashing, and monitoring are documented in the
+[toolchain guide](docs/development/toolchain.md).

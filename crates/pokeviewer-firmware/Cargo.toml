@@ -11,5 +11,20 @@ version.workspace = true
 [dependencies]
 pokeviewer-core = { path = "../pokeviewer-core" }
 
+[target.'cfg(target_arch = "xtensa")'.dependencies]
+epd-waveshare = { version = "=0.6.0", default-features = false, features = ["epd2in13_v3", "graphics"] }
+embedded-hal-async = { version = "=1.0.0", default-features = false }
+esp-backtrace = { version = "=0.19.0", default-features = false, features = ["esp32s3", "panic-handler", "println"] }
+esp-bootloader-esp-idf = { version = "=0.5.0", default-features = false, features = ["esp32s3"] }
+esp-hal = { version = "=1.1.1", default-features = false, features = ["esp32s3", "exception-handler", "float-save-restore", "rt"] }
+esp-println = { version = "=0.17.0", default-features = false, features = ["esp32s3", "jtag-serial"] }
+pcf85063a = { version = "=0.1.1", default-features = false }
+
+[[bin]]
+name = "pokeviewer-firmware"
+path = "src/main.rs"
+bench = false
+test = false
+
 [lints]
 workspace = true

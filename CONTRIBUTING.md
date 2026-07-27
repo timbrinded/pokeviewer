@@ -11,9 +11,9 @@ Cargo is the only build entry point:
 
 ```console
 cargo fmt --all --check
-cargo clippy --workspace --all-targets -- -D warnings
-cargo test --workspace
-cargo run -p xtask -- help
+cargo clippy --workspace --all-targets --locked -- -D warnings
+cargo test --workspace --locked
+cargo xtask help
 ```
 
 Run the commands from the repository root with the pinned toolchain. Do not add
