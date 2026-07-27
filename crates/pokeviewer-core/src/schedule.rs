@@ -171,6 +171,30 @@ pub fn select_daily_pokemon(local: LocalDateTime) -> Result<DailySelection, Inva
     })
 }
 
+/// Calculate the first 07:00:00 local transition strictly after `local`.
+///
+/// # Errors
+///
+/// Returns [`InvalidDateTime`] for invalid input or if the next transition
+/// falls outside the RTC's supported 2000–2099 range.
+pub fn next_rollover(local: LocalDateTime) -> Result<LocalDateTime, InvalidDateTime> {
+    let local = local.to_primitive()?;
+    let date = if local.hour() < ROLLOVER_HOUR {
+        local.date()
+    } else {
+        local.date().next_day().ok_or(InvalidDateTime)?
+    };
+    let next = LocalDateTime {
+        year: u16::try_from(date.year()).map_err(|_| InvalidDateTime)?,
+        month: date.month() as u8,
+        day: date.day(),
+        hour: ROLLOVER_HOUR,
+        minute: 0,
+        second: 0,
+    };
+    next.validate()
+}
+
 #[cfg(test)]
 #[path = "schedule_tests.rs"]
 mod tests;

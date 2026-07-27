@@ -18,7 +18,7 @@ pub use recovery::{RecoveryState, SetupReason, assess_rtc};
 pub use render::{DailyCard, Framebuffer, RenderError, render_daily_card, render_setup_screen};
 pub use schedule::{
     DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,
-    select_daily_pokemon,
+    next_rollover, select_daily_pokemon,
 };
 
 /// Width of the supported e-paper panel in pixels.

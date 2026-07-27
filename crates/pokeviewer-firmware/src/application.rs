@@ -1,8 +1,9 @@
 //! Allocation-free composition of RTC, content, schedule, and rendering.
 
 use pokeviewer_core::{
-    ContentPack, DailyCard, DailySelection, Framebuffer, LocalDateTime, PackError, RecoveryState,
-    RenderError, SetupReason, assess_rtc, render_daily_card, render_setup_screen,
+    ContentPack, DailyCard, DailySelection, DisplayDate, Framebuffer, InvalidDateTime,
+    LocalDateTime, PackError, RecoveryState, RenderError, SetupReason, assess_rtc, next_rollover,
+    render_daily_card, render_setup_screen, select_daily_pokemon,
 };
 
 const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
@@ -34,6 +35,42 @@ pub enum ApplicationError {
     Render(RenderError),
     /// Pack schedule and scheduling-domain identifiers disagree.
     ScheduleMismatch,
+}
+
+/// Last display day known to be retained by the panel.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RetainedCard {
+    /// Atomic date and weekday rendered in the retained frame.
+    pub display_date: DisplayDate,
+}
+
+/// Decision for one valid wake before hardware effects occur.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct WakePlan {
+    /// Complete card selection for the current passive display day.
+    pub selection: DailySelection,
+    /// First local 07:00 transition strictly after the RTC reading.
+    pub next_wake: LocalDateTime,
+    /// Whether the panel is unknown or retains a different display day.
+    pub refresh_required: bool,
+}
+
+/// Plan one wake from validated RTC state and optional retained-card evidence.
+///
+/// # Errors
+///
+/// Returns [`InvalidDateTime`] for invalid input or an unsupported next wake.
+pub fn plan_wake(
+    now: LocalDateTime,
+    retained: Option<RetainedCard>,
+) -> Result<WakePlan, InvalidDateTime> {
+    let selection = select_daily_pokemon(now)?;
+    Ok(WakePlan {
+        selection,
+        next_wake: next_rollover(now)?,
+        refresh_required: retained
+            .is_none_or(|retained| retained.display_date != selection.display_date),
+    })
 }
 
 /// Render one complete application frame from a fresh RTC assessment.
@@ -93,7 +130,7 @@ mod tests {
         ContentPack, DailySelection, DisplayDate, Framebuffer, LocalDateTime, SetupReason, Weekday,
     };
 
-    use super::{PACK, Screen, render_rtc_frame, render_selection};
+    use super::{PACK, RetainedCard, Screen, plan_wake, render_rtc_frame, render_selection};
 
     const MONDAY_BULBASAUR: &[u8; 5_000] =
         include_bytes!("../../../tests/goldens/cards/monday-001.bin");
@@ -175,6 +212,91 @@ mod tests {
 
         assert_eq!(result.screen, Screen::Setup(SetupReason::OscillatorStopped));
         assert_eq!(result.crc32, 0x063c_ff9d);
+    }
+
+    #[test]
+    fn wake_plan_retains_before_seven_refreshes_at_transition_and_skips_duplicates() {
+        let before = LocalDateTime {
+            year: 2026,
+            month: 1,
+            day: 1,
+            hour: 6,
+            minute: 59,
+            second: 59,
+        };
+        let prior = plan_wake(before, None).unwrap();
+        assert_eq!(prior.selection.dex_id, 79);
+        assert_eq!(
+            prior.next_wake,
+            LocalDateTime {
+                hour: 7,
+                minute: 0,
+                second: 0,
+                ..before
+            }
+        );
+
+        let transition = LocalDateTime {
+            hour: 7,
+            minute: 0,
+            second: 0,
+            ..before
+        };
+        let changed = plan_wake(
+            transition,
+            Some(RetainedCard {
+                display_date: prior.selection.display_date,
+            }),
+        )
+        .unwrap();
+        assert_eq!(changed.selection.dex_id, 1);
+        assert!(changed.refresh_required);
+        assert_eq!(
+            changed.next_wake,
+            LocalDateTime {
+                year: 2026,
+                month: 1,
+                day: 2,
+                hour: 7,
+                minute: 0,
+                second: 0,
+            }
+        );
+
+        let duplicate = plan_wake(
+            transition,
+            Some(RetainedCard {
+                display_date: changed.selection.display_date,
+            }),
+        )
+        .unwrap();
+        assert!(!duplicate.refresh_required);
+    }
+
+    #[test]
+    fn reset_without_retained_evidence_converges_by_refreshing() {
+        let plan = plan_wake(
+            LocalDateTime {
+                year: 2027,
+                month: 1,
+                day: 1,
+                hour: 12,
+                minute: 0,
+                second: 0,
+            },
+            None,
+        )
+        .unwrap();
+
+        assert!(plan.refresh_required);
+        assert_eq!(
+            (
+                plan.selection.cycle_index,
+                plan.next_wake.month,
+                plan.next_wake.day
+            ),
+            (63, 1, 2)
+        );
     }
 
     const fn selection(cycle_index: u8, dex_id: u8, weekday: Weekday) -> DailySelection {

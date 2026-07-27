@@ -18,18 +18,25 @@ mod pcf85063;
 mod protocol;
 mod rtc;
 #[cfg(target_arch = "xtensa")]
+mod runtime;
+#[cfg(target_arch = "xtensa")]
+mod sleep;
+#[cfg(target_arch = "xtensa")]
 mod usb_protocol;
 
-pub use application::{ApplicationError, RenderedFrame, Screen, render_rtc_frame};
+pub use application::{
+    ApplicationError, RenderedFrame, RetainedCard, Screen, WakePlan, plan_wake, render_rtc_frame,
+};
 #[cfg(target_arch = "xtensa")]
 pub use board::{
-    HardwareDiagnosticReport, run_hardware_diagnostics, run_pokeviewer, run_sleep_diagnostic,
-    run_usb_provisioning,
+    HardwareDiagnosticReport, run_hardware_diagnostics, run_sleep_diagnostic, run_usb_provisioning,
 };
 #[cfg(target_arch = "xtensa")]
 pub use pcf85063::{Pcf85063Rtc, Pcf85063RtcError};
 pub use protocol::handle_protocol_request;
 pub use rtc::{FakeRtc, FakeRtcError, Rtc};
+#[cfg(target_arch = "xtensa")]
+pub use runtime::run_pokeviewer;
 #[cfg(target_arch = "xtensa")]
 pub use usb_protocol::{UsbProtocolError, UsbProtocolTransport};
 

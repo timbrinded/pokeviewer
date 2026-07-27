@@ -5,7 +5,7 @@ use time::{Date, Duration};
 
 use super::{
     CYCLE_LENGTH, DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, Weekday,
-    select_daily_pokemon,
+    next_rollover, select_daily_pokemon,
 };
 use crate::ContentPack;
 
@@ -32,6 +32,79 @@ fn at_noon(date: Date) -> LocalDateTime {
         minute: 0,
         second: 0,
     }
+}
+
+#[test]
+fn next_rollover_is_strict_and_crosses_calendar_boundaries() {
+    for (now, expected) in [
+        (
+            LocalDateTime {
+                year: 2026,
+                month: 7,
+                day: 27,
+                hour: 6,
+                minute: 59,
+                second: 59,
+            },
+            LocalDateTime {
+                year: 2026,
+                month: 7,
+                day: 27,
+                hour: 7,
+                minute: 0,
+                second: 0,
+            },
+        ),
+        (
+            LocalDateTime {
+                year: 2026,
+                month: 12,
+                day: 31,
+                hour: 7,
+                minute: 0,
+                second: 0,
+            },
+            LocalDateTime {
+                year: 2027,
+                month: 1,
+                day: 1,
+                hour: 7,
+                minute: 0,
+                second: 0,
+            },
+        ),
+        (
+            LocalDateTime {
+                year: 2024,
+                month: 2,
+                day: 28,
+                hour: 23,
+                minute: 59,
+                second: 59,
+            },
+            LocalDateTime {
+                year: 2024,
+                month: 2,
+                day: 29,
+                hour: 7,
+                minute: 0,
+                second: 0,
+            },
+        ),
+    ] {
+        assert_eq!(next_rollover(now), Ok(expected));
+    }
+    assert_eq!(
+        next_rollover(LocalDateTime {
+            year: 2099,
+            month: 12,
+            day: 31,
+            hour: 7,
+            minute: 0,
+            second: 0,
+        }),
+        Err(InvalidDateTime)
+    );
 }
 
 #[test]

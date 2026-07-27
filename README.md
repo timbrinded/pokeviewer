@@ -88,3 +88,6 @@ Invalid clocks are governed by the
 [RTC setup and recovery contract](docs/rtc-recovery.md).
 The normal V2 firmware composition and current memory budget are documented in
 [on-device integration](docs/development/on-device-integration.md).
+Battery operation follows the
+[07:00 wake-refresh-sleep state machine](docs/hardware/wake-sleep-state-machine.md);
+capacity must be calculated from [measured current](docs/hardware/battery-sizing.md).
