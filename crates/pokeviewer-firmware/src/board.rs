@@ -1,38 +1,33 @@
 //! Boundary around the pinned ESP HAL and supported V2 board.
 
 use embassy_futures::block_on;
-use embedded_graphics::{
-    Drawable,
-    mono_font::{MonoTextStyle, ascii::FONT_6X10},
-    prelude::{DrawTarget, Point, Primitive},
-    primitives::{PrimitiveStyle, Rectangle},
-    text::Text,
-};
-use embedded_hal::{delay::DelayNs, digital::OutputPin, spi::SpiDevice};
-use embedded_hal_bus::spi::ExclusiveDevice;
-use epd_waveshare::{
-    epd1in54_v2::{Display1in54, Epd1in54},
-    prelude::{Color, WaveshareDisplay},
-};
+use embedded_hal::delay::DelayNs;
 use esp_hal::{
     delay::Delay,
-    gpio::{Input, InputConfig, Level, Output, OutputConfig},
+    gpio::{Input, InputConfig, Level, Output, OutputConfig, Pull, RtcPin},
     i2c::master::{Config as I2cConfig, I2c},
-    spi::{
-        Mode,
-        master::{Config, Spi},
+    peripherals::{GPIO5, GPIO6, GPIO17, GPIO42, LPWR},
+    rtc_cntl::{
+        Rtc as HalRtc,
+        sleep::{Ext0WakeupSource, WakeupLevel},
+        wakeup_cause,
     },
+    system::SleepSource,
     time::Rate,
 };
 
 use crate::{
     LocalDateTime, Pcf85063Rtc, Rtc,
-    bounded_busy::{BoundedBusy, BusyState},
+    panel::{PanelDiagnostic, run_panel_diagnostics},
 };
 
-const BUSY_POLL_US: u32 = 10_000;
-const BUSY_MAX_POLLS: u32 = 500;
-static PANEL_BUSY_STATE: BusyState = BusyState::new();
+struct SleepResources {
+    rtc_interrupt: GPIO5<'static>,
+    panel_power: GPIO6<'static>,
+    power_latch: GPIO17<'static>,
+    audio_power: GPIO42<'static>,
+    low_power: LPWR<'static>,
+}
 
 /// Successful RTC observations from the combined hardware diagnostic.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -45,10 +40,69 @@ pub struct HardwareDiagnosticReport {
 
 /// Run RTC and panel bring-up diagnostics while enforcing board power states.
 pub fn run_hardware_diagnostics() -> Result<HardwareDiagnosticReport, &'static str> {
+    run_board_diagnostics(PanelDiagnostic::Full, true).map(|(report, _)| report)
+}
+
+/// Refresh one frame, validate RTC state, and enter active-low RTC deep sleep.
+pub fn run_sleep_diagnostic() -> ! {
+    let cause = wakeup_cause();
+    let configure_alarm = !matches!(cause, SleepSource::Ext0);
+    match run_board_diagnostics(PanelDiagnostic::SingleFrame, configure_alarm) {
+        Ok((report, resources)) => {
+            if matches!(cause, SleepSource::Ext0) && !report.alarm_was_pending {
+                esp_println::println!(
+                    "sleep diagnostic failed: RTC wake had no asserted alarm flag"
+                );
+                loop {
+                    core::hint::spin_loop();
+                }
+            }
+            esp_println::println!(
+                "sleep diagnostic ready; wake_cause={cause:?}; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending={}; rails_off=true",
+                report.rtc_datetime.year,
+                report.rtc_datetime.month,
+                report.rtc_datetime.day,
+                report.rtc_datetime.hour,
+                report.rtc_datetime.minute,
+                report.rtc_datetime.second,
+                report.alarm_was_pending,
+            );
+            resources.sleep();
+        }
+        Err(error) => {
+            esp_println::println!("sleep diagnostic failed: {error}");
+            loop {
+                core::hint::spin_loop();
+            }
+        }
+    }
+}
+
+fn run_board_diagnostics(
+    panel_diagnostic: PanelDiagnostic,
+    configure_alarm: bool,
+) -> Result<(HardwareDiagnosticReport, SleepResources), &'static str> {
     let peripherals = esp_hal::init(esp_hal::Config::default());
-    let _power_latch = Output::new(peripherals.GPIO17, Level::High, OutputConfig::default());
-    let mut panel_power = Output::new(peripherals.GPIO6, Level::High, OutputConfig::default());
-    let _audio_power = Output::new(peripherals.GPIO42, Level::High, OutputConfig::default());
+    let mut power_latch_pin = peripherals.GPIO17;
+    power_latch_pin.rtcio_pad_hold(false);
+    let power_latch = Output::new(
+        power_latch_pin.reborrow(),
+        Level::High,
+        OutputConfig::default(),
+    );
+    let mut panel_power_pin = peripherals.GPIO6;
+    panel_power_pin.rtcio_pad_hold(false);
+    let mut panel_power = Output::new(
+        panel_power_pin.reborrow(),
+        Level::High,
+        OutputConfig::default(),
+    );
+    let mut audio_power_pin = peripherals.GPIO42;
+    let audio_power = Output::new(
+        audio_power_pin.reborrow(),
+        Level::High,
+        OutputConfig::default(),
+    );
 
     let i2c = I2c::new(
         peripherals.I2C0,
@@ -58,79 +112,76 @@ pub fn run_hardware_diagnostics() -> Result<HardwareDiagnosticReport, &'static s
     .with_sda(peripherals.GPIO47)
     .with_scl(peripherals.GPIO48)
     .into_async();
-    let rtc_result = run_rtc_diagnostics(Pcf85063Rtc::new(i2c));
+    let rtc_result = run_rtc_diagnostics(Pcf85063Rtc::new(i2c), configure_alarm);
 
     panel_power.set_low();
-    let panel_result = (|| {
-        let busy = BoundedBusy::new(
-            Input::new(peripherals.GPIO8, InputConfig::default()),
-            BUSY_MAX_POLLS,
-            &PANEL_BUSY_STATE,
-        );
-        let dc = Output::new(peripherals.GPIO10, Level::Low, OutputConfig::default());
-        let reset_pin = Output::new(peripherals.GPIO9, Level::High, OutputConfig::default());
-        let spi = Spi::new(
-            peripherals.SPI2,
-            Config::default()
-                .with_frequency(Rate::from_mhz(10))
-                .with_mode(Mode::_0),
-        )
-        .map_err(|_| "invalid SPI configuration")?
-        .with_sck(peripherals.GPIO12)
-        .with_mosi(peripherals.GPIO13);
-        let cs = Output::new(peripherals.GPIO11, Level::High, OutputConfig::default());
-        let mut spi =
-            ExclusiveDevice::new_no_delay(spi, cs).map_err(|_| "SPI device setup failed")?;
-        let mut delay = Delay::new();
-        let mut panel = Epd1in54::new(
-            &mut spi,
-            busy,
-            dc,
-            reset_pin,
-            &mut delay,
-            Some(BUSY_POLL_US),
-        )
-        .map_err(|_| "panel initialization failed")?;
-        check_busy()?;
-
-        let mut frame = Display1in54::default();
-        frame
-            .clear(Color::White)
-            .map_err(|_| "white frame failed")?;
-        refresh(&mut panel, &mut spi, &mut delay, &frame)?;
-        delay.delay_ms(2_000);
-
-        frame
-            .clear(Color::Black)
-            .map_err(|_| "black frame failed")?;
-        refresh(&mut panel, &mut spi, &mut delay, &frame)?;
-        delay.delay_ms(2_000);
-
-        draw_checkerboard(&mut frame)?;
-        refresh(&mut panel, &mut spi, &mut delay, &frame)?;
-        delay.delay_ms(2_000);
-
-        draw_border(&mut frame)?;
-        refresh(&mut panel, &mut spi, &mut delay, &frame)?;
-        delay.delay_ms(2_000);
-
-        draw_text(&mut frame)?;
-        refresh(&mut panel, &mut spi, &mut delay, &frame)?;
-
-        wait_until_idle(&mut panel, &mut spi, &mut delay)?;
-        PANEL_BUSY_STATE.reset();
-        panel
-            .sleep(&mut spi, &mut delay)
-            .map_err(|_| "panel sleep failed")?;
-        check_busy()
-    })();
+    let panel_result = run_panel_diagnostics(
+        peripherals.SPI2,
+        peripherals.GPIO8,
+        peripherals.GPIO9,
+        peripherals.GPIO10,
+        peripherals.GPIO11,
+        peripherals.GPIO12,
+        peripherals.GPIO13,
+        panel_diagnostic,
+    );
     panel_power.set_high();
+    drop(panel_power);
+    drop(power_latch);
+    drop(audio_power);
     panel_result?;
-    rtc_result
+    rtc_result.map(|report| {
+        (
+            report,
+            SleepResources {
+                rtc_interrupt: peripherals.GPIO5,
+                panel_power: panel_power_pin,
+                power_latch: power_latch_pin,
+                audio_power: audio_power_pin,
+                low_power: peripherals.LPWR,
+            },
+        )
+    })
+}
+
+impl SleepResources {
+    fn sleep(self) -> ! {
+        let mut rtc_interrupt = self.rtc_interrupt;
+        let interrupt_input = Input::new(
+            rtc_interrupt.reborrow(),
+            InputConfig::default().with_pull(Pull::Up),
+        );
+        if interrupt_input.is_low() {
+            esp_println::println!("sleep diagnostic failed: RTC interrupt remained low");
+            loop {
+                core::hint::spin_loop();
+            }
+        }
+        drop(interrupt_input);
+
+        let mut panel_power = self.panel_power;
+        let panel_output =
+            Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
+        drop(panel_output);
+        panel_power.rtcio_pad_hold(true);
+
+        let mut power_latch = self.power_latch;
+        let latch_output =
+            Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
+        drop(latch_output);
+        power_latch.rtcio_pad_hold(true);
+
+        let _audio_power = Output::new(self.audio_power, Level::High, OutputConfig::default());
+        let wake = Ext0WakeupSource::new(rtc_interrupt, WakeupLevel::Low);
+        let mut low_power = HalRtc::new(self.low_power);
+        Delay::new().delay_ms(100);
+        low_power.sleep_deep(&[&wake]);
+    }
 }
 
 fn run_rtc_diagnostics<I2cBus>(
     mut rtc: Pcf85063Rtc<I2cBus>,
+    configure_alarm: bool,
 ) -> Result<HardwareDiagnosticReport, &'static str>
 where
     I2cBus: embedded_hal_async::i2c::I2c,
@@ -165,103 +216,15 @@ where
         {
             return Err("RTC alarm flag remained asserted");
         }
-        rtc.configure_daily_alarm()
-            .await
-            .map_err(|_| "RTC alarm configuration failed")?;
+        if configure_alarm {
+            rtc.configure_daily_alarm()
+                .await
+                .map_err(|_| "RTC alarm configuration failed")?;
+        }
 
         Ok(HardwareDiagnosticReport {
             rtc_datetime: readback,
             alarm_was_pending,
         })
     })
-}
-
-fn refresh<SpiDeviceType, BusyPin, DcPin, ResetPin, DelayType>(
-    panel: &mut Epd1in54<SpiDeviceType, BoundedBusy<'static, BusyPin>, DcPin, ResetPin, DelayType>,
-    spi: &mut SpiDeviceType,
-    delay: &mut DelayType,
-    frame: &Display1in54,
-) -> Result<(), &'static str>
-where
-    SpiDeviceType: SpiDevice,
-    BusyPin: embedded_hal::digital::InputPin,
-    DcPin: OutputPin,
-    ResetPin: OutputPin,
-    DelayType: DelayNs,
-{
-    wait_until_idle(panel, spi, delay)?;
-    PANEL_BUSY_STATE.reset();
-    panel
-        .update_frame(spi, frame.buffer(), delay)
-        .map_err(|_| "panel refresh failed")?;
-    check_busy()?;
-    PANEL_BUSY_STATE.reset();
-    panel
-        .display_frame(spi, delay)
-        .map_err(|_| "panel refresh failed")?;
-    check_busy()?;
-    wait_until_idle(panel, spi, delay)
-}
-
-fn wait_until_idle<SpiDeviceType, BusyPin, DcPin, ResetPin, DelayType>(
-    panel: &mut Epd1in54<SpiDeviceType, BoundedBusy<'static, BusyPin>, DcPin, ResetPin, DelayType>,
-    spi: &mut SpiDeviceType,
-    delay: &mut DelayType,
-) -> Result<(), &'static str>
-where
-    SpiDeviceType: SpiDevice,
-    BusyPin: embedded_hal::digital::InputPin,
-    DcPin: OutputPin,
-    ResetPin: OutputPin,
-    DelayType: DelayNs,
-{
-    PANEL_BUSY_STATE.reset();
-    panel
-        .wait_until_idle(spi, delay)
-        .map_err(|_| "panel BUSY wait failed")?;
-    check_busy()
-}
-
-fn check_busy() -> Result<(), &'static str> {
-    if PANEL_BUSY_STATE.timed_out() {
-        Err("panel BUSY timeout")
-    } else {
-        Ok(())
-    }
-}
-
-fn draw_checkerboard(frame: &mut Display1in54) -> Result<(), &'static str> {
-    frame
-        .clear(Color::White)
-        .map_err(|_| "checkerboard clear failed")?;
-    for y in 0..10 {
-        for x in 0..10 {
-            if (x + y) % 2 == 0 {
-                Rectangle::new(Point::new(x * 20, y * 20), (20, 20).into())
-                    .into_styled(PrimitiveStyle::with_fill(Color::Black))
-                    .draw(frame)
-                    .map_err(|_| "checkerboard draw failed")?;
-            }
-        }
-    }
-    Ok(())
-}
-
-fn draw_border(frame: &mut Display1in54) -> Result<(), &'static str> {
-    frame
-        .clear(Color::White)
-        .map_err(|_| "border clear failed")?;
-    Rectangle::new(Point::zero(), (200, 200).into())
-        .into_styled(PrimitiveStyle::with_stroke(Color::Black, 2))
-        .draw(frame)
-        .map_err(|_| "border draw failed")
-}
-
-fn draw_text(frame: &mut Display1in54) -> Result<(), &'static str> {
-    frame.clear(Color::White).map_err(|_| "text clear failed")?;
-    let style = MonoTextStyle::new(&FONT_6X10, Color::Black);
-    Text::new("POKEVIEWER\n1.54 V2\n200 x 200", Point::new(48, 80), style)
-        .draw(frame)
-        .map(|_| ())
-        .map_err(|_| "text draw failed")
 }

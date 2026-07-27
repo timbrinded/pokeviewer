@@ -100,3 +100,6 @@ Physical evidence is pending while the development user lacks permission to
 open `/dev/ttyACM0`. Do not make the device node world-writable. Restore access
 through the host's normal serial-device group, reconnect or re-login, and
 follow the [privacy and evidence rules](../privacy-and-evidence.md).
+
+RTC wake and current measurements continue in the
+[deep-sleep qualification](deep-sleep-qualification.md).

@@ -9,11 +9,13 @@ mod board;
 #[cfg(any(target_arch = "xtensa", test))]
 mod bounded_busy;
 #[cfg(target_arch = "xtensa")]
+mod panel;
+#[cfg(target_arch = "xtensa")]
 mod pcf85063;
 mod rtc;
 
 #[cfg(target_arch = "xtensa")]
-pub use board::{HardwareDiagnosticReport, run_hardware_diagnostics};
+pub use board::{HardwareDiagnosticReport, run_hardware_diagnostics, run_sleep_diagnostic};
 #[cfg(target_arch = "xtensa")]
 pub use pcf85063::{Pcf85063Rtc, Pcf85063RtcError};
 pub use rtc::{FakeRtc, FakeRtcError, InvalidDateTime, LocalDateTime, Rtc, Weekday};

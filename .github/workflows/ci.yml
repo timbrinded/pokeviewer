@@ -130,6 +130,8 @@ jobs:
         run: |
           set -o pipefail
           cargo xtask firmware-build 2>&1 | tee artifacts/firmware/build.log
+          cargo xtask sleep-diagnostic-build \
+            2>&1 | tee artifacts/firmware/sleep-diagnostic-build.log
 
       - name: Report firmware size
         run: |
@@ -152,5 +154,6 @@ jobs:
           path: |
             artifacts/firmware
             target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-sleep-diagnostic
           if-no-files-found: warn
           retention-days: 14

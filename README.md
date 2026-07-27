@@ -11,7 +11,9 @@ Firmware supports only the
 Panel diagnostics follow the
 [e-paper bring-up procedure](docs/hardware/panel-bring-up.md), and RTC
 qualification follows the
-[PCF85063 bring-up procedure](docs/hardware/rtc-bring-up.md).
+[PCF85063 bring-up procedure](docs/hardware/rtc-bring-up.md). The separate
+[deep-sleep qualification](docs/hardware/deep-sleep-qualification.md) covers
+RTC wake behavior and battery measurements.
 
 ## V1 experience
 

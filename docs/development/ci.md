@@ -8,13 +8,15 @@ push to `main`.
 | `Host checks` | host quality and policy | `host-check-logs` |
 | `ESP32-S3 release` | target build and size | `esp32s3-release` |
 
-Host quality covers formatting, Clippy, tests, a locked build, dependency policy,
-and workflow syntax. Target validation installs pinned Xtensa Rust, performs a
-locked release build, and reports the linked firmware size.
+Host quality covers formatting, Clippy, tests, a locked build, dependency
+policy, and workflow syntax. Target validation installs pinned Xtensa Rust,
+performs locked release builds of the application and sleep diagnostic, and
+reports the linked application-firmware size.
 
 Host commands do not set or inherit an embedded default target. The firmware
-job selects `xtensa-esp32s3-none-elf` through `cargo xtask firmware-build`.
-Neither job runs the content generator, so normal CI makes no PokéAPI request.
+job selects `xtensa-esp32s3-none-elf` through `cargo xtask firmware-build` and
+`cargo xtask sleep-diagnostic-build`. Neither job runs the content generator,
+so normal CI makes no PokéAPI request.
 
 Third-party actions are pinned to full commit SHAs. The comments beside action
 references record the reviewed release tag where one exists. Tool inputs also
@@ -48,6 +50,7 @@ cargo check --workspace --all-targets --locked
 cargo deny --locked check
 actionlint
 cargo xtask firmware-build
+cargo xtask sleep-diagnostic-build
 ```
 
 The final command requires the embedded setup in the

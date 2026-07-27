@@ -7,6 +7,8 @@ use std::process::{Command, ExitCode};
 const ESP_TOOLCHAIN: &str = "esp-1.95.0.0";
 const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
 const ESP_TARGET: &str = "xtensa-esp32s3-none-elf";
+const RELEASE_FIRMWARE: &str = "pokeviewer-firmware";
+const SLEEP_DIAGNOSTIC: &str = "pokeviewer-sleep-diagnostic";
 
 fn main() -> ExitCode {
     match env::args().nth(1).as_deref() {
@@ -14,8 +16,10 @@ fn main() -> ExitCode {
             print_help();
             ExitCode::SUCCESS
         }
-        Some("firmware-build") => run_cargo(&firmware_args("build")),
-        Some("firmware-flash") => run_cargo(&firmware_args("run")),
+        Some("firmware-build") => run_cargo(&firmware_args("build", RELEASE_FIRMWARE)),
+        Some("firmware-flash") => run_cargo(&firmware_args("run", RELEASE_FIRMWARE)),
+        Some("sleep-diagnostic-build") => run_cargo(&firmware_args("build", SLEEP_DIAGNOSTIC)),
+        Some("sleep-diagnostic-flash") => run_cargo(&firmware_args("run", SLEEP_DIAGNOSTIC)),
         Some(command) => {
             eprintln!("unknown xtask command: {command}");
             ExitCode::from(2)
@@ -23,14 +27,14 @@ fn main() -> ExitCode {
     }
 }
 
-fn firmware_args(action: &'static str) -> [&'static str; 9] {
+fn firmware_args(action: &'static str, binary: &'static str) -> [&'static str; 9] {
     [
         ESP_TOOLCHAIN_ARG,
         action,
         "--package",
         "pokeviewer-firmware",
         "--bin",
-        "pokeviewer-firmware",
+        binary,
         "--target",
         ESP_TARGET,
         "--locked",
@@ -61,20 +65,32 @@ USAGE:
 COMMANDS:
     firmware-build    Build release firmware
     firmware-flash    Build, flash, and monitor release firmware
+    sleep-diagnostic-build
+                      Build RTC wake/deep-sleep diagnostic firmware
+    sleep-diagnostic-flash
+                      Build, flash, and monitor sleep diagnostic firmware
     help              Print this help"
     );
 }
 
 #[cfg(test)]
 mod tests {
-    use super::{ESP_TARGET, firmware_args};
+    use super::{ESP_TARGET, RELEASE_FIRMWARE, SLEEP_DIAGNOSTIC, firmware_args};
 
     #[test]
     fn firmware_commands_select_the_embedded_target() {
-        let args = firmware_args("build");
+        let args = firmware_args("build", RELEASE_FIRMWARE);
 
         assert_eq!(args[1], "build");
         assert!(args.contains(&ESP_TARGET));
         assert!(args.contains(&"--locked"));
+    }
+
+    #[test]
+    fn sleep_diagnostic_selects_its_own_binary() {
+        let args = firmware_args("run", SLEEP_DIAGNOSTIC);
+
+        assert_eq!(args[1], "run");
+        assert!(args.contains(&SLEEP_DIAGNOSTIC));
     }
 }
