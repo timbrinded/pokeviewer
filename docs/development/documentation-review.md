@@ -7,7 +7,7 @@
 | offline 07:00 operation | user guide, product contract | schedule/state tests | complete |
 | battery/small-parts/heat supervision | safety guide | link/docs CI | complete |
 | all recovery codes | troubleshooting guide | failure-policy tests | complete |
-| release download and verification | release-verification guide | packaging owned by #26 | draft |
+| release download and verification | release-verification guide | candidate bundle verification | complete |
 | fresh Linux walkthrough | clean-host rehearsal | owned by #27 | pending |
 | sanitized screenshots and physical logs | qualification evidence | owned by #24 | blocked |
 | licence and media exclusions | licence and third-party notices | repository review | complete |

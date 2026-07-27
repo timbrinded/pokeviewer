@@ -25,6 +25,12 @@ pub fn run(arguments: impl IntoIterator<Item = String>) -> Result<String, String
     let Some(command) = arguments.first().map(String::as_str) else {
         return Err(usage());
     };
+    if command == "--version" {
+        if arguments.len() != 1 {
+            return Err(usage());
+        }
+        return Ok(format!("pokeviewerctl {}", env!("CARGO_PKG_VERSION")));
+    }
     if command == "list" {
         if arguments.len() != 1 {
             return Err(usage());
@@ -198,18 +204,33 @@ fn option<'a>(arguments: &'a [String], name: &str) -> Option<&'a str> {
 }
 
 fn usage() -> String {
-    "usage: pokeviewerctl list | <info|get-rtc|diagnostics> --device PATH | set-rtc --device PATH --datetime YYYY-MM-DDTHH:MM:SS".to_owned()
+    "usage: pokeviewerctl --version | list | <info|get-rtc|diagnostics> --device PATH | set-rtc --device PATH --datetime YYYY-MM-DDTHH:MM:SS".to_owned()
 }
 
 #[cfg(test)]
 mod tests {
     use std::io::{self, Cursor, Read};
 
-    use pokeviewer_core::{Command, FrameKind, ProtocolFrame, Status};
+    use pokeviewer_core::{Command, FIRMWARE_VERSION, FrameKind, ProtocolFrame, Status};
 
-    use super::{format_response, parse_datetime, read_response};
+    use super::{format_response, parse_datetime, read_response, run};
 
     const NOW: &str = "2026-07-27T19:05:09";
+
+    #[test]
+    fn package_and_protocol_versions_cannot_drift() {
+        assert_eq!(
+            env!("CARGO_PKG_VERSION"),
+            format!(
+                "{}.{}.{}",
+                FIRMWARE_VERSION[0], FIRMWARE_VERSION[1], FIRMWARE_VERSION[2]
+            )
+        );
+        assert_eq!(
+            run(["--version".to_owned()]).unwrap(),
+            "pokeviewerctl 1.0.0"
+        );
+    }
 
     #[test]
     fn strict_datetime_parser_rejects_invalid_calendar_fields() {
@@ -224,7 +245,13 @@ mod tests {
             1,
             FrameKind::Response,
             Command::Handshake,
-            &[Status::Ok as u8, 0, 1, 0, 0x0f],
+            &[
+                Status::Ok as u8,
+                FIRMWARE_VERSION[0],
+                FIRMWARE_VERSION[1],
+                FIRMWARE_VERSION[2],
+                0x0f,
+            ],
         )
         .unwrap()
         .encode();
@@ -233,7 +260,7 @@ mod tests {
         let response = read_response(&mut Cursor::new(bytes)).unwrap();
         assert_eq!(
             format_response(response).unwrap(),
-            "protocol=1 firmware=0.1.0 capabilities=0x0f"
+            "protocol=1 firmware=1.0.0 capabilities=0x0f"
         );
     }
 

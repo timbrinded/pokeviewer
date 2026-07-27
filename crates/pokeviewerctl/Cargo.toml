@@ -9,7 +9,7 @@ rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
-pokeviewer-core = { version = "=0.1.0", path = "../pokeviewer-core" }
+pokeviewer-core = { version = "=1.0.0", path = "../pokeviewer-core" }
 serial2 = { version = "=0.2.37", default-features = false }
 
 [lints]

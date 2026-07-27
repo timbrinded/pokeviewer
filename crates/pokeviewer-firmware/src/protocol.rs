@@ -1,7 +1,8 @@
 //! Bounded command handling independent of the USB transport.
 
 use pokeviewer_core::{
-    Command, FrameError, FrameKind, ProtocolFrame, Status, decode_datetime, encode_datetime,
+    Command, FIRMWARE_VERSION, FrameError, FrameKind, ProtocolFrame, Status, decode_datetime,
+    encode_datetime,
 };
 
 use crate::Rtc;
@@ -28,7 +29,16 @@ where
         return response(request, &[Status::InvalidRequest as u8]);
     }
     match request.command {
-        Command::Handshake => response(request, &[Status::Ok as u8, 0, 1, 0, 0x0f]),
+        Command::Handshake => response(
+            request,
+            &[
+                Status::Ok as u8,
+                FIRMWARE_VERSION[0],
+                FIRMWARE_VERSION[1],
+                FIRMWARE_VERSION[2],
+                0x0f,
+            ],
+        ),
         Command::ReadRtc => match rtc.read_datetime().await {
             Ok(datetime) => datetime_response(request, Status::Ok, datetime),
             Err(_) => response(request, &[Status::DeviceError as u8]),

@@ -10,6 +10,8 @@ const MAX_PAYLOAD_BYTES: usize = 16;
 pub const MAX_FRAME_BYTES: usize = HEADER_BYTES + MAX_PAYLOAD_BYTES + CHECKSUM_BYTES;
 /// Supported USB protocol version.
 pub const PROTOCOL_VERSION: u8 = 1;
+/// Product version reported by v1 firmware over USB.
+pub const FIRMWARE_VERSION: [u8; 3] = [1, 0, 0];
 
 /// Direction encoded in a protocol frame.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

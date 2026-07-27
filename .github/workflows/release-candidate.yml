@@ -1,0 +1,97 @@
+name: Release candidate
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: release-candidate-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release-tests:
+    name: Required release tests
+    uses: ./.github/workflows/ci.yml
+    permissions:
+      contents: read
+
+  candidate:
+    name: Reproducible v1.0.0 candidate
+    needs: release-tests
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out immutable source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+        with:
+          fetch-depth: 1
+
+      - name: Confirm requested commit
+        run: |
+          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
+          git diff --exit-code
+
+      - name: Install host Rust
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: 1.96.0
+
+      - name: Install espup
+        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
+        with:
+          tool: espup@0.17.1
+
+      - name: Install espflash
+        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
+        with:
+          tool: espflash@4.5.0
+
+      - name: Install pinned Xtensa Rust
+        run: |
+          espup install \
+            --name esp-1.95.0.0 \
+            --targets esp32s3 \
+            --toolchain-version 1.95.0.0 \
+            --export-file "$RUNNER_TEMP/esp-export.sh"
+          source "$RUNNER_TEMP/esp-export.sh"
+          echo "$PATH" >> "$GITHUB_PATH"
+          echo "LIBCLANG_PATH=$LIBCLANG_PATH" >> "$GITHUB_ENV"
+          echo "CLANG_PATH=$CLANG_PATH" >> "$GITHUB_ENV"
+
+      - name: Build first clean candidate
+        run: |
+          cargo clean
+          scripts/build-release-candidate.sh artifacts/candidate-a
+
+      - name: Build second clean candidate
+        run: |
+          cargo clean
+          scripts/build-release-candidate.sh artifacts/candidate-b
+
+      - name: Prove reproducibility
+        run: |
+          archive=pokeviewer-v1.0.0.tar.gz
+          cmp \
+            "artifacts/candidate-a/$archive" \
+            "artifacts/candidate-b/$archive"
+          diff -u \
+            "artifacts/candidate-a/$archive.sha256" \
+            "artifacts/candidate-b/$archive.sha256"
+          mkdir -p artifacts/release-candidate
+          cp "artifacts/candidate-a/$archive" \
+            "artifacts/candidate-a/$archive.sha256" \
+            artifacts/release-candidate/
+          {
+            echo "source_commit=$GITHUB_SHA"
+            echo "clean_builds=2"
+            cat "artifacts/candidate-a/$archive.sha256"
+          } >artifacts/release-candidate/reproducibility.txt
+
+      - name: Upload retained candidate
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: pokeviewer-v1.0.0-candidate-${{ github.sha }}
+          path: artifacts/release-candidate
+          if-no-files-found: error
+          retention-days: 14

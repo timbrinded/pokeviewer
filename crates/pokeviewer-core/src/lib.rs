@@ -11,8 +11,8 @@ mod schedule;
 
 pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
 pub use protocol::{
-    Command, EncodedFrame, FrameAccumulator, FrameError, FrameKind, ProtocolFrame, Status,
-    decode_datetime, encode_datetime,
+    Command, EncodedFrame, FIRMWARE_VERSION, FrameAccumulator, FrameError, FrameKind,
+    ProtocolFrame, Status, decode_datetime, encode_datetime,
 };
 pub use recovery::{RecoveryState, SetupReason, assess_rtc};
 pub use render::{

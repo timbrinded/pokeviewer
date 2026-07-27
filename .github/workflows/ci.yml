@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+  workflow_call:
 
 permissions:
   contents: read
@@ -93,6 +94,7 @@ jobs:
             THIRD_PARTY_NOTICES.md \
             'docs/**/*.md' \
             'content/**/*.md' \
+            'release/**/*.md' \
             2>&1 | tee artifacts/host/markdownlint.log
           git ls-files -z '*.md' \
             | xargs -0 lychee --no-progress \

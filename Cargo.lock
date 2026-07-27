@@ -1140,7 +1140,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewer-core"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "crc32fast",
  "time",
@@ -1148,7 +1148,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewer-firmware"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "embassy-futures",
  "embedded-graphics",
@@ -1167,7 +1167,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewerctl"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "pokeviewer-core",
  "serial2",
@@ -1664,7 +1664,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "0.1.0"
+version = "1.0.0"
 dependencies = [
  "crc32fast",
  "png",
