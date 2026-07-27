@@ -2,6 +2,10 @@
 #![forbid(unsafe_code)]
 #![doc = "Deterministic domain and rendering logic shared by firmware and host tests."]
 
+mod content;
+
+pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
+
 /// Width of the supported e-paper panel in pixels.
 pub const DISPLAY_WIDTH: usize = 200;
 

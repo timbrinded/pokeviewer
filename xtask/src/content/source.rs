@@ -70,6 +70,8 @@ pub(super) struct ConvertedRecord {
     pub(super) name: String,
     pub(super) primary_type: u8,
     pub(super) secondary_type: u8,
+    pub(super) source_width: usize,
+    pub(super) source_height: usize,
     pub(super) sprite: Vec<u8>,
 }
 
@@ -133,12 +135,15 @@ pub(super) fn parse_source(
     let name: String = english_names[0].name.nfc().collect();
     validate_name(id, &name)?;
 
+    let (sprite, source_width, source_height) = convert_sprite(id, sprite_bytes)?;
     Ok(ConvertedRecord {
         id,
         name,
         primary_type,
         secondary_type,
-        sprite: convert_sprite(id, sprite_bytes)?,
+        source_width,
+        source_height,
+        sprite,
     })
 }
 
@@ -197,7 +202,7 @@ fn validate_name(id: u16, name: &str) -> TaskResult {
     Ok(())
 }
 
-fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<Vec<u8>> {
+fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> {
     let mut decoder = png::Decoder::new(Cursor::new(bytes));
     decoder.set_transformations(Transformations::EXPAND | Transformations::STRIP_16);
     let mut reader = decoder
@@ -249,7 +254,7 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<Vec<u8>> {
             output[output_index / 8] |= 1 << (7 - output_index % 8);
         }
     }
-    Ok(output)
+    Ok((output, source_width, source_height))
 }
 
 fn rgba_pixels(

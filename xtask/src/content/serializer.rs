@@ -3,8 +3,10 @@ use std::{fs, path::Path};
 use super::{
     CACHE_SCHEMA_VERSION, CONTENT_REVISION, CacheManifest, FIRST_ID, FORMAT_VERSION, LAST_ID,
     PackManifest, PackManifestEntry, SCHEDULE_VERSION, SPRITES_REVISION, SourceEntry, TaskResult,
-    read, sha256_hex,
-    source::{ConvertedRecord, SPRITE_BYTES, SPRITE_HEIGHT, SPRITE_WIDTH, parse_source},
+    ValidationReport, read, sha256_hex,
+    source::{
+        ConvertedRecord, NO_SECONDARY_TYPE, SPRITE_BYTES, SPRITE_HEIGHT, SPRITE_WIDTH, parse_source,
+    },
     write_json,
 };
 
@@ -41,6 +43,12 @@ pub(super) fn convert_cache(
         provenance.push(PackManifestEntry {
             id: expected_id,
             name: record.name.clone(),
+            primary_type: record.primary_type,
+            secondary_type: (record.secondary_type != NO_SECONDARY_TYPE)
+                .then_some(record.secondary_type),
+            source_width: record.source_width,
+            source_height: record.source_height,
+            encoded_sprite_bytes: record.sprite.len(),
             pokemon_sha256: entry.pokemon.sha256.clone(),
             species_sha256: entry.species.sha256.clone(),
             sprite_sha256: entry.sprite.sha256.clone(),
@@ -57,6 +65,14 @@ pub(super) fn convert_cache(
     fs::write(pack_path, &pack)
         .map_err(|error| format!("failed to write {}: {error}", pack_path.display()))?;
     create_parent(pack_manifest_path)?;
+    let contact_sheet_path = pack_path.with_file_name("sprites-contact-sheet.png");
+    write_contact_sheet(&converted, &contact_sheet_path)?;
+    let contact_sheet = fs::read(&contact_sheet_path).map_err(|error| {
+        format!(
+            "failed to read generated contact sheet {}: {error}",
+            contact_sheet_path.display()
+        )
+    })?;
     let pack_file_name = pack_path
         .file_name()
         .and_then(|value| value.to_str())
@@ -64,6 +80,7 @@ pub(super) fn convert_cache(
     write_json(
         pack_manifest_path,
         &PackManifest {
+            converter_version: env!("CARGO_PKG_VERSION"),
             format_version: FORMAT_VERSION,
             content_revision: CONTENT_REVISION,
             schedule_version: SCHEDULE_VERSION,
@@ -72,6 +89,9 @@ pub(super) fn convert_cache(
             pack_path: pack_file_name.to_owned(),
             pack_length: pack.len(),
             pack_sha256: sha256_hex(&pack),
+            contact_sheet_path: "sprites-contact-sheet.png".to_owned(),
+            contact_sheet_sha256: sha256_hex(&contact_sheet),
+            validation: validation_report(&converted, pack.len()),
             entries: provenance,
         },
     )?;
@@ -239,6 +259,68 @@ fn build_pack(records: &[ConvertedRecord]) -> TaskResult<Vec<u8>> {
     Ok(pack)
 }
 
+fn validation_report(records: &[ConvertedRecord], pack_bytes: usize) -> ValidationReport {
+    ValidationReport {
+        record_count: records.len(),
+        unique_id_count: records.len(),
+        first_id: FIRST_ID,
+        last_id: LAST_ID,
+        valid_sprite_count: records.len(),
+        metadata_bytes: pack_bytes - records.len() * SPRITE_BYTES,
+        sprite_bytes: records.len() * SPRITE_BYTES,
+        pack_bytes,
+        maximum_source_width: records
+            .iter()
+            .map(|record| record.source_width)
+            .max()
+            .unwrap_or(0),
+        maximum_source_height: records
+            .iter()
+            .map(|record| record.source_height)
+            .max()
+            .unwrap_or(0),
+        encoded_sprite_bytes: SPRITE_BYTES,
+        firmware_decode_heap_bytes: 0,
+        display_framebuffer_bytes: 5_000,
+    }
+}
+
+fn write_contact_sheet(records: &[ConvertedRecord], path: &Path) -> TaskResult {
+    const COLUMNS: usize = 16;
+    const ROWS: usize = 10;
+    let width = COLUMNS * SPRITE_WIDTH;
+    let height = ROWS * SPRITE_HEIGHT;
+    let mut pixels = vec![255; width * height];
+    for (record_index, record) in records.iter().enumerate() {
+        let cell_x = (record_index % COLUMNS) * SPRITE_WIDTH;
+        let cell_y = (record_index / COLUMNS) * SPRITE_HEIGHT;
+        for sprite_index in 0..SPRITE_WIDTH * SPRITE_HEIGHT {
+            let byte = record.sprite[sprite_index / 8];
+            let is_black = byte & (1 << (7 - sprite_index % 8)) != 0;
+            if is_black {
+                let x = cell_x + sprite_index % SPRITE_WIDTH;
+                let y = cell_y + sprite_index / SPRITE_WIDTH;
+                pixels[y * width + x] = 0;
+            }
+        }
+    }
+
+    create_parent(path)?;
+    let file = fs::File::create(path)
+        .map_err(|error| format!("failed to create {}: {error}", path.display()))?;
+    let width = u32::try_from(width).map_err(|_| "contact-sheet width exceeds u32")?;
+    let height = u32::try_from(height).map_err(|_| "contact-sheet height exceeds u32")?;
+    let mut encoder = png::Encoder::new(file, width, height);
+    encoder.set_color(png::ColorType::Grayscale);
+    encoder.set_depth(png::BitDepth::Eight);
+    let mut writer = encoder
+        .write_header()
+        .map_err(|error| format!("failed to write {} header: {error}", path.display()))?;
+    writer
+        .write_image_data(&pixels)
+        .map_err(|error| format!("failed to write {} pixels: {error}", path.display()))
+}
+
 fn create_parent(path: &Path) -> TaskResult {
     let parent = path
         .parent()
@@ -250,7 +332,6 @@ fn create_parent(path: &Path) -> TaskResult {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::content::source::NO_SECONDARY_TYPE;
 
     #[test]
     fn identical_records_produce_identical_pack_bytes() {
@@ -272,6 +353,8 @@ mod tests {
                 name: format!("P{id}"),
                 primary_type: 0,
                 secondary_type: NO_SECONDARY_TYPE,
+                source_width: SPRITE_WIDTH,
+                source_height: SPRITE_HEIGHT,
                 sprite: vec![0; SPRITE_BYTES],
             })
             .collect()

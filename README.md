@@ -47,6 +47,8 @@ Significant decisions are recorded in the
 [architecture decision log](docs/decisions/README.md). The accepted
 [content-pack and daily-schedule contract](docs/content-pack-v1.md) defines the
 offline wire format and deterministic 151-day rotation.
+The reviewed inputs, generated pack, validation report, and sprite contact
+sheet are indexed in the [content directory](content/README.md).
 
 ## Development
 

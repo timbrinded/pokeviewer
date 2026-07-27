@@ -50,6 +50,7 @@ pub(crate) struct SourceFile {
 
 #[derive(Debug, Serialize)]
 pub(crate) struct PackManifest {
+    pub(crate) converter_version: &'static str,
     pub(crate) format_version: u16,
     pub(crate) content_revision: u32,
     pub(crate) schedule_version: u16,
@@ -58,13 +59,38 @@ pub(crate) struct PackManifest {
     pub(crate) pack_path: String,
     pub(crate) pack_length: usize,
     pub(crate) pack_sha256: String,
+    pub(crate) contact_sheet_path: String,
+    pub(crate) contact_sheet_sha256: String,
+    pub(crate) validation: ValidationReport,
     pub(crate) entries: Vec<PackManifestEntry>,
+}
+
+#[derive(Debug, Serialize)]
+pub(crate) struct ValidationReport {
+    pub(crate) record_count: usize,
+    pub(crate) unique_id_count: usize,
+    pub(crate) first_id: u16,
+    pub(crate) last_id: u16,
+    pub(crate) valid_sprite_count: usize,
+    pub(crate) metadata_bytes: usize,
+    pub(crate) sprite_bytes: usize,
+    pub(crate) pack_bytes: usize,
+    pub(crate) maximum_source_width: usize,
+    pub(crate) maximum_source_height: usize,
+    pub(crate) encoded_sprite_bytes: usize,
+    pub(crate) firmware_decode_heap_bytes: usize,
+    pub(crate) display_framebuffer_bytes: usize,
 }
 
 #[derive(Debug, Serialize)]
 pub(crate) struct PackManifestEntry {
     pub(crate) id: u16,
     pub(crate) name: String,
+    pub(crate) primary_type: u8,
+    pub(crate) secondary_type: Option<u8>,
+    pub(crate) source_width: usize,
+    pub(crate) source_height: usize,
+    pub(crate) encoded_sprite_bytes: usize,
     pub(crate) pokemon_sha256: String,
     pub(crate) species_sha256: String,
     pub(crate) sprite_sha256: String,
