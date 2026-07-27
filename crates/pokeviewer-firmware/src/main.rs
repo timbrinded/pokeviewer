@@ -11,8 +11,10 @@ esp_bootloader_esp_idf::esp_app_desc!();
 #[cfg(target_arch = "xtensa")]
 #[esp_hal::main]
 fn main() -> ! {
-    let _board = pokeviewer_firmware::Board::initialize();
-    esp_println::println!("Pokeviewer firmware bootstrap");
+    match pokeviewer_firmware::run_display_diagnostics() {
+        Ok(()) => esp_println::println!("display diagnostics complete; panel rail off"),
+        Err(error) => esp_println::println!("display diagnostics failed: {error}"),
+    }
 
     loop {
         core::hint::spin_loop();

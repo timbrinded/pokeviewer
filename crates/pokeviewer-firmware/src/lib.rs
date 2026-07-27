@@ -6,11 +6,13 @@ pub use pokeviewer_core::{DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES};
 
 #[cfg(target_arch = "xtensa")]
 mod board;
+#[cfg(any(target_arch = "xtensa", test))]
+mod bounded_busy;
 #[cfg(target_arch = "xtensa")]
 mod rtc;
 
 #[cfg(target_arch = "xtensa")]
-pub use board::Board;
+pub use board::run_display_diagnostics;
 #[cfg(target_arch = "xtensa")]
 pub use rtc::Pcf85063Rtc;
 

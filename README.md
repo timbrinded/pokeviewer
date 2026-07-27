@@ -8,6 +8,8 @@ is the [v1 product contract](docs/product-contract.md); work is tracked under
 the [v1.0.0 delivery issue](https://github.com/timbrinded/pokeviewer/issues/1).
 Firmware supports only the
 [documented V2 board contract](docs/hardware/v2-board-contract.md).
+Panel diagnostics follow the
+[e-paper bring-up procedure](docs/hardware/panel-bring-up.md).
 
 ## V1 experience
 
