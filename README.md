@@ -48,6 +48,7 @@ Public project evidence must follow the
 - [Safety](docs/safety.md)
 - [Troubleshooting and recovery](docs/troubleshooting.md)
 - [Release download and verification](docs/release-verification.md)
+- [Clean-host release rehearsal](docs/hardware/clean-host-rehearsal.md)
 - [Legal and third-party media](THIRD_PARTY_NOTICES.md)
 
 ## Decisions

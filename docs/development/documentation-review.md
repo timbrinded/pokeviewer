@@ -8,7 +8,7 @@
 | battery/small-parts/heat supervision | safety guide | link/docs CI | complete |
 | all recovery codes | troubleshooting guide | failure-policy tests | complete |
 | release download and verification | release-verification guide | candidate bundle verification | complete |
-| fresh Linux walkthrough | clean-host rehearsal | owned by #27 | pending |
+| fresh Linux walkthrough | clean-host rehearsal | evidence validator | blocked |
 | sanitized screenshots and physical logs | qualification evidence | owned by #24 | blocked |
 | licence and media exclusions | licence and third-party notices | repository review | complete |
 

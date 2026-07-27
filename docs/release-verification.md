@@ -36,6 +36,8 @@ The release must remain a draft and must not be described as qualified while
 the [seven-day physical run](hardware/seven-day-run.md) is pending. The
 [clean-host rehearsal](https://github.com/timbrinded/pokeviewer/issues/27)
 must validate the final artifact names and commands before publication.
+Its exact procedure and private evidence contract are documented in the
+[clean-host rehearsal guide](hardware/clean-host-rehearsal.md).
 
 Pokémon media is excluded from the source MIT licence; read
 [Third-party notices](../THIRD_PARTY_NOTICES.md).
