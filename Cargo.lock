@@ -1143,7 +1143,6 @@ name = "pokeviewer-core"
 version = "0.1.0"
 dependencies = [
  "crc32fast",
- "embedded-graphics",
  "time",
 ]
 
@@ -1654,6 +1653,7 @@ version = "0.1.0"
 dependencies = [
  "crc32fast",
  "png",
+ "pokeviewer-core",
  "serde",
  "serde_json",
  "sha2",

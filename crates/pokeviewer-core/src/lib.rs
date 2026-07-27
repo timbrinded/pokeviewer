@@ -3,9 +3,12 @@
 #![doc = "Deterministic domain and rendering logic shared by firmware and host tests."]
 
 mod content;
+mod font;
+mod render;
 mod schedule;
 
 pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
+pub use render::{DailyCard, Framebuffer, RenderError, render_daily_card};
 pub use schedule::{
     DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,
     select_daily_pokemon,

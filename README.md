@@ -76,3 +76,5 @@ Embedded setup, builds, flashing, and monitoring are documented in the
 [CI guide](docs/development/ci.md) for automated checks and artifacts. Explicit
 cache refresh and offline pack conversion are documented in the
 [content tooling guide](docs/development/content-tooling.md).
+The [shared-renderer guide](docs/development/rendering.md) documents the exact
+panel buffer, host evidence command, and renderer memory budget.

@@ -5,6 +5,7 @@ use std::env;
 use std::process::{Command, ExitCode};
 
 mod content;
+mod render;
 
 const ESP_TOOLCHAIN: &str = "esp-1.95.0.0";
 const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
@@ -33,6 +34,13 @@ fn main() -> ExitCode {
         Some("content-build") => {
             let arguments: Vec<_> = arguments.collect();
             task_result(content::build_command(&arguments))
+        }
+        Some("render-samples") => {
+            let output_dir = arguments.next();
+            if arguments.next().is_some() {
+                return fail("render-samples accepts at most one output directory");
+            }
+            task_result(render::samples_command(output_dir.as_deref()))
         }
         Some(command) => {
             eprintln!("unknown xtask command: {command}");
@@ -99,6 +107,8 @@ COMMANDS:
                       Explicitly fetch IDs 1-151 into a new review cache
     content-build [CACHE_DIR] [PACK_FILE] [MANIFEST_FILE]
                       Build a deterministic pack without network access
+    render-samples [OUTPUT_DIR]
+                      Render representative panel-native PBM and PNG evidence
     help              Print this help"
     );
 }
