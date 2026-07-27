@@ -71,4 +71,6 @@ cargo xtask help
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and review rules.
 Embedded setup, builds, flashing, and monitoring are documented in the
 [toolchain guide](docs/development/toolchain.md). See the
-[CI guide](docs/development/ci.md) for automated checks and artifacts.
+[CI guide](docs/development/ci.md) for automated checks and artifacts. Explicit
+cache refresh and offline pack conversion are documented in the
+[content tooling guide](docs/development/content-tooling.md).

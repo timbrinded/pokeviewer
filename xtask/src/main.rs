@@ -4,6 +4,8 @@
 use std::env;
 use std::process::{Command, ExitCode};
 
+mod content;
+
 const ESP_TOOLCHAIN: &str = "esp-1.95.0.0";
 const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
 const ESP_TARGET: &str = "xtensa-esp32s3-none-elf";
@@ -11,7 +13,8 @@ const RELEASE_FIRMWARE: &str = "pokeviewer-firmware";
 const SLEEP_DIAGNOSTIC: &str = "pokeviewer-sleep-diagnostic";
 
 fn main() -> ExitCode {
-    match env::args().nth(1).as_deref() {
+    let mut arguments = env::args().skip(1);
+    match arguments.next().as_deref() {
         None | Some("help" | "--help" | "-h") => {
             print_help();
             ExitCode::SUCCESS
@@ -20,11 +23,34 @@ fn main() -> ExitCode {
         Some("firmware-flash") => run_cargo(&firmware_args("run", RELEASE_FIRMWARE)),
         Some("sleep-diagnostic-build") => run_cargo(&firmware_args("build", SLEEP_DIAGNOSTIC)),
         Some("sleep-diagnostic-flash") => run_cargo(&firmware_args("run", SLEEP_DIAGNOSTIC)),
+        Some("content-fetch") => {
+            let cache_dir = arguments.next();
+            if arguments.next().is_some() {
+                return fail("content-fetch accepts at most one cache directory");
+            }
+            task_result(content::fetch_command(cache_dir.as_deref()))
+        }
+        Some("content-build") => {
+            let arguments: Vec<_> = arguments.collect();
+            task_result(content::build_command(&arguments))
+        }
         Some(command) => {
             eprintln!("unknown xtask command: {command}");
             ExitCode::from(2)
         }
     }
+}
+
+fn task_result(result: Result<(), String>) -> ExitCode {
+    match result {
+        Ok(()) => ExitCode::SUCCESS,
+        Err(error) => fail(&error),
+    }
+}
+
+fn fail(error: &str) -> ExitCode {
+    eprintln!("{error}");
+    ExitCode::FAILURE
 }
 
 fn firmware_args(action: &'static str, binary: &'static str) -> [&'static str; 9] {
@@ -69,6 +95,10 @@ COMMANDS:
                       Build RTC wake/deep-sleep diagnostic firmware
     sleep-diagnostic-flash
                       Build, flash, and monitor sleep diagnostic firmware
+    content-fetch [CACHE_DIR]
+                      Explicitly fetch IDs 1-151 into a new review cache
+    content-build [CACHE_DIR] [PACK_FILE] [MANIFEST_FILE]
+                      Build a deterministic pack without network access
     help              Print this help"
     );
 }
