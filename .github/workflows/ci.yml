@@ -1,0 +1,148 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  CARGO_TERM_COLOR: always
+
+jobs:
+  host:
+    name: Host checks
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install host Rust
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: 1.96.0
+          components: clippy, rustfmt
+
+      - name: Install cargo-deny
+        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
+        with:
+          tool: cargo-deny@0.20.2
+
+      - name: Install actionlint
+        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
+        with:
+          tool: actionlint@1.7.12
+
+      - name: Prepare logs
+        run: mkdir -p artifacts/host
+
+      - name: Check formatting
+        run: |
+          set -o pipefail
+          cargo fmt --all --check 2>&1 | tee artifacts/host/format.log
+
+      - name: Lint
+        run: |
+          set -o pipefail
+          cargo clippy --workspace --all-targets --locked -- -D warnings \
+            2>&1 | tee artifacts/host/clippy.log
+
+      - name: Test
+        run: |
+          set -o pipefail
+          cargo test --workspace --locked 2>&1 | tee artifacts/host/test.log
+
+      - name: Check locked workspace
+        run: |
+          set -o pipefail
+          cargo check --workspace --all-targets --locked \
+            2>&1 | tee artifacts/host/check.log
+
+      - name: Check dependency policy
+        run: |
+          set -o pipefail
+          cargo deny --locked check 2>&1 | tee artifacts/host/cargo-deny.log
+
+      - name: Check GitHub Actions
+        run: |
+          set -o pipefail
+          actionlint 2>&1 | tee artifacts/host/actionlint.log
+
+      - name: Upload host logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: host-check-logs
+          path: artifacts/host
+          if-no-files-found: error
+          retention-days: 14
+
+  firmware:
+    name: ESP32-S3 release
+    runs-on: ubuntu-latest
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - name: Check out source
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4.3.1
+
+      - name: Install host Rust
+        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
+        with:
+          toolchain: 1.96.0
+
+      - name: Install espup
+        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
+        with:
+          tool: espup@0.17.1
+
+      - name: Install pinned Xtensa Rust
+        run: |
+          espup install \
+            --name esp-1.95.0.0 \
+            --targets esp32s3 \
+            --toolchain-version 1.95.0.0 \
+            --export-file "$RUNNER_TEMP/esp-export.sh"
+          source "$RUNNER_TEMP/esp-export.sh"
+          echo "$PATH" >> "$GITHUB_PATH"
+          echo "LIBCLANG_PATH=$LIBCLANG_PATH" >> "$GITHUB_ENV"
+          echo "CLANG_PATH=$CLANG_PATH" >> "$GITHUB_ENV"
+
+      - name: Prepare logs
+        run: mkdir -p artifacts/firmware
+
+      - name: Build locked release firmware
+        run: |
+          set -o pipefail
+          cargo xtask firmware-build 2>&1 | tee artifacts/firmware/build.log
+
+      - name: Report firmware size
+        run: |
+          set -o pipefail
+          firmware=target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
+          xtensa-esp-elf-size "$firmware" \
+            2>&1 | tee artifacts/firmware/size.txt
+          {
+            echo "## ESP32-S3 firmware size"
+            echo '```text'
+            cat artifacts/firmware/size.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Upload firmware and logs
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: esp32s3-release
+          path: |
+            artifacts/firmware
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
+          if-no-files-found: warn
+          retention-days: 14

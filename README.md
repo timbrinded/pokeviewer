@@ -62,4 +62,5 @@ cargo xtask help
 
 See [CONTRIBUTING.md](CONTRIBUTING.md) for development and review rules.
 Embedded setup, builds, flashing, and monitoring are documented in the
-[toolchain guide](docs/development/toolchain.md).
+[toolchain guide](docs/development/toolchain.md). See the
+[CI guide](docs/development/ci.md) for automated checks and artifacts.

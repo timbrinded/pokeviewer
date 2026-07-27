@@ -13,6 +13,7 @@ Cargo is the only build entry point:
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
+cargo deny --locked check
 cargo xtask help
 ```
 

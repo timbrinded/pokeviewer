@@ -9,7 +9,7 @@ rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
-pokeviewer-core = { path = "../pokeviewer-core" }
+pokeviewer-core = { version = "=0.1.0", path = "../pokeviewer-core" }
 
 [target.'cfg(target_arch = "xtensa")'.dependencies]
 epd-waveshare = { version = "=0.6.0", default-features = false, features = ["epd2in13_v3", "graphics"] }
