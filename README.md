@@ -3,8 +3,9 @@
 Pokeviewer is a battery-powered, fully offline Pokémon-of-the-day display for
 the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 board.
 
-The project is at the start of its v1 implementation. The authoritative scope
-is the [v1 product contract](docs/product-contract.md); work is tracked under
+The v1 implementation is feature-complete in source; physical qualification
+and release publication remain gated. The authoritative scope is the
+[v1 product contract](docs/product-contract.md); work is tracked under
 the [v1.0.0 delivery issue](https://github.com/timbrinded/pokeviewer/issues/1).
 Firmware supports only the
 [documented V2 board contract](docs/hardware/v2-board-contract.md).
@@ -40,6 +41,14 @@ before redistributing a build or asset pack.
 
 Public project evidence must follow the
 [privacy and evidence rules](docs/privacy-and-evidence.md).
+
+## Adult guides
+
+- [Setup and operation](docs/user-guide.md)
+- [Safety](docs/safety.md)
+- [Troubleshooting and recovery](docs/troubleshooting.md)
+- [Release download and verification](docs/release-verification.md)
+- [Legal and third-party media](THIRD_PARTY_NOTICES.md)
 
 ## Decisions
 

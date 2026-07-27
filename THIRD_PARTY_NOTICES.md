@@ -8,8 +8,8 @@ grants permission to use or redistribute that material. The project is not
 affiliated with, endorsed by, or sponsored by Nintendo, Creatures Inc.,
 GAME FREAK inc., or The Pokémon Company International.
 
-The committed content pack derives sprites from the Pokémon Yellow sprite set
-at PokeAPI/sprites revision
+The committed content pack derives sprites from the
+[Pokémon Yellow sprite set][sprites] at PokeAPI/sprites revision
 `8dfa3d97e953caaafaafd4963eff7621811af08e`. Those files are not covered by
 Pokeviewer's MIT license. Converting a sprite to a monochrome firmware format
 does not remove the underlying third-party rights.

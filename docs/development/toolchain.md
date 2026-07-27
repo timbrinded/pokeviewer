@@ -106,7 +106,7 @@ abstraction around `pcf85063a`.
 
 Primary references:
 
-- [Espressif Rust installation](https://docs.espressif.com/projects/rust/book/installation/riscv-and-xtensa.html)
+- [Espressif Rust toolchain installation](https://docs.espressif.com/projects/rust/book/getting-started/toolchain.html)
 - [Xtensa Rust 1.95.0.0 release](https://github.com/esp-rs/rust-build/releases/tag/v1.95.0.0)
 - [`esp-hal` 1.1.1](https://docs.rs/esp-hal/1.1.1/esp_hal/)
 - [`epd-waveshare` 0.6.0](https://docs.rs/epd-waveshare/0.6.0/epd_waveshare/epd1in54_v2/)

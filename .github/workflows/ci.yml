@@ -38,6 +38,11 @@ jobs:
         with:
           tool: cargo-deny@0.20.2
 
+      - name: Install Markdown link checker
+        uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
+        with:
+          tool: lychee@0.23.0
+
       - name: Install actionlint
         run: |
           archive="$RUNNER_TEMP/actionlint.tar.gz"
@@ -78,6 +83,20 @@ jobs:
           set -o pipefail
           RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked \
             2>&1 | tee artifacts/host/docs.log
+
+      - name: Check Markdown
+        run: |
+          set -o pipefail
+          npx --yes markdownlint-cli2@0.23.0 \
+            README.md \
+            CONTRIBUTING.md \
+            THIRD_PARTY_NOTICES.md \
+            'docs/**/*.md' \
+            'content/**/*.md' \
+            2>&1 | tee artifacts/host/markdownlint.log
+          git ls-files -z '*.md' \
+            | xargs -0 lychee --no-progress \
+            2>&1 | tee artifacts/host/links.log
 
       - name: Check dependency policy
         run: |
