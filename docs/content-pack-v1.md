@@ -161,6 +161,9 @@ underflowing.
 | 2026-05-31 23:59 | 2026-05-31, Sunday | 150 | 79 | final cycle entry |
 | 2026-06-01 06:59:59 | 2026-05-31, Sunday | 150 | 79 | final entry retained after midnight |
 | 2026-06-01 07:00:00 | 2026-06-01, Monday | 0 | 1 | entry 151 wraps to entry 1 |
+| 2024-03-01 06:59:59 | 2024-02-29, Thursday | 83 | 20 | leap-day rollback |
+| 2000-01-01 00:00:00 | 1999-12-31, Friday | 15 | 39 | earliest supported RTC reading |
+| 2099-12-31 23:59:59 | 2099-12-31, Thursday | 149 | 6 | latest supported RTC reading |
 
 A restart before 07:00 must never combine the new calendar weekday with the
 prior Pokémon. If recovery requires rendering, both weekday and Pokémon come

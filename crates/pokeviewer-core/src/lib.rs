@@ -3,8 +3,13 @@
 #![doc = "Deterministic domain and rendering logic shared by firmware and host tests."]
 
 mod content;
+mod schedule;
 
 pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
+pub use schedule::{
+    DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,
+    select_daily_pokemon,
+};
 
 /// Width of the supported e-paper panel in pixels.
 pub const DISPLAY_WIDTH: usize = 200;

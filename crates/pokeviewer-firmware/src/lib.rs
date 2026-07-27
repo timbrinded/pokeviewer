@@ -2,7 +2,9 @@
 #![forbid(unsafe_code)]
 #![doc = "Firmware boundary for the supported Waveshare V2 board."]
 
-pub use pokeviewer_core::{DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES};
+pub use pokeviewer_core::{
+    DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES, InvalidDateTime, LocalDateTime, Weekday,
+};
 
 #[cfg(target_arch = "xtensa")]
 mod board;
@@ -18,7 +20,7 @@ mod rtc;
 pub use board::{HardwareDiagnosticReport, run_hardware_diagnostics, run_sleep_diagnostic};
 #[cfg(target_arch = "xtensa")]
 pub use pcf85063::{Pcf85063Rtc, Pcf85063RtcError};
-pub use rtc::{FakeRtc, FakeRtcError, InvalidDateTime, LocalDateTime, Rtc, Weekday};
+pub use rtc::{FakeRtc, FakeRtcError, Rtc};
 
 /// Exact hardware target supported by release firmware.
 pub const BOARD_TARGET: &str = "Waveshare ESP32-S3-ePaper-1.54-EN V2";
