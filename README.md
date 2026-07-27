@@ -6,6 +6,8 @@ the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 board.
 The project is at the start of its v1 implementation. The authoritative scope
 is the [v1 product contract](docs/product-contract.md); work is tracked under
 the [v1.0.0 delivery issue](https://github.com/timbrinded/pokeviewer/issues/1).
+Firmware supports only the
+[documented V2 board contract](docs/hardware/v2-board-contract.md).
 
 ## V1 experience
 
