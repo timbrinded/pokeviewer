@@ -45,8 +45,8 @@ detail, MAC, USB serial, credentials, raw device path, or unsanitized log.
 | USB | info/get/set/diagnostics | protocol v1 responses within two seconds; no wireless initialized |
 | content/render | host matrix plus representative panel photos | all 151 pass; physical bytes/hash match expected golden |
 | panel | full refresh and BUSY timing | completes once within 10 s; no clipping/ghosting; rail off afterward |
-| awake baseline | release firmware over USB | one refresh, continuous enumeration, and no reset for 10 min |
-| awake rollover | set a synthetic time just before 07:00 | exactly one reset and refresh, then no further reset for 10 min |
+| active boot | release firmware over USB | one refresh, then USB disappears on deep-sleep entry within 30 s and does not re-enumerate before the alarm |
+| rollover planning | host boundary tests plus synthetic near-07:00 diagnostic | exactly one boundary transition and a strictly future next alarm |
 | daily wake | build/flash with `cargo xtask sleep-diagnostic-build` and `cargo xtask sleep-diagnostic-flash`; set to 06:59:30 and observe | GPIO5 RTC-domain pull-up enabled with pull-down disabled; prior card before 07:00; one new card at/after 07:00; one `Ext0` wake |
 | reset/power loss | reset before/after 07:00; remove/restore power | correct display day and next alarm on every recovery |
 | failure codes | safe RTC/panel/alarm injections | expected code/flag; at most one attempt; terminal low-power state |

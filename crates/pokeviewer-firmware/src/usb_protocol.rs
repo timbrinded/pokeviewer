@@ -1,6 +1,6 @@
 //! Bounded ESP32-S3 USB Serial/JTAG transport adapter.
 
-use esp_hal::{Blocking, peripherals::USB_DEVICE, usb_serial_jtag::UsbSerialJtag};
+use esp_hal::{Blocking, peripherals::USB_DEVICE, usb::usb_serial_jtag::UsbSerialJtag};
 use pokeviewer_core::{FrameAccumulator, FrameError};
 
 use crate::{Rtc, handle_protocol_request};

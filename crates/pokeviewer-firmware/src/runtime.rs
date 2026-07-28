@@ -1,4 +1,4 @@
-//! Awake-first refresh, provisioning, and daily rollover runtime.
+//! Passive daily refresh, provisioning, and RTC-alarm sleep runtime.
 
 use embassy_futures::block_on;
 use embedded_hal::delay::DelayNs;
@@ -11,22 +11,20 @@ use esp_hal::{
 use pokeviewer_core::{Framebuffer, RecoveryState, SetupReason, assess_rtc};
 use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
 
-use crate::application::{AwakePollDecision, decide_awake_poll};
 use crate::{
-    FailureKind, LocalDateTime, Pcf85063Rtc, Pcf85063RtcError, Rtc, Screen,
+    FailureKind, Pcf85063Rtc, Pcf85063RtcError, Rtc, Screen,
+    application::planned_wake_reached,
     es8311::suspend_audio_codec,
     panel::refresh_panel_frame,
     plan_wake, render_failure_screen,
-    sleep::{restore_panel_power, restore_power_latch},
+    sleep::{SleepResources, restore_panel_power, restore_power_latch},
     usb_protocol::UsbProtocolTransport,
 };
 
 type BoardI2c = esp_hal::i2c::master::I2c<'static, esp_hal::Async>;
 type BoardRtc = Pcf85063Rtc<BoardI2c>;
 
-const AWAKE_POLL_INTERVAL_MS: u32 = 30_000;
-
-/// Render one frame, then remain awake until the next daily rollover.
+/// Render one frame, then deep-sleep until the next daily RTC alarm.
 pub fn run_pokeviewer() -> ! {
     let peripherals = esp_hal::init(esp_hal::Config::default());
     let mut power_latch_pin = peripherals.GPIO17;
@@ -135,20 +133,41 @@ pub fn run_pokeviewer() -> ! {
         );
     };
     let wake_plan = wake_plan.expect("daily frame has a validated wake plan");
+    if block_on(rtc.configure_daily_alarm()).is_err() {
+        terminal!(FailureKind::Alarm);
+    }
+    let after_alarm_configuration = match block_on(rtc.read_datetime()) {
+        Ok(datetime) => datetime,
+        Err(_) => terminal!(FailureKind::Alarm),
+    };
+    match planned_wake_reached(after_alarm_configuration, wake_plan.next_wake) {
+        Ok(true) => {
+            esp_println::println!("daily rollover crossed during refresh; restarting once");
+            Delay::new().delay_ms(100);
+            esp_hal::system::software_reset();
+        }
+        Ok(false) => {}
+        Err(_) => terminal!(FailureKind::Alarm),
+    }
     esp_println::println!(
-        "daily card ready; framebuffer_crc32={:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; awake=true",
+        "daily card ready; framebuffer_crc32={:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true",
         rendered.crc32,
         wake_plan.next_wake.year,
         wake_plan.next_wake.month,
         wake_plan.next_wake.day,
     );
-    supervise_awake(
-        &mut rtc,
-        wake_plan.next_wake,
-        panel_power,
-        power_latch,
-        audio_power,
-    );
+    drop(rtc);
+    drop(panel_power);
+    drop(power_latch);
+    drop(audio_power);
+    SleepResources {
+        rtc_interrupt: peripherals.GPIO5,
+        panel_power: panel_power_pin,
+        power_latch: power_latch_pin,
+        audio_power: audio_power_pin,
+        low_power: peripherals.LPWR,
+    }
+    .sleep();
 }
 
 fn serve_setup(
@@ -173,41 +192,6 @@ fn serve_setup(
             Err(_) => transport.reset_partial_frame(),
         }
         delay.delay_ms(1);
-    }
-}
-
-fn supervise_awake(
-    rtc: &mut BoardRtc,
-    next_wake: LocalDateTime,
-    _panel_power: Output<'_>,
-    _power_latch: Output<'_>,
-    _audio_power: Output<'_>,
-) -> ! {
-    let mut delay = Delay::new();
-    let mut failure_logged = false;
-    loop {
-        delay.delay_ms(AWAKE_POLL_INTERVAL_MS);
-        match decide_awake_poll(block_on(rtc.read_datetime()).ok(), next_wake) {
-            AwakePollDecision::Wait => {
-                if failure_logged {
-                    esp_println::println!("awake RTC polling recovered");
-                    failure_logged = false;
-                }
-            }
-            AwakePollDecision::Restart => {
-                esp_println::println!("daily rollover reached; restarting once");
-                delay.delay_ms(100);
-                esp_hal::system::software_reset();
-            }
-            AwakePollDecision::ReadFailure => {
-                if !failure_logged {
-                    esp_println::println!(
-                        "awake RTC polling failed; retaining current card and retrying"
-                    );
-                    failure_logged = true;
-                }
-            }
-        }
     }
 }
 

@@ -12,15 +12,6 @@ const GPIO42_DIGITAL_HOLD_MASK: u32 = 1 << (42 - 21);
 pub fn hold_audio_power_pad() {
     critical_section::with(|_| {
         set_audio_power_pad_hold(true);
-        esp_hal::peripherals::LPWR::regs()
-            .dig_iso()
-            .modify(|_, writer| {
-                writer
-                    .dg_pad_force_unhold()
-                    .clear_bit()
-                    .dg_pad_autohold_en()
-                    .set_bit()
-            });
     });
 }
 
@@ -28,9 +19,6 @@ pub fn hold_audio_power_pad() {
 #[cfg(target_arch = "xtensa")]
 pub fn release_audio_power_pad() {
     critical_section::with(|_| {
-        esp_hal::peripherals::LPWR::regs()
-            .dig_iso()
-            .modify(|_, writer| writer.dg_pad_autohold_en().clear_bit());
         set_audio_power_pad_hold(false);
     });
 }

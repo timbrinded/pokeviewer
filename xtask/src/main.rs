@@ -14,7 +14,9 @@ const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
 const ESP_TARGET: &str = "xtensa-esp32s3-none-elf";
 const RELEASE_FIRMWARE: &str = "pokeviewer-firmware";
 const HARDWARE_DIAGNOSTIC: &str = "pokeviewer-hardware-diagnostic";
+const RTC_ALARM_ASSERTION_DIAGNOSTIC: &str = "pokeviewer-rtc-alarm-assertion-diagnostic";
 const SLEEP_DIAGNOSTIC: &str = "pokeviewer-sleep-diagnostic";
+const TIMER_SLEEP_DIAGNOSTIC: &str = "pokeviewer-timer-sleep-diagnostic";
 const USB_PROVISIONING: &str = "pokeviewer-usb-provisioning";
 
 fn main() -> ExitCode {
@@ -26,14 +28,18 @@ fn main() -> ExitCode {
         }
         Some("firmware-build") => run_cargo(&firmware_args("build", RELEASE_FIRMWARE)),
         Some("firmware-flash") => run_cargo(&firmware_args("run", RELEASE_FIRMWARE)),
-        Some("firmware-diagnostic-build") => {
-            run_cargo(&firmware_args("build", HARDWARE_DIAGNOSTIC))
-        }
-        Some("firmware-diagnostic-flash") => run_cargo(&firmware_args("run", HARDWARE_DIAGNOSTIC)),
-        Some("sleep-diagnostic-build") => run_cargo(&firmware_args("build", SLEEP_DIAGNOSTIC)),
-        Some("sleep-diagnostic-flash") => run_cargo(&firmware_args("run", SLEEP_DIAGNOSTIC)),
-        Some("usb-provisioning-build") => run_cargo(&firmware_args("build", USB_PROVISIONING)),
-        Some("usb-provisioning-flash") => run_cargo(&firmware_args("run", USB_PROVISIONING)),
+        Some(
+            command @ ("firmware-diagnostic-build"
+            | "firmware-diagnostic-flash"
+            | "rtc-alarm-assertion-diagnostic-build"
+            | "rtc-alarm-assertion-diagnostic-flash"
+            | "sleep-diagnostic-build"
+            | "sleep-diagnostic-flash"
+            | "timer-sleep-diagnostic-build"
+            | "timer-sleep-diagnostic-flash"
+            | "usb-provisioning-build"
+            | "usb-provisioning-flash"),
+        ) => run_firmware_diagnostic(command),
         Some("content-fetch") => {
             let cache_dir = arguments.next();
             if arguments.next().is_some() {
@@ -110,6 +116,23 @@ fn main() -> ExitCode {
     }
 }
 
+fn run_firmware_diagnostic(command: &str) -> ExitCode {
+    let (action, binary) = match command {
+        "firmware-diagnostic-build" => ("build", HARDWARE_DIAGNOSTIC),
+        "firmware-diagnostic-flash" => ("run", HARDWARE_DIAGNOSTIC),
+        "rtc-alarm-assertion-diagnostic-build" => ("build", RTC_ALARM_ASSERTION_DIAGNOSTIC),
+        "rtc-alarm-assertion-diagnostic-flash" => ("run", RTC_ALARM_ASSERTION_DIAGNOSTIC),
+        "sleep-diagnostic-build" => ("build", SLEEP_DIAGNOSTIC),
+        "sleep-diagnostic-flash" => ("run", SLEEP_DIAGNOSTIC),
+        "timer-sleep-diagnostic-build" => ("build", TIMER_SLEEP_DIAGNOSTIC),
+        "timer-sleep-diagnostic-flash" => ("run", TIMER_SLEEP_DIAGNOSTIC),
+        "usb-provisioning-build" => ("build", USB_PROVISIONING),
+        "usb-provisioning-flash" => ("run", USB_PROVISIONING),
+        _ => unreachable!("caller only passes known diagnostic commands"),
+    };
+    run_cargo(&firmware_args(action, binary))
+}
+
 fn task_result(result: Result<(), String>) -> ExitCode {
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -164,10 +187,18 @@ COMMANDS:
                       Build RTC and panel bring-up diagnostic firmware
     firmware-diagnostic-flash
                       Build, flash, and monitor RTC and panel diagnostic firmware
+    rtc-alarm-assertion-diagnostic-build
+                      Build awake RTC alarm and GPIO5 assertion firmware
+    rtc-alarm-assertion-diagnostic-flash
+                      Build, flash, and monitor RTC alarm assertion firmware
     sleep-diagnostic-build
                       Build RTC wake/deep-sleep diagnostic firmware
     sleep-diagnostic-flash
                       Build, flash, and monitor sleep diagnostic firmware
+    timer-sleep-diagnostic-build
+                      Build timer-only deep-sleep isolation firmware
+    timer-sleep-diagnostic-flash
+                      Build, flash, and monitor timer-only sleep firmware
     usb-provisioning-build
                       Build the bounded wired RTC provisioning firmware
     usb-provisioning-flash
@@ -198,8 +229,8 @@ COMMANDS:
 #[cfg(test)]
 mod tests {
     use super::{
-        ESP_TARGET, HARDWARE_DIAGNOSTIC, RELEASE_FIRMWARE, SLEEP_DIAGNOSTIC, USB_PROVISIONING,
-        firmware_args,
+        ESP_TARGET, HARDWARE_DIAGNOSTIC, RELEASE_FIRMWARE, RTC_ALARM_ASSERTION_DIAGNOSTIC,
+        SLEEP_DIAGNOSTIC, TIMER_SLEEP_DIAGNOSTIC, USB_PROVISIONING, firmware_args,
     };
 
     #[test]
@@ -217,6 +248,22 @@ mod tests {
 
         assert_eq!(args[1], "run");
         assert!(args.contains(&SLEEP_DIAGNOSTIC));
+    }
+
+    #[test]
+    fn timer_sleep_diagnostic_selects_its_own_binary() {
+        let args = firmware_args("run", TIMER_SLEEP_DIAGNOSTIC);
+
+        assert_eq!(args[1], "run");
+        assert!(args.contains(&TIMER_SLEEP_DIAGNOSTIC));
+    }
+
+    #[test]
+    fn rtc_alarm_assertion_diagnostic_selects_its_own_binary() {
+        let args = firmware_args("run", RTC_ALARM_ASSERTION_DIAGNOSTIC);
+
+        assert_eq!(args[1], "run");
+        assert!(args.contains(&RTC_ALARM_ASSERTION_DIAGNOSTIC));
     }
 
     #[test]

@@ -103,8 +103,8 @@ Record power-control levels on USB and on a verified-polarity protected battery:
 | --- | --- | --- |
 | RTC presence | direct `0x51` set/read-back | USB smoke pass |
 | datetime | sanitized boundary readback log | current-time read-back passed; boundary matrix pending |
-| alarm | GPIO5 low/high trace plus flag log | pending |
-| RTC wake bias | GPIO5 RTC-domain pull-up enabled, pull-down disabled | firmware path implemented; physical wake pending |
+| alarm | GPIO5 low/high trace plus flag log | passed at synthetic 07:00; clearing AF released GPIO5 |
+| RTC wake bias | GPIO5 RTC-domain pull-up enabled, pull-down disabled | alarm-driven EXT0 wake passed |
 | battery latch | GPIO17 high measurement | pending |
 | panel rail | GPIO6 low during refresh, high afterward | pending |
 | audio rail | GPIO42 low while active and held low through sleep; codec software-suspended | firmware path passed; physical measurement pending |
@@ -112,13 +112,12 @@ Record power-control levels on USB and on a verified-polarity protected battery:
 USB-only smoke testing has flashed the connected V2 board, set and read back a
 valid local datetime, rendered content-revision-1 daily-card CRC `d227338a`,
 programmed the next 07:00 alarm, and entered deep sleep after the GPIO5 RTC-mux
-cleanup; the USB connection disappeared as expected. That entry predates
-qualification of the explicit RTC-domain GPIO5 pull-up and does not prove wake
-reliability. A separate 2026-07-28 content-revision-2 smoke flash rendered CRC
-`4f636e68` through the current awake-first firmware path; it does not alter the
-deep-sleep qualification status. The scheduled RTC wake/reboot, boundary
-values, GPIO5 alarm transition, rail measurements, battery polarity and
-operation, and sanitized photographs remain pending. Follow the
+cleanup. A separate 2026-07-28 content-revision-2 smoke flash rendered CRC
+`4f636e68`. The bounded alarm assertion diagnostic subsequently observed AF
+and GPIO5 assert at a synthetic 07:00 boundary, and clearing AF released
+GPIO5. The integrated sleep diagnostic then retained an `Ext0` wake verdict
+with the PCF alarm flag asserted. Boundary values, rail measurements, battery
+polarity and operation, and sanitized photographs remain pending. Follow the
 [privacy and evidence rules](../privacy-and-evidence.md).
 
 RTC wake and current measurements continue in the

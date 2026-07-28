@@ -6,11 +6,12 @@ use esp_hal::{
     delay::Delay,
     gpio::{Level, Output, OutputConfig},
     i2c::master::{Config as I2cConfig, I2c},
-    rtc_cntl::wakeup_cause,
-    system::SleepSource,
-    time::Rate,
+    rtc_cntl::{reset_reason, wakeup_cause},
+    system::{Cpu, SleepSource},
+    time::{Duration, Rate},
 };
 use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
+use portable_atomic::{AtomicU32, Ordering};
 
 use crate::{
     LocalDateTime, Pcf85063Rtc, Rtc,
@@ -19,6 +20,12 @@ use crate::{
     sleep::{SleepResources, restore_panel_power, restore_power_latch},
     usb_protocol::UsbProtocolTransport,
 };
+
+const RTC_WAKE_DIAGNOSTIC_PASS_MAGIC: u32 = 0x4558_5430;
+const RTC_WAKE_DIAGNOSTIC_NO_ALARM_MAGIC: u32 = 0x4E4F_4146;
+
+#[esp_hal::ram(unstable(rtc_fast, persistent))]
+static RTC_WAKE_DIAGNOSTIC_RESULT: AtomicU32 = AtomicU32::new(0);
 
 /// Successful RTC observations from the combined hardware diagnostic.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -37,29 +44,56 @@ pub fn run_hardware_diagnostics() -> Result<HardwareDiagnosticReport, &'static s
 /// Refresh one frame, validate RTC state, and enter active-low RTC deep sleep.
 pub fn run_sleep_diagnostic() -> ! {
     let cause = wakeup_cause();
+    match RTC_WAKE_DIAGNOSTIC_RESULT.load(Ordering::Relaxed) {
+        RTC_WAKE_DIAGNOSTIC_PASS_MAGIC => {
+            let mut delay = Delay::new();
+            loop {
+                esp_println::println!(
+                    "sleep diagnostic retained result: passed; wake_cause=Ext0; alarm_was_pending=true"
+                );
+                delay.delay_ms(1_000);
+            }
+        }
+        RTC_WAKE_DIAGNOSTIC_NO_ALARM_MAGIC => {
+            let mut delay = Delay::new();
+            loop {
+                esp_println::println!(
+                    "sleep diagnostic retained result: failed; wake_cause=Ext0; alarm_was_pending=false"
+                );
+                delay.delay_ms(1_000);
+            }
+        }
+        _ => {}
+    }
+    RTC_WAKE_DIAGNOSTIC_RESULT.store(0, Ordering::Relaxed);
     let configure_alarm = !matches!(cause, SleepSource::Ext0);
     match run_board_diagnostics(PanelDiagnostic::SingleFrame, configure_alarm) {
         Ok((report, resources)) => {
             if matches!(cause, SleepSource::Ext0) {
                 if !report.alarm_was_pending {
-                    esp_println::println!(
-                        "sleep diagnostic failed: RTC wake had no asserted alarm flag"
-                    );
+                    RTC_WAKE_DIAGNOSTIC_RESULT
+                        .store(RTC_WAKE_DIAGNOSTIC_NO_ALARM_MAGIC, Ordering::Relaxed);
+                    let mut delay = Delay::new();
                     loop {
-                        core::hint::spin_loop();
+                        esp_println::println!(
+                            "sleep diagnostic failed: RTC wake had no asserted alarm flag"
+                        );
+                        delay.delay_ms(1_000);
                     }
                 }
-                esp_println::println!(
-                    "sleep diagnostic passed; wake_cause=Ext0; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending=true; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
-                    report.rtc_datetime.year,
-                    report.rtc_datetime.month,
-                    report.rtc_datetime.day,
-                    report.rtc_datetime.hour,
-                    report.rtc_datetime.minute,
-                    report.rtc_datetime.second,
-                );
+                RTC_WAKE_DIAGNOSTIC_RESULT.store(RTC_WAKE_DIAGNOSTIC_PASS_MAGIC, Ordering::Relaxed);
+                let mut delay = Delay::new();
                 loop {
-                    core::hint::spin_loop();
+                    esp_println::println!(
+                        "sleep diagnostic passed; wake_cause=Ext0; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending=true; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
+                        report.rtc_datetime.year,
+                        report.rtc_datetime.month,
+                        report.rtc_datetime.day,
+                        report.rtc_datetime.hour,
+                        report.rtc_datetime.minute,
+                        report.rtc_datetime.second,
+                    );
+                    delay.delay_ms(1_000);
                 }
             }
             esp_println::println!(
@@ -75,11 +109,171 @@ pub fn run_sleep_diagnostic() -> ! {
             resources.sleep();
         }
         Err(error) => {
-            esp_println::println!("sleep diagnostic failed: {error}");
+            let mut delay = Delay::new();
             loop {
-                core::hint::spin_loop();
+                esp_println::println!("sleep diagnostic failed: {error}");
+                delay.delay_ms(1_000);
             }
         }
+    }
+}
+
+/// Enter timer-only deep sleep once and remain awake after the validated wake.
+pub fn run_timer_sleep_diagnostic() -> ! {
+    let cause = wakeup_cause();
+    let reset = reset_reason(Cpu::ProCpu);
+    let peripherals = esp_hal::init(esp_hal::Config::default());
+    let mut power_latch_pin = peripherals.GPIO17;
+    let power_latch = restore_power_latch(&mut power_latch_pin);
+    let mut panel_power_pin = peripherals.GPIO6;
+    let panel_power = restore_panel_power(&mut panel_power_pin);
+    let mut audio_power_pin = peripherals.GPIO42;
+    let audio_power = Output::new(
+        audio_power_pin.reborrow(),
+        Level::Low,
+        OutputConfig::default(),
+    );
+    release_audio_power_pad();
+
+    match cause {
+        SleepSource::Timer => {
+            let mut delay = Delay::new();
+            loop {
+                esp_println::println!(
+                    "timer sleep diagnostic passed; wake_cause=Timer; reset_reason={reset:?}; panel_rail_off=true; power_latch_high=true; audio_power_low=true"
+                );
+                delay.delay_ms(1_000);
+            }
+        }
+        SleepSource::Undefined => {
+            esp_println::println!(
+                "timer sleep diagnostic ready; wake_cause=Undefined; reset_reason={reset:?}; duration_seconds=10; panel_rail_off=true; power_latch_high=true; audio_power_low=true"
+            );
+            drop(panel_power);
+            drop(power_latch);
+            drop(audio_power);
+            SleepResources {
+                rtc_interrupt: peripherals.GPIO5,
+                panel_power: panel_power_pin,
+                power_latch: power_latch_pin,
+                audio_power: audio_power_pin,
+                low_power: peripherals.LPWR,
+            }
+            .sleep_with_timer(Duration::from_secs(10));
+        }
+        other => {
+            let mut delay = Delay::new();
+            loop {
+                esp_println::println!(
+                    "timer sleep diagnostic failed; unexpected_wake_cause={other:?}; reset_reason={reset:?}; panel_rail_off=true; power_latch_high=true; audio_power_low=true"
+                );
+                delay.delay_ms(1_000);
+            }
+        }
+    }
+}
+
+/// Verify the RTC alarm flag and active-low interrupt while remaining awake.
+pub fn run_rtc_alarm_assertion_diagnostic() -> ! {
+    let peripherals = esp_hal::init(esp_hal::Config::default());
+    let _power_latch = Output::new(peripherals.GPIO17, Level::High, OutputConfig::default());
+    let _panel_power = Output::new(peripherals.GPIO6, Level::High, OutputConfig::default());
+    let _audio_power = Output::new(peripherals.GPIO42, Level::Low, OutputConfig::default());
+    release_audio_power_pad();
+
+    let mut i2c = match I2c::new(
+        peripherals.I2C0,
+        I2cConfig::default().with_frequency(Rate::from_khz(100)),
+    ) {
+        Ok(i2c) => i2c
+            .with_sda(peripherals.GPIO47)
+            .with_scl(peripherals.GPIO48)
+            .into_async(),
+        Err(_) => rtc_alarm_failure("invalid I2C configuration"),
+    };
+    if block_on(suspend_audio_codec(&mut i2c)).is_err() {
+        rtc_alarm_failure("audio codec suspend failed");
+    }
+
+    let mut rtc = Pcf85063Rtc::new(i2c);
+    let interrupt = esp_hal::gpio::Input::new(
+        peripherals.GPIO5,
+        esp_hal::gpio::InputConfig::default().with_pull(esp_hal::gpio::Pull::Up),
+    );
+    let start = match block_on(rtc.read_datetime()) {
+        Ok(datetime) => datetime,
+        Err(_) => rtc_alarm_failure("RTC read failed"),
+    };
+    if start.hour != 6 || start.minute != 59 || start.second < 30 {
+        rtc_alarm_failure("set RTC to 06:59:30-06:59:59 before running");
+    }
+    if block_on(rtc.clear_alarm()).is_err() {
+        rtc_alarm_failure("RTC alarm clear failed");
+    }
+    if block_on(rtc.configure_daily_alarm()).is_err() {
+        rtc_alarm_failure("RTC alarm configuration failed");
+    }
+
+    let mut delay = Delay::new();
+    loop {
+        let datetime = match block_on(rtc.read_datetime()) {
+            Ok(datetime) => datetime,
+            Err(_) => rtc_alarm_failure("RTC poll failed"),
+        };
+        let pending = match block_on(rtc.alarm_pending()) {
+            Ok(pending) => pending,
+            Err(_) => rtc_alarm_failure("RTC alarm flag read failed"),
+        };
+        let interrupt_low = interrupt.is_low();
+
+        if pending {
+            if !interrupt_low {
+                rtc_alarm_failure("alarm flag asserted without GPIO5 low");
+            }
+            if block_on(rtc.clear_alarm()).is_err() {
+                rtc_alarm_failure("RTC alarm flag clear failed");
+            }
+            delay.delay_ms(10);
+            if interrupt.is_low() {
+                rtc_alarm_failure("GPIO5 remained low after clearing alarm");
+            }
+            loop {
+                esp_println::println!(
+                    "RTC alarm assertion diagnostic passed; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_flag_asserted=true; GPIO5_low=true; clear_released_GPIO5=true",
+                    datetime.year,
+                    datetime.month,
+                    datetime.day,
+                    datetime.hour,
+                    datetime.minute,
+                    datetime.second,
+                );
+                delay.delay_ms(1_000);
+            }
+        }
+
+        if datetime.hour > 7 || (datetime.hour == 7 && (datetime.minute > 0 || datetime.second > 5))
+        {
+            rtc_alarm_failure("07:00:00 passed without alarm assertion");
+        }
+
+        esp_println::println!(
+            "RTC alarm assertion diagnostic waiting; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_pending=false; GPIO5_low={interrupt_low}",
+            datetime.year,
+            datetime.month,
+            datetime.day,
+            datetime.hour,
+            datetime.minute,
+            datetime.second,
+        );
+        delay.delay_ms(250);
+    }
+}
+
+fn rtc_alarm_failure(reason: &'static str) -> ! {
+    let mut delay = Delay::new();
+    loop {
+        esp_println::println!("RTC alarm assertion diagnostic failed: {reason}");
+        delay.delay_ms(1_000);
     }
 }
 

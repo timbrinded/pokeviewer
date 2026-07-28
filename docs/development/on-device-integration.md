@@ -1,6 +1,6 @@
 # On-device daily-card integration
 
-- Status: awake-first build and physical stability gates passed; deep sleep pending
+- Status: RTC alarm deep sleep integrated and physically qualified
 - Delivery issue: [I18 / #19][issue-19]
 - Last reviewed: 2026-07-28
 
@@ -18,11 +18,11 @@ host evidence:
    rail.
 
 The shared I²C bus requires GPIO42 to remain low, so the audio rail stays
-powered while the staged runtime remains awake. Firmware applies the vendor
-ES8311 software-suspend sequence before using the RTC, retains GPIO42 low as an
-ordinary output, and disables only the panel rail after refresh. The rail is
-powered; only the codec is software-suspended. Audio capture and playback are
-never configured.
+powered through the active phase and deep sleep. Firmware applies the vendor
+ES8311 software-suspend sequence before using the RTC, retains GPIO42 low with
+its digital per-pin hold, and disables only the panel rail after refresh. The
+rail is powered; only the codec is software-suspended. Audio capture and
+playback are never configured.
 
 No Wi-Fi, BLE, SD, runtime API, heap-backed content loading, or child-facing
 input is initialized. In setup mode, the existing bounded USB protocol remains
@@ -49,21 +49,22 @@ must still be sanitized before publication.
 
 On 2026-07-28, the connected V2 board running content revision 2 rendered
 framebuffer CRC-32 `4f636e68`, read the RTC, put the panel controller to sleep,
-and switched the panel rail off. The earlier attempted low-power path did not
-prove stable deep sleep: a measured 15-second trace showed USB re-enumeration
-and another boot about 2.3 seconds later. USB disappearance alone is therefore
-not pass evidence.
+and switched the panel rail off. An earlier low-power implementation reset
+because it combined a pre-fix ESP-HAL sleep request with global digital-pad
+autohold. The corrected implementation follows ESP-IDF sleep entry and uses
+only GPIO42's per-pin hold. USB disappearance alone remains insufficient pass
+evidence.
 
-The current development build renders once, remains awake, and polls the RTC
-every 30 seconds until the strictly future 07:00 boundary. It is a bring-up
-baseline, not the v1 release behavior. On 2026-07-28, an ordinary boot remained
-continuously present over USB for 607 seconds with zero state changes. A
-synthetic near-07:00 run made one reset and refresh, planned the following
-day's boundary, then remained continuously present for 608 seconds with zero
-state changes.
+The release build now renders once, configures the fixed daily alarm, verifies
+that refresh/configuration did not cross the planned boundary, and enters
+GPIO5 active-low EXT0 deep sleep. The connected V2 board passed timer-only
+sleep, awake PCF alarm/GPIO5 assertion, and one alarm-driven EXT0 wake with the
+alarm flag asserted. After the real local RTC was restored and read back, the
+production binary refreshed once, entered deep sleep, and remained absent from
+USB throughout the bounded 45-second observation.
 
-Sanitized panel photos, battery-side current measurements, the battery
-polarity gate, and isolated sleep/wake qualification remain pending.
+Sanitized panel photos, battery-side current measurements, and the battery
+polarity gate remain pending.
 
 ## Static release budget
 
@@ -84,7 +85,7 @@ linked sizes change when the hardware boundary changes and must not be copied
 from an earlier build. The fixed application framebuffer is 5,000 bytes. A
 linker-reported stack region is remaining address-space allocation, not a
 measurement of peak stack use. USB flashing and a daily-card render have
-passed. Deep sleep remains unqualified, and a hardware high-water measurement
+passed. Deep sleep is physically qualified. A hardware high-water measurement
 plus sanitized panel photographs remain pending.
 
 [issue-19]: https://github.com/timbrinded/pokeviewer/issues/19

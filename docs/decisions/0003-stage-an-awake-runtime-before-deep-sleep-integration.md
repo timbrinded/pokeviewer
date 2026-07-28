@@ -1,11 +1,15 @@
 ---
-status: accepted
+status: superseded by ADR-0004
 date: 2026-07-28
 decision-makers:
   - Project maintainer
 ---
 
 # Stage an awake runtime before deep-sleep integration
+
+Superseded by
+[ADR 0004](0004-use-esp-idf-aligned-rtc-deep-sleep.md) after the isolated
+timer, alarm-assertion, and GPIO5 EXT0 gates passed on 2026-07-28.
 
 ## Context and Problem Statement
 
@@ -132,3 +136,4 @@ sleep, RTC alarm wake, battery operation, or v1 release.
 - [On-device daily-card integration](../development/on-device-integration.md)
 - [RTC wake and deep-sleep qualification](../hardware/deep-sleep-qualification.md)
 - [07:00 runtime state machine](../hardware/wake-sleep-state-machine.md)
+- [ADR 0004](0004-use-esp-idf-aligned-rtc-deep-sleep.md)

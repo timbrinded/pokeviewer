@@ -139,9 +139,9 @@ of correct polarity.
 | Flash size | verified | 8 MB device probe |
 | PSRAM size/mode | pending | diagnostic firmware required |
 | RTC at `0x51` | verified | set/read-back and valid daily boot |
-| Deep-sleep entry | unqualified | USB re-enumerated and booted again about 2.3 s after attempted entry |
-| GPIO5 RTC-domain pull-up | implemented, unqualified | scheduled wake observation required |
-| Scheduled RTC wake/reboot | pending | near-07:00 observation required |
+| Deep-sleep entry | verified | timer diagnostic slept once and woke by timer without a reset loop |
+| GPIO5 RTC-domain pull-up | verified | alarm-driven EXT0 wake passed at a synthetic 07:00 boundary |
+| Scheduled RTC wake/reboot | verified | retained verdict reported `Ext0` with the PCF alarm flag asserted |
 | Non-touch I²C population | pending | sanitized full-bus probe required |
 | Battery connector polarity | pending | physical multimeter check required |
 

@@ -10,8 +10,9 @@ use esp_hal::{
     peripherals::{GPIO5, GPIO6, GPIO17, GPIO42, LPWR},
     rtc_cntl::{
         Rtc as HalRtc,
-        sleep::{Ext0WakeupSource, WakeupLevel},
+        sleep::{Ext0WakeupSource, TimerWakeupSource, WakeupLevel},
     },
+    time::Duration,
 };
 use pokeviewer_esp32s3_pad_hold::hold_audio_power_pad;
 
@@ -42,6 +43,28 @@ pub(crate) struct SleepResources {
 }
 
 impl SleepResources {
+    /// Enter deep sleep with only the ESP32-S3 RTC timer as a wake source.
+    pub(crate) fn sleep_with_timer(self, duration: Duration) -> ! {
+        let mut panel_power = self.panel_power;
+        let panel_output =
+            Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
+        drop(panel_output);
+        panel_power.rtcio_pad_hold(true);
+
+        let mut power_latch = self.power_latch;
+        let latch_output =
+            Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
+        drop(latch_output);
+        power_latch.rtcio_pad_hold(true);
+
+        let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
+        hold_audio_power_pad();
+        let timer = TimerWakeupSource::new(duration);
+        let mut low_power = HalRtc::new(self.low_power);
+        Delay::new().delay_ms(100);
+        low_power.sleep_deep(&[&timer]);
+    }
+
     pub(crate) fn sleep(self) -> ! {
         let mut rtc_interrupt = self.rtc_interrupt;
         // Deep-sleep wake restarts the digital core, so the prior EXT0

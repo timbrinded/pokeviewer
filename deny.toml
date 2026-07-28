@@ -3,7 +3,7 @@ all-features = false
 
 [advisories]
 ignore = [
-    { id = "RUSTSEC-2024-0436", reason = "paste is a transitive esp-hal 1.1.1 dependency with no safe upgrade" },
+    { id = "RUSTSEC-2024-0436", reason = "paste is a transitive dependency of the pinned ESP-HAL correction with no safe upgrade" },
 ]
 
 [licenses]
@@ -24,4 +24,7 @@ wildcards = "deny"
 unknown-registry = "deny"
 unknown-git = "deny"
 allow-registry = ["https://github.com/rust-lang/crates.io-index"]
-allow-git = []
+allow-git = [
+    "https://github.com/esp-rs/esp-hal",
+    "https://github.com/esp-rs/esp-pacs",
+]

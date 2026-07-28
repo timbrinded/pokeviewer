@@ -34,7 +34,8 @@ pub use application::{
 };
 #[cfg(target_arch = "xtensa")]
 pub use board::{
-    HardwareDiagnosticReport, run_hardware_diagnostics, run_sleep_diagnostic, run_usb_provisioning,
+    HardwareDiagnosticReport, run_hardware_diagnostics, run_rtc_alarm_assertion_diagnostic,
+    run_sleep_diagnostic, run_timer_sleep_diagnostic, run_usb_provisioning,
 };
 pub use failure::{FailureKind, FailurePolicy, RecoveryAction, render_failure_screen};
 #[cfg(target_arch = "xtensa")]

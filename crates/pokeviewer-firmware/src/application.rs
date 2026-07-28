@@ -56,7 +56,7 @@ pub struct WakePlan {
 }
 
 /// Decision made from one awake-mode RTC poll.
-#[cfg(any(target_arch = "xtensa", test))]
+#[cfg(test)]
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub(crate) enum AwakePollDecision {
     /// The planned rollover has not been reached.
@@ -101,7 +101,7 @@ pub(crate) fn planned_wake_reached(
 }
 
 /// Decide whether one awake-mode RTC observation requires a restart.
-#[cfg(any(target_arch = "xtensa", test))]
+#[cfg(test)]
 pub(crate) fn decide_awake_poll(
     observed: Option<LocalDateTime>,
     planned_wake: LocalDateTime,

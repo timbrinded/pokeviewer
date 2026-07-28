@@ -19,8 +19,9 @@ The dedicated `pokeviewer-sleep-diagnostic` binary:
 7. holds GPIO6 and GPIO17 high and GPIO42 low through deep sleep; and
 8. enables the GPIO5 RTC-domain pull-up, disables its RTC-domain pull-down, and
    enters deep sleep with GPIO5 as an active-low RTC-domain wake source;
-9. after a valid RTC wake, revalidates the RTC and panel, prints one stable
-   pass record, and remains awake for evidence capture and reflashing.
+9. after a valid RTC wake, revalidates the RTC and panel, records the verdict
+   in RTC-retained memory, and remains awake for evidence capture and
+   reflashing.
 
 Avoiding alarm reconfiguration after an `Ext0` wake is deliberate: the
 diagnostic clears AF, preserves the already configured daily comparison, and
@@ -44,11 +45,18 @@ correctly; the one-alarm/one-wake observation is required.
 GPIO42 is not an RTC-domain pin, so ESP-HAL cannot retain it with `RtcPin`.
 The audited `pokeviewer-esp32s3-pad-hold` crate owns the single PAC operation
 that changes GPIO42's documented digital hold bit under a critical section.
-Firmware configures GPIO42 low before enabling per-pad auto-hold and restores
-the low output before releasing the hold after wake. It never uses the
-all-digital-pad force-hold control, which would also freeze flash and USB pins.
-This follows Espressif's [GPIO hold contract][gpio-hold] and
+Firmware configures GPIO42 low before setting that per-pin bit and restores the
+low output before releasing it after wake. It does not enable global
+`DG_PAD_AUTOHOLD_EN` or use all-digital-pad force hold. This is the direct
+ESP-IDF `gpio_hold_en(GPIO42)` behavior and avoids affecting flash, USB, or
+power-related pads. See Espressif's [GPIO hold contract][gpio-hold] and
 [ESP32-S3 hold-mask mapping][hold-mask].
+
+Sleep-entry behavior comes from the exact upstream ESP-HAL merge commit for
+[PR 5807][esp-hal-5807], which aligns the request sequence with ESP-IDF:
+request sleep without asserting `slp_wakeup`, then wait while the RTC clock
+domain accepts deep sleep. Hardware experiments validate this translation;
+they do not define the expected behavior.
 
 ## Build and run
 
@@ -126,21 +134,22 @@ minimum alongside those assumptions; do not present it as universal runtime.
 
 | Acceptance check | Status | Evidence |
 | --- | --- | --- |
-| release-firmware deep-sleep entry | failed/unqualified | a 15-second trace re-enumerated and booted again after about 2.3 s |
-| GPIO5 RTC-domain pull-up | pending | dedicated diagnostic sleep/wake run required |
-| one alarm, one `Ext0` wake | pending | dedicated diagnostic run required |
+| timer-only deep-sleep entry | passed | one ten-second sleep interval and timer wake with all three rail levels retained |
+| PCF alarm and GPIO5 assertion | passed | AF asserted at 07:00:00, GPIO5 went low, and clearing AF released GPIO5 |
+| GPIO5 RTC-domain pull-up | passed | alarm-driven EXT0 wake returned at the synthetic 07:00 boundary |
+| one alarm, one `Ext0` wake | passed | retained result reported `wake_cause=Ext0` and `alarm_was_pending=true` |
+| release-firmware sleep implementation | passed | production entered deep sleep after its refresh and remained absent from USB for the bounded 45-second observation |
 | passive image retention | pending | before/after photos required |
 | refresh/active/sleep current | pending | battery-side measurement required |
 | daily energy and 72-hour capacity | pending | depends on measured values |
 
-USB serial access, RTC reads, the release-firmware render, panel-controller
-sleep, and panel rail-off have passed. USB disappearance by itself is not a
-deep-sleep pass; the observed re-enumeration/reset must not be relabelled as a
-wake. The dedicated timer-sleep and near-07:00 RTC-wake diagnostics,
-battery-side measurements, battery polarity gate, and retained-image photos
+USB disappearance alone remains insufficient evidence. The accepted wake proof
+combines timed USB state with the RTC-retained `Ext0` and alarm-flag verdict.
+Battery-side measurements, the battery polarity gate, and retained-image photos
 remain pending. Follow the
 [privacy and evidence rules](../privacy-and-evidence.md) before publishing logs
 or photos.
 
 [gpio-hold]: https://docs.espressif.com/projects/esp-idf/en/v5.5.1/esp32s3/api-reference/peripherals/gpio.html
 [hold-mask]: https://github.com/espressif/esp-idf/blob/v5.5.1/components/soc/esp32s3/gpio_periph.c
+[esp-hal-5807]: https://github.com/esp-rs/esp-hal/pull/5807

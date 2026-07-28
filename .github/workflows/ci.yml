@@ -268,6 +268,10 @@ jobs:
             2>&1 | tee artifacts/firmware/hardware-diagnostic-build.log
           cargo xtask sleep-diagnostic-build \
             2>&1 | tee artifacts/firmware/sleep-diagnostic-build.log
+          cargo xtask timer-sleep-diagnostic-build \
+            2>&1 | tee artifacts/firmware/timer-sleep-diagnostic-build.log
+          cargo xtask rtc-alarm-assertion-diagnostic-build \
+            2>&1 | tee artifacts/firmware/rtc-alarm-assertion-diagnostic-build.log
           cargo xtask usb-provisioning-build \
             2>&1 | tee artifacts/firmware/usb-provisioning-build.log
 
@@ -288,6 +292,8 @@ jobs:
             "$firmware" artifacts/firmware/second
           cargo xtask firmware-diagnostic-build
           cargo xtask sleep-diagnostic-build
+          cargo xtask timer-sleep-diagnostic-build
+          cargo xtask rtc-alarm-assertion-diagnostic-build
           cargo xtask usb-provisioning-build
           diff -u \
             artifacts/firmware/first/section-hashes.txt \
@@ -309,6 +315,8 @@ jobs:
             target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
             target/xtensa-esp32s3-none-elf/release/pokeviewer-hardware-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-sleep-diagnostic
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-timer-sleep-diagnostic
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-rtc-alarm-assertion-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-usb-provisioning
           if-no-files-found: warn
           retention-days: 14
