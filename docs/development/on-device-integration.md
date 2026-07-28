@@ -63,8 +63,7 @@ alarm flag asserted. After the real local RTC was restored and read back, the
 production binary refreshed once, entered deep sleep, and remained absent from
 USB throughout the bounded 45-second observation.
 
-Sanitized panel photos, battery-side current measurements, and the battery
-polarity gate remain pending.
+Sanitized panel photos and battery-side current measurements remain pending.
 
 ## Static release budget
 

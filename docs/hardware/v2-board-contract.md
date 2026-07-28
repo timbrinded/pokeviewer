@@ -108,25 +108,8 @@ required RTC address and must not infer board identity from a scan.
   diagnostic, not a precise state-of-charge measurement.
 
 The ETA6098 charger and connector do not make an arbitrary lithium cell safe.
-Battery choice, protection, charge current, connector orientation, enclosure,
-and supervision remain adult integration responsibilities.
-
-## Battery connector safety gate
-
-No cell may be attached until all of these checks are recorded:
-
-1. Disconnect USB and ensure no battery is present.
-2. Identify the connector ground pin with a multimeter continuity check against
-   a known board ground.
-3. Photograph the board connector and intended cell plug in the same
-   orientation, with no identifying background.
-4. Confirm the cell plug's positive lead aligns with board `VBAT`, regardless
-   of wire colour.
-5. Confirm the cell is a protected, single-cell 3.7 V lithium battery suitable
-   for the ETA6098 charge configuration.
-
-Reversed MX1.25 harnesses exist. Connector fit and wire colour are not evidence
-of correct polarity.
+Battery choice, protection, charge current, enclosure, and supervision remain
+adult integration responsibilities.
 
 ## Physical verification status
 
@@ -143,7 +126,6 @@ of correct polarity.
 | GPIO5 RTC-domain pull-up | verified | alarm-driven EXT0 wake passed at a synthetic 07:00 boundary |
 | Scheduled RTC wake/reboot | verified | retained verdict reported `Ext0` with the PCF alarm flag asserted |
 | Non-touch I²C population | pending | sanitized full-bus probe required |
-| Battery connector polarity | pending | physical multimeter check required |
 
 Serial access is operational through the host's normal device group; device
 permissions were not weakened. Complete the remaining

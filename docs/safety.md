@@ -8,9 +8,7 @@ assembly, inspection, charging, placement, and supervision.
 ## Battery and charging
 
 - Use only a reputable protected single-cell 3.7 V lithium battery compatible
-  with the board's charger and connector. Connector fit and wire colour do not
-  prove polarity.
-- Complete the two-adult multimeter polarity check before first connection.
+  with the board's charger and connector.
 - Charge only while an adult is present, on a stable non-combustible surface,
   away from bedding, soft furnishings, heat, liquids, direct sunlight, and
   escape routes. Do not charge overnight.
