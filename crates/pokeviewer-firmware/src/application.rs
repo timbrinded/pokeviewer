@@ -73,6 +73,21 @@ pub fn plan_wake(
     })
 }
 
+/// Return whether an observed RTC value reached the wake that was planned
+/// before a potentially slow panel refresh.
+///
+/// # Errors
+///
+/// Returns [`InvalidDateTime`] if either value is outside the RTC's supported
+/// calendar range.
+#[cfg(any(target_arch = "xtensa", test))]
+pub(crate) fn planned_wake_reached(
+    observed: LocalDateTime,
+    planned_wake: LocalDateTime,
+) -> Result<bool, InvalidDateTime> {
+    Ok(observed.to_primitive()? >= planned_wake.to_primitive()?)
+}
+
 /// Render one complete application frame from a fresh RTC assessment.
 ///
 /// # Errors
@@ -139,8 +154,8 @@ mod tests {
     };
 
     use super::{
-        ApplicationError, PACK, RetainedCard, Screen, plan_wake, render_rtc_frame,
-        render_rtc_frame_from_pack, render_selection,
+        ApplicationError, PACK, RetainedCard, Screen, plan_wake, planned_wake_reached,
+        render_rtc_frame, render_rtc_frame_from_pack, render_selection,
     };
 
     const MONDAY_BULBASAUR: &[u8; 5_000] =
@@ -303,6 +318,37 @@ mod tests {
         )
         .unwrap();
         assert!(!duplicate.refresh_required);
+    }
+
+    #[test]
+    fn refresh_or_alarm_configuration_crossing_rollover_requires_one_restart() {
+        let planned_wake = LocalDateTime {
+            year: 2026,
+            month: 1,
+            day: 1,
+            hour: 7,
+            minute: 0,
+            second: 0,
+        };
+        let before_alarm_configuration = LocalDateTime {
+            second: 59,
+            minute: 59,
+            hour: 6,
+            ..planned_wake
+        };
+        let after_alarm_configuration = LocalDateTime {
+            second: 1,
+            ..planned_wake
+        };
+
+        assert!(!planned_wake_reached(before_alarm_configuration, planned_wake).unwrap());
+        assert!(planned_wake_reached(planned_wake, planned_wake).unwrap());
+        assert!(planned_wake_reached(after_alarm_configuration, planned_wake).unwrap());
+
+        let replanned = plan_wake(after_alarm_configuration, None).unwrap();
+        assert_eq!(replanned.selection.display_date.day, 1);
+        assert_eq!(replanned.next_wake.day, 2);
+        assert!(!planned_wake_reached(after_alarm_configuration, replanned.next_wake).unwrap());
     }
 
     #[test]

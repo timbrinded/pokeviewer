@@ -1,0 +1,21 @@
+[package]
+name = "pokeviewer-esp32s3-pad-hold"
+description = "Audited ESP32-S3 GPIO42 deep-sleep hold shim for Pokeviewer"
+authors.workspace = true
+edition.workspace = true
+license.workspace = true
+repository.workspace = true
+rust-version.workspace = true
+version.workspace = true
+
+[target.'cfg(target_arch = "xtensa")'.dependencies]
+critical-section = { version = "=1.2.0" }
+esp-hal = { version = "=1.1.1", default-features = false, features = ["esp32s3", "unstable"] }
+
+[lints.rust]
+missing_docs = "warn"
+unsafe_code = "deny"
+
+[lints.clippy]
+all = { level = "deny", priority = -1 }
+pedantic = { level = "warn", priority = -1 }

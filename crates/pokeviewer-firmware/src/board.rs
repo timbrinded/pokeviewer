@@ -10,9 +10,11 @@ use esp_hal::{
     system::SleepSource,
     time::Rate,
 };
+use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
 
 use crate::{
     LocalDateTime, Pcf85063Rtc, Rtc,
+    es8311::suspend_audio_codec,
     panel::{PanelDiagnostic, run_panel_diagnostics},
     sleep::SleepResources,
     usb_protocol::UsbProtocolTransport,
@@ -38,16 +40,30 @@ pub fn run_sleep_diagnostic() -> ! {
     let configure_alarm = !matches!(cause, SleepSource::Ext0);
     match run_board_diagnostics(PanelDiagnostic::SingleFrame, configure_alarm) {
         Ok((report, resources)) => {
-            if matches!(cause, SleepSource::Ext0) && !report.alarm_was_pending {
+            if matches!(cause, SleepSource::Ext0) {
+                if !report.alarm_was_pending {
+                    esp_println::println!(
+                        "sleep diagnostic failed: RTC wake had no asserted alarm flag"
+                    );
+                    loop {
+                        core::hint::spin_loop();
+                    }
+                }
                 esp_println::println!(
-                    "sleep diagnostic failed: RTC wake had no asserted alarm flag"
+                    "sleep diagnostic passed; wake_cause=Ext0; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending=true; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
+                    report.rtc_datetime.year,
+                    report.rtc_datetime.month,
+                    report.rtc_datetime.day,
+                    report.rtc_datetime.hour,
+                    report.rtc_datetime.minute,
+                    report.rtc_datetime.second,
                 );
                 loop {
                     core::hint::spin_loop();
                 }
             }
             esp_println::println!(
-                "sleep diagnostic ready; wake_cause={cause:?}; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending={}; rails_off=true",
+                "sleep diagnostic ready; wake_cause={cause:?}; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending={}; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
                 report.rtc_datetime.year,
                 report.rtc_datetime.month,
                 report.rtc_datetime.day,
@@ -72,8 +88,10 @@ pub fn run_usb_provisioning() -> ! {
     let peripherals = esp_hal::init(esp_hal::Config::default());
     let _power_latch = Output::new(peripherals.GPIO17, Level::High, OutputConfig::default());
     let _panel_power = Output::new(peripherals.GPIO6, Level::High, OutputConfig::default());
-    let _audio_power = Output::new(peripherals.GPIO42, Level::High, OutputConfig::default());
-    let i2c = match I2c::new(
+    // The unpowered ES8311 clamps the shared RTC I²C bus low.
+    let _audio_power = Output::new(peripherals.GPIO42, Level::Low, OutputConfig::default());
+    release_audio_power_pad();
+    let mut i2c = match I2c::new(
         peripherals.I2C0,
         I2cConfig::default().with_frequency(Rate::from_khz(100)),
     ) {
@@ -85,6 +103,11 @@ pub fn run_usb_provisioning() -> ! {
             core::hint::spin_loop();
         },
     };
+    if block_on(suspend_audio_codec(&mut i2c)).is_err() {
+        loop {
+            core::hint::spin_loop();
+        }
+    }
     let mut rtc = Pcf85063Rtc::new(i2c);
     let mut transport = UsbProtocolTransport::new(peripherals.USB_DEVICE);
     let mut delay = Delay::new();
@@ -116,13 +139,15 @@ fn run_board_diagnostics(
         OutputConfig::default(),
     );
     let mut audio_power_pin = peripherals.GPIO42;
+    // Keep the shared-bus codec powered until all RTC transactions complete.
     let audio_power = Output::new(
         audio_power_pin.reborrow(),
-        Level::High,
+        Level::Low,
         OutputConfig::default(),
     );
+    release_audio_power_pad();
 
-    let i2c = I2c::new(
+    let mut i2c = I2c::new(
         peripherals.I2C0,
         I2cConfig::default().with_frequency(Rate::from_khz(100)),
     )
@@ -130,6 +155,7 @@ fn run_board_diagnostics(
     .with_sda(peripherals.GPIO47)
     .with_scl(peripherals.GPIO48)
     .into_async();
+    block_on(suspend_audio_codec(&mut i2c)).map_err(|_| "audio codec suspend failed")?;
     let rtc_result = run_rtc_diagnostics(Pcf85063Rtc::new(i2c), configure_alarm);
 
     panel_power.set_low();

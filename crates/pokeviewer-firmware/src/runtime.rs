@@ -11,11 +11,13 @@ use esp_hal::{
     time::Rate,
 };
 use pokeviewer_core::{Framebuffer, RecoveryState, SetupReason, assess_rtc};
+use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
 
+use crate::application::planned_wake_reached;
 use crate::{
     FailureKind, LocalDateTime, Pcf85063Rtc, Pcf85063RtcError, RetainedCard, Rtc, Screen,
-    panel::refresh_panel_frame, plan_wake, render_failure_screen, sleep::SleepResources,
-    usb_protocol::UsbProtocolTransport,
+    es8311::suspend_audio_codec, panel::refresh_panel_frame, plan_wake, render_failure_screen,
+    sleep::SleepResources, usb_protocol::UsbProtocolTransport,
 };
 
 type BoardI2c = esp_hal::i2c::master::I2c<'static, esp_hal::Async>;
@@ -32,6 +34,7 @@ enum ApplicationRun {
         crc32: u32,
         rtc: BoardRtc,
         usb_device: esp_hal::peripherals::USB_DEVICE<'static>,
+        audio_power: esp_hal::peripherals::GPIO42<'static>,
     },
     Failure {
         failure: FailureKind,
@@ -49,7 +52,7 @@ pub fn run_pokeviewer() -> ! {
             resources,
         } => {
             esp_println::println!(
-                "daily card ready; framebuffer_crc32={crc32:08x}; refreshed={refreshed}; next_wake={:04}-{:02}-{:02} 07:00:00; rails_off=true",
+                "daily card ready; framebuffer_crc32={crc32:08x}; refreshed={refreshed}; next_wake={:04}-{:02}-{:02} 07:00:00; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
                 next_wake.year,
                 next_wake.month,
                 next_wake.day,
@@ -60,14 +63,15 @@ pub fn run_pokeviewer() -> ! {
             crc32,
             mut rtc,
             usb_device,
+            audio_power,
         } => {
             esp_println::println!("RTC setup required; framebuffer_crc32={crc32:08x}");
-            serve_setup(&mut rtc, usb_device);
+            serve_setup(&mut rtc, usb_device, audio_power);
         }
         ApplicationRun::Failure { failure, resources } => {
             let policy = failure.policy();
             esp_println::println!(
-                "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; rails_off=true",
+                "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; panel_rail_off=true; audio_rail_on=true",
                 policy.code,
                 policy.diagnostic_flag,
                 policy.max_attempts,
@@ -95,11 +99,13 @@ fn run_application_once() -> ApplicationRun {
         OutputConfig::default(),
     );
     let mut audio_power_pin = peripherals.GPIO42;
+    // The unpowered ES8311 clamps the shared RTC I²C bus low.
     let audio_power = Output::new(
         audio_power_pin.reborrow(),
-        Level::High,
+        Level::Low,
         OutputConfig::default(),
     );
+    release_audio_power_pad();
 
     macro_rules! terminal {
         ($failure:expr) => {{
@@ -119,15 +125,8 @@ fn run_application_once() -> ApplicationRun {
         }};
     }
 
-    let i2c = match I2c::new(
-        peripherals.I2C0,
-        I2cConfig::default().with_frequency(Rate::from_khz(100)),
-    ) {
-        Ok(i2c) => i2c
-            .with_sda(peripherals.GPIO47)
-            .with_scl(peripherals.GPIO48)
-            .into_async(),
-        Err(_) => {
+    macro_rules! invalid_rtc {
+        () => {{
             let mut framebuffer = Framebuffer::default();
             render_failure_screen(&mut framebuffer, FailureKind::InvalidRtc)
                 .expect("fixed recovery labels must render");
@@ -144,8 +143,22 @@ fn run_application_once() -> ApplicationRun {
             );
             panel_power.set_high();
             terminal!(FailureKind::InvalidRtc);
-        }
+        }};
+    }
+
+    let mut i2c = match I2c::new(
+        peripherals.I2C0,
+        I2cConfig::default().with_frequency(Rate::from_khz(100)),
+    ) {
+        Ok(i2c) => i2c
+            .with_sda(peripherals.GPIO47)
+            .with_scl(peripherals.GPIO48)
+            .into_async(),
+        Err(_) => invalid_rtc!(),
     };
+    if block_on(suspend_audio_codec(&mut i2c)).is_err() {
+        invalid_rtc!();
+    }
     let mut rtc = Pcf85063Rtc::new(i2c);
     let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
     let mut framebuffer = Framebuffer::default();
@@ -228,15 +241,32 @@ fn run_application_once() -> ApplicationRun {
 
     let rendered = rendered.expect("successful frame has a rendered state");
     let Screen::Daily(_) = rendered.screen else {
+        drop(audio_power);
         return ApplicationRun::Setup {
             crc32: rendered.crc32,
             rtc,
             usb_device: peripherals.USB_DEVICE,
+            audio_power: audio_power_pin,
         };
     };
     let wake_plan = wake_plan.expect("daily frame has a validated wake plan");
     if block_on(rtc.configure_daily_alarm()).is_err() {
         terminal!(FailureKind::Alarm);
+    }
+    let observed_after_refresh = match block_on(rtc.read_datetime()) {
+        Ok(observed) => observed,
+        Err(_) => terminal!(FailureKind::Alarm),
+    };
+    match planned_wake_reached(observed_after_refresh, wake_plan.next_wake) {
+        Ok(true) => {
+            // A full e-paper update can straddle 07:00. Restarting here is
+            // bounded: the next boot plans tomorrow's strictly-future wake.
+            esp_println::println!("daily rollover crossed during panel refresh; restarting");
+            Delay::new().delay_ms(100);
+            esp_hal::system::software_reset();
+        }
+        Ok(false) => {}
+        Err(_) => terminal!(FailureKind::Alarm),
     }
     drop(rtc);
     drop(panel_power);
@@ -256,7 +286,12 @@ fn run_application_once() -> ApplicationRun {
     }
 }
 
-fn serve_setup(rtc: &mut BoardRtc, usb_device: esp_hal::peripherals::USB_DEVICE<'static>) -> ! {
+fn serve_setup(
+    rtc: &mut BoardRtc,
+    usb_device: esp_hal::peripherals::USB_DEVICE<'static>,
+    audio_power: esp_hal::peripherals::GPIO42<'static>,
+) -> ! {
+    let _audio_power = Output::new(audio_power, Level::Low, OutputConfig::default());
     let mut transport = UsbProtocolTransport::new(usb_device);
     let mut delay = Delay::new();
     loop {

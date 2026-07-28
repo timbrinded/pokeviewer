@@ -1,6 +1,7 @@
 [workspace]
 members = [
     "crates/pokeviewer-core",
+    "crates/pokeviewer-esp32s3-pad-hold",
     "crates/pokeviewer-firmware",
     "crates/pokeviewerctl",
     "xtask",

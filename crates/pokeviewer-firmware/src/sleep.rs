@@ -3,13 +3,17 @@
 use embedded_hal::delay::DelayNs;
 use esp_hal::{
     delay::Delay,
-    gpio::{Input, InputConfig, Level, Output, OutputConfig, Pull, RtcPin},
+    gpio::{
+        Input, InputConfig, Level, Output, OutputConfig, Pull, RtcFunction, RtcPin,
+        RtcPinWithResistors,
+    },
     peripherals::{GPIO5, GPIO6, GPIO17, GPIO42, LPWR},
     rtc_cntl::{
         Rtc as HalRtc,
         sleep::{Ext0WakeupSource, WakeupLevel},
     },
 };
+use pokeviewer_esp32s3_pad_hold::hold_audio_power_pad;
 
 pub(crate) struct SleepResources {
     pub(crate) rtc_interrupt: GPIO5<'static>,
@@ -22,6 +26,9 @@ pub(crate) struct SleepResources {
 impl SleepResources {
     pub(crate) fn sleep(self) -> ! {
         let mut rtc_interrupt = self.rtc_interrupt;
+        // Deep-sleep wake restarts the digital core, so the prior EXT0
+        // source's Drop cannot restore this retained pad to the GPIO path.
+        rtc_interrupt.rtc_set_config(true, false, RtcFunction::Rtc);
         let interrupt_input = Input::new(
             rtc_interrupt.reborrow(),
             InputConfig::default().with_pull(Pull::Up),
@@ -46,7 +53,10 @@ impl SleepResources {
         drop(latch_output);
         power_latch.rtcio_pad_hold(true);
 
-        let _audio_power = Output::new(self.audio_power, Level::High, OutputConfig::default());
+        let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
+        hold_audio_power_pad();
+        rtc_interrupt.rtcio_pullup(true);
+        rtc_interrupt.rtcio_pulldown(false);
         let wake = Ext0WakeupSource::new(rtc_interrupt, WakeupLevel::Low);
         let mut low_power = HalRtc::new(self.low_power);
         Delay::new().delay_ms(100);
@@ -68,7 +78,8 @@ impl SleepResources {
             Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
         drop(latch_output);
         power_latch.rtcio_pad_hold(true);
-        let _audio_power = Output::new(self.audio_power, Level::High, OutputConfig::default());
+        let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
+        hold_audio_power_pad();
         let mut low_power = HalRtc::new(self.low_power);
         Delay::new().delay_ms(100);
         low_power.sleep_deep(&[]);

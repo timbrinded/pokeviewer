@@ -11,10 +11,12 @@ mod application;
 mod board;
 #[cfg(any(target_arch = "xtensa", test))]
 mod bounded_busy;
+#[cfg(any(target_arch = "xtensa", test))]
+mod es8311;
 mod failure;
 #[cfg(target_arch = "xtensa")]
 mod panel;
-#[cfg(target_arch = "xtensa")]
+#[cfg(any(target_arch = "xtensa", test))]
 mod pcf85063;
 mod protocol;
 mod rtc;
@@ -22,6 +24,8 @@ mod rtc;
 mod runtime;
 #[cfg(target_arch = "xtensa")]
 mod sleep;
+#[cfg(test)]
+mod test_i2c;
 #[cfg(target_arch = "xtensa")]
 mod usb_protocol;
 
