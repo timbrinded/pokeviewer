@@ -73,7 +73,10 @@ scripts/check-qualification-evidence.sh PATH
 ```
 
 The validator rejects missing files, pending/failed checklist rows, non-full
-commit IDs, the wrong board revision, and common path/device/credential leaks.
+commits or hashes, malformed/duplicate measurement and seven-day rows, failed
+thresholds, the wrong board revision, and common path/device/credential leaks.
+A synthetic passing fixture and deliberate failure cases run in host CI; they
+are validator tests, never physical qualification evidence.
 
 ## Capacity calculation
 

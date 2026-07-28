@@ -1,0 +1,4 @@
+minimum_72h_mAh=9.791
+intended_cell_rated_mAh=1000
+usable_capacity_fraction=0.80
+status=PASS
