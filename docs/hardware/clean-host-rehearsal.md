@@ -86,8 +86,10 @@ scripts/check-rehearsal-evidence.sh \
 
 The script verifies the candidate, cross-checks its commit and payload hashes,
 requires every release outcome to be `PASS`, checks the exact board identifier,
-requires all five photographs, and rejects common private machine/device
-identifiers in the transcript.
+requires all five photographs to match their recorded SHA-256 values, and
+rejects common private machine/device identifiers in the transcript. Keep the
+photographs private; record only that reviewed images were provided when
+updating the public issue.
 
 The validator cannot judge photograph meaning, electrical safety, or whether an
 observation is truthful. Two adults must complete the checklist and resolve
