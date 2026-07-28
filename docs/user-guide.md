@@ -14,7 +14,26 @@ re-login; never use a world-writable device-node workaround.
 
 Before connecting a cell, read the [safety guide](safety.md).
 
-## Build and flash
+## Install a release bundle
+
+For the release rehearsal, obtain `pokeviewer-v1.0.0.tar.gz` and its adjacent
+`pokeviewer-v1.0.0.tar.gz.sha256` from the retained candidate workflow
+artifact. After publication, download those same files from the official
+GitHub release. Verify and extract the archive:
+
+```console
+sha256sum --check pokeviewer-v1.0.0.tar.gz.sha256
+tar -xzf pokeviewer-v1.0.0.tar.gz
+cd pokeviewer-v1.0.0
+sha256sum --check SHA256SUMS
+```
+
+Read the bundled `SAFETY.md`, then follow the bundled `FLASHING.md`. That guide
+uses the merged V2 firmware image and Linux x86-64 `pokeviewerctl` binary from
+the same verified archive. Do not substitute a binary copied from an issue,
+chat, third-party mirror, or source-tree build.
+
+## Install from a source checkout
 
 From a clean, verified release checkout:
 
