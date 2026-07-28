@@ -6,6 +6,14 @@ if (( $# != 6 )); then
   exit 2
 fi
 
+number='^[0-9]+([.][0-9]+)?$'
+for value in "$@"; do
+  if [[ ! $value =~ $number ]]; then
+    echo "measurements and usable fraction must be decimal numbers" >&2
+    exit 2
+  fi
+done
+
 awk -v sleep_ma="$1" -v active_ma="$2" -v active_s="$3" \
   -v refresh_ma="$4" -v refresh_s="$5" -v usable="$6" '
 BEGIN {

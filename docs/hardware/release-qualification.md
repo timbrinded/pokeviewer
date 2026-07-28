@@ -1,6 +1,6 @@
 # V2 release qualification procedure
 
-- Status: blocked; awake stability, sleep, wake, and battery gates pending
+- Status: blocked; power, failure-injection, and seven-day gates pending
 - Delivery issue: [Q22 / #23][issue-23]
 - Last reviewed: 2026-07-28
 
@@ -103,17 +103,14 @@ revision v0.2 and 8 MB flash. Content-revision-2 firmware flashed and verified
 over USB on 2026-07-28; protocol info and RTC set/read-back passed, and the
 board rendered daily-card CRC `4f636e68`.
 
-Deep sleep has not passed. A 15-second observation of the attempted transition
-showed USB re-enumeration and another boot about 2.3 seconds later. The current
-awake-first development build passed its two preliminary physical checks on
-2026-07-28: 607 seconds of ordinary awake stability with zero USB changes, then
-one synthetic 07:00 reset and refresh followed by 608 seconds with zero USB
-changes. Device identifiers were omitted and permissions were not weakened.
+The corrected ESP-IDF-aligned implementation passed timer-only deep sleep, the
+PCF alarm/GPIO5 assertion sequence, and one alarm-driven `Ext0` wake with the
+alarm flag asserted. Production then refreshed once, entered deep sleep, and
+did not re-enumerate during the bounded 45-second observation. Private physical
+evidence also confirms a readable retained card while unplugged.
 
-This is not release qualification. PSRAM identity, complete I²C population,
-physical panel photographs, the scheduled RTC wake/reboot with the explicit
-GPIO5 RTC-domain pull-up, alarm transitions, battery-only operation, current
-measurements, recovery injections, repeated 07:00 transitions, and the
+This is not release qualification. Battery-only operation, battery-side current
+measurements, safe recovery injections, repeated 07:00 transitions, and the
 seven-day run remain pending.
 
 [issue-23]: https://github.com/timbrinded/pokeviewer/issues/23

@@ -72,6 +72,8 @@ jobs:
         run: |
           set -o pipefail
           cargo test --workspace --locked 2>&1 | tee artifacts/host/test.log
+          scripts/test-battery-capacity.sh \
+            2>&1 | tee artifacts/host/battery-capacity-test.log
 
       - name: Check locked workspace
         run: |
