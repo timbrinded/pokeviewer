@@ -97,7 +97,8 @@ Then configure a near-future alarm temporarily, observe GPIO5 transition low,
 clear the alarm flag, and confirm GPIO5 returns high. Restore the fixed 07:00
 alarm afterward.
 
-Record power-control levels on USB and on a verified-polarity protected battery:
+Record power-control levels on USB and on the protected battery used for
+qualification:
 
 | Check | Required evidence | Status |
 | --- | --- | --- |
@@ -117,7 +118,7 @@ cleanup. A separate 2026-07-28 content-revision-2 smoke flash rendered CRC
 and GPIO5 assert at a synthetic 07:00 boundary, and clearing AF released
 GPIO5. The integrated sleep diagnostic then retained an `Ext0` wake verdict
 with the PCF alarm flag asserted. Boundary values, rail measurements, battery
-polarity and operation, and sanitized photographs remain pending. Follow the
+operation, and sanitized photographs remain pending. Follow the
 [privacy and evidence rules](../privacy-and-evidence.md).
 
 RTC wake and current measurements continue in the
