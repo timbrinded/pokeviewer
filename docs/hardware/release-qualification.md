@@ -1,6 +1,6 @@
 # V2 release qualification procedure
 
-- Status: procedure complete; connected-device dry run blocked
+- Status: USB render/deep-sleep-entry smoke pass; wake and battery gates pending
 - Delivery issue: [Q22 / #23][issue-23]
 - Last reviewed: 2026-07-27
 
@@ -45,7 +45,7 @@ detail, MAC, USB serial, credentials, raw device path, or unsanitized log.
 | USB | info/get/set/diagnostics | protocol v1 responses within two seconds; no wireless initialized |
 | content/render | host matrix plus representative panel photos | all 151 pass; physical bytes/hash match expected golden |
 | panel | full refresh and BUSY timing | completes once within 10 s; no clipping/ghosting; rail off afterward |
-| daily wake | set to 06:59:30 and observe | prior card before 07:00; one new card at/after 07:00; one sleep |
+| daily wake | build/flash with `cargo xtask sleep-diagnostic-build` and `cargo xtask sleep-diagnostic-flash`; set to 06:59:30 and observe | GPIO5 RTC-domain pull-up enabled with pull-down disabled; prior card before 07:00; one new card at/after 07:00; one `Ext0` wake |
 | reset/power loss | reset before/after 07:00; remove/restore power | correct display day and next alarm on every recovery |
 | failure codes | safe RTC/panel/alarm injections | expected code/flag; at most one attempt; terminal low-power state |
 | active duration | current trace, boot to settled sleep | at most 30 s |
@@ -97,10 +97,18 @@ the intended protected cell.
 ## Current dry-run result
 
 The repository, host tests, artifact validation, templates, calculator, and
-evidence validator are usable. The connected device is visible, but the active
-account still lacks access to its serial group; non-interactive privilege
-elevation is unavailable. Flashing, serial capture, photos, and current
-measurement therefore remain blocked. Permissions were not weakened.
+evidence validator are usable. The connected V2 board reports an ESP32-S3
+revision v0.2 and 8 MB flash. Release firmware flashed and verified over USB;
+protocol info and RTC set/read-back passed. After the GPIO5 RTC-mux cleanup, the
+board rendered daily-card CRC `d227338a`, programmed the next alarm, and entered
+deep sleep; the USB connection disappeared as expected. Device identifiers
+were omitted and permissions were not weakened.
+
+This is not release qualification. PSRAM identity, complete I²C population,
+physical panel photographs, the scheduled RTC wake/reboot with the explicit
+GPIO5 RTC-domain pull-up, alarm transitions, battery polarity, battery-only
+operation, current measurements, recovery injections, repeated 07:00
+transitions, and the seven-day run remain pending.
 
 [issue-23]: https://github.com/timbrinded/pokeviewer/issues/23
 [template]: ../evidence/qualification-template/

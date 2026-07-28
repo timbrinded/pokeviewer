@@ -9,13 +9,19 @@ wake-refresh-sleep implementation.
 - PCF85063A at its fixed `0x51` address;
 - I²C0 at 100 kHz on SDA GPIO47 and SCL GPIO48;
 - RTC interrupt on GPIO5, active low;
+- GPIO5 RTC-domain pull-up enabled and RTC-domain pull-down disabled for
+  `Ext0` deep-sleep wake;
 - GPIO17 high to hold the battery-controlled system path on;
-- GPIO42 high so the audio rail remains off; and
+- GPIO42 low while active and held low through deep sleep; and
 - daily alarm at 07:00:00 local civil time.
 
 Firmware talks directly to `0x51`; it does not select a device based on an I²C
-scan. Wi-Fi, BLE, audio, SD, touch, and environmental sensors remain
-uninitialized.
+scan. The ES8311 codec shares SDA/SCL and clamps both lines low when its rail is
+off. Firmware therefore keeps that rail powered, applies the vendor ES8311
+software-suspend sequence, and holds active-low GPIO42 low through deep sleep.
+The audio rail remains powered; the ES8311 is software-suspended. Audio capture
+and playback remain unconfigured. Wi-Fi, BLE, SD, touch, and environmental
+sensors remain uninitialized.
 
 ## Automated coverage
 
@@ -39,7 +45,7 @@ cargo test --workspace --locked
 source .tools/export-esp.sh
 CARGO_HOME="$PWD/.cargo-cache" \
   RUSTUP_HOME="$PWD/.rustup-cache" \
-  cargo xtask firmware-build
+  cargo xtask firmware-diagnostic-build
 ```
 
 ## Device diagnostic
@@ -49,17 +55,23 @@ monitor using the pinned toolchain:
 
 ```sh
 source .tools/export-esp.sh
-cargo xtask firmware-flash
+cargo xtask firmware-diagnostic-flash
 ```
 
 On boot, the combined hardware diagnostic:
 
-1. holds GPIO17 high and GPIO42 high;
+1. holds GPIO17 high and GPIO42 low while the shared I²C bus is active;
 2. rejects an RTC whose oscillator-stop bit is set;
 3. reads the current datetime, writes that same value, and verifies readback;
 4. reads and clears any pending alarm flag, verifies it stayed clear, and
    configures the daily 07:00 alarm; and
-5. runs the panel patterns before switching its active-low rail off.
+5. runs the panel patterns before switching off only the panel rail, then
+   remains awake with the audio rail powered and the ES8311
+   software-suspended.
+
+The hardware diagnostic does not enter deep sleep. Use the separate
+`sleep-diagnostic-build` and `sleep-diagnostic-flash` commands to verify the
+GPIO5 RTC-domain pull-up, GPIO42 hold, deep-sleep entry, and `Ext0` wake path.
 
 A successful sanitized log has this form:
 
@@ -89,17 +101,22 @@ Record power-control levels on USB and on a verified-polarity protected battery:
 
 | Check | Required evidence | Status |
 | --- | --- | --- |
-| RTC presence | sanitized I²C scan showing `0x51` | pending |
-| datetime | sanitized boundary readback log | pending |
+| RTC presence | direct `0x51` set/read-back | USB smoke pass |
+| datetime | sanitized boundary readback log | current-time read-back passed; boundary matrix pending |
 | alarm | GPIO5 low/high trace plus flag log | pending |
+| RTC wake bias | GPIO5 RTC-domain pull-up enabled, pull-down disabled | firmware path implemented; physical wake pending |
 | battery latch | GPIO17 high measurement | pending |
 | panel rail | GPIO6 low during refresh, high afterward | pending |
-| audio rail | GPIO42 high throughout | pending |
+| audio rail | GPIO42 low while active and held low through sleep; codec software-suspended | firmware path passed; physical measurement pending |
 
-Physical evidence is pending while the development user lacks permission to
-open `/dev/ttyACM0`. Do not make the device node world-writable. Restore access
-through the host's normal serial-device group, reconnect or re-login, and
-follow the [privacy and evidence rules](../privacy-and-evidence.md).
+USB-only smoke testing has flashed the connected V2 board, set and read back a
+valid local datetime, rendered daily-card CRC `d227338a`, programmed the next
+07:00 alarm, and entered deep sleep after the GPIO5 RTC-mux cleanup; the USB
+connection disappeared as expected. That entry predates qualification of the
+explicit RTC-domain GPIO5 pull-up and does not prove wake reliability. The
+scheduled RTC wake/reboot, boundary values, GPIO5 alarm transition, rail
+measurements, battery polarity and operation, and sanitized photographs remain
+pending. Follow the [privacy and evidence rules](../privacy-and-evidence.md).
 
 RTC wake and current measurements continue in the
 [deep-sleep qualification](deep-sleep-qualification.md).

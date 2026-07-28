@@ -1,6 +1,6 @@
 # 07:00 wake-refresh-sleep state machine
 
-- Status: implemented; physical power evidence pending
+- Status: implemented; deep-sleep entry passed; scheduled wake and battery evidence pending
 - Delivery issue: [P19 / #20][issue-20]
 - Last reviewed: 2026-07-27
 
@@ -8,11 +8,13 @@ The release firmware has one scheduled active period per local display day:
 
 ```text
 boot/wake
+  -> hold the shared-bus audio rail on and software-suspend the ES8311
   -> validate RTC
   -> derive current display day and next strict 07:00
   -> refresh only for reset/unknown state or an asserted RTC alarm
   -> clear and arm the PCF85063 daily 07:00 alarm
-  -> panel sleep, panel rail off, audio rail off
+  -> panel sleep and panel rail off; audio rail remains on with codec suspended
+  -> enable GPIO5 RTC-domain pull-up and disable its RTC-domain pull-down
   -> ESP32-S3 deep sleep on active-low RTC_INT
 ```
 
@@ -43,8 +45,11 @@ Host tests cover:
 - month, year, leap-day, maximum-range, and schedule-cycle boundaries; and
 - invalid RTC routing through the setup state.
 
-Hardware evidence is still required for the exact V2 board: timestamped
-RTC/serial transitions, retained-card photographs, refresh duration,
-awake-idle current, and deep-sleep current.
+After the GPIO5 RTC-mux cleanup, the connected V2 board rendered framebuffer
+CRC `d227338a` and entered deep sleep; the USB connection disappeared as
+expected. That entry does not qualify the subsequently explicit RTC-domain
+GPIO5 pull-up. The scheduled RTC wake/reboot is still pending. Timestamped
+alarm transitions, retained-card photographs, refresh duration, battery
+polarity, awake-idle current, and deep-sleep current also remain required.
 
 [issue-20]: https://github.com/timbrinded/pokeviewer/issues/20

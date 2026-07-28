@@ -41,7 +41,8 @@ Host tests prove:
 
 The committed [recovery-screen goldens][screens] record exact framebuffer and
 PNG hashes. Safe hardware injections for RTC, panel, and alarm plus an active
-duration/power trace remain pending serial access.
+duration/power trace remain pending a safe fixture and battery-side
+qualification.
 
 [issue-21]: https://github.com/timbrinded/pokeviewer/issues/21
 [screens]: ../evidence/recovery-screens/README.md

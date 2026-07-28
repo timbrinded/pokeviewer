@@ -15,16 +15,20 @@ integration. It is diagnostic firmware, not the final daily-card experience.
 
 BUSY is active high. The board adapter polls every 10 ms and terminates a wait
 after 500 polls, giving a five-second upper bound. A timeout is printed as a
-failure and the panel rail is switched off. The audio rail remains disabled on
-GPIO42 throughout.
+failure and the panel rail is switched off. The combined diagnostic keeps
+GPIO42 low because switching off the ES8311 rail clamps the shared RTC I²C bus.
+Firmware applies the vendor ES8311 software-suspend sequence and keeps the
+audio rail powered while this diagnostic remains awake; only the codec is
+software-suspended, and only the panel rail is switched off. The separate
+sleep diagnostic qualifies rail retention through deep sleep.
 
 ## Run
 
 Build and flash using the pinned toolchain:
 
 ```sh
-cargo xtask firmware-build
-cargo xtask firmware-flash
+cargo xtask firmware-diagnostic-build
+cargo xtask firmware-diagnostic-flash
 ```
 
 The diagnostic displays, in order:

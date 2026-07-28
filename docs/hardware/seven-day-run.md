@@ -1,12 +1,12 @@
 # Seven-day physical qualification run
 
-- Status: blocked before day 1 by serial-device permission
+- Status: blocked before day 1 by physical qualification prerequisites
 - Delivery issue: [Q23 / #24][issue-24]
 - Last reviewed: 2026-07-27
 
 The seven-day run cannot be replaced by simulation. This document fixes its
-inputs and evidence so it can begin immediately after the connected V2 board is
-accessible and the release matrix is green.
+inputs and evidence so it can begin after the connected V2 board passes the
+one-wake, polarity, battery-current, and release-matrix gates.
 
 ## Freeze the candidate
 
@@ -59,10 +59,10 @@ obtain second-adult review, and run:
 scripts/check-qualification-evidence.sh PATH
 ```
 
-Only a passing validator output may unblock release. At present the connected
-device remains owned by a serial group unavailable to the active account, so
-no day-1 timestamp, photograph, current measurement, or pass status exists.
-Permissions were not weakened and no physical evidence is inferred.
+Only a passing validator output may unblock release. Serial access, provisioning,
+rendering, and release-firmware deep-sleep entry have passed. The dedicated
+one-alarm/one-wake diagnostic, polarity check, battery-side measurements, and
+photographs remain prerequisites, so no day-1 evidence or pass status exists.
 
 [issue-24]: https://github.com/timbrinded/pokeviewer/issues/24
 [template]: ../evidence/qualification-template/

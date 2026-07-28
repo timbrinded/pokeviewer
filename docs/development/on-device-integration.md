@@ -1,6 +1,6 @@
 # On-device daily-card integration
 
-- Status: host-complete; physical evidence pending
+- Status: USB render/deep-sleep-entry smoke pass; wake and battery evidence pending
 - Delivery issue: [I18 / #19][issue-19]
 - Last reviewed: 2026-07-27
 
@@ -16,6 +16,12 @@ host evidence:
 6. log its CRC-32 and pass those exact bytes to the V2 panel adapter; and
 7. perform one bounded full refresh, put the panel to sleep, and disable its
    rail.
+
+The shared I²C bus requires GPIO42 to remain low, so the audio rail stays
+powered through deep sleep. Firmware applies the vendor ES8311 software-suspend
+sequence before using the RTC, holds GPIO42 low across sleep, and disables only
+the panel rail after refresh. The rail is powered; only the codec is
+software-suspended. Audio capture and playback are never configured.
 
 No Wi-Fi, BLE, SD, runtime API, heap-backed content loading, or child-facing
 input is initialized. In setup mode, the existing bounded USB protocol remains
@@ -34,9 +40,18 @@ single/dual type, short/long name, punctuation, and sprite variation and
 compare all 5,000 bytes against the reviewed visual goldens. The published epoch vector
 `2026-01-01 07:00:00` resolves to cycle `0`, Pokédex `1`, Thursday.
 
-Invalid RTC input compares against the setup-screen CRC-32 `34e31d2e`. Each
-successful device boot logs only the exact framebuffer CRC-32, not the local
-date, device identifier, or host path.
+Invalid RTC input compares against the setup-screen CRC-32 `34e31d2e`. The
+release success record contains the exact framebuffer CRC-32 and the next-wake
+calendar date. Hardware diagnostics additionally log the RTC datetime. Neither
+path intentionally logs a device identifier or host path, but captured output
+must still be sanitized before publication.
+
+On 2026-07-27, after restoring GPIO5 from its retained RTC mux before checking
+the interrupt, the connected V2 board rendered framebuffer CRC-32 `d227338a`
+and entered deep sleep; the USB connection disappeared as expected. A
+scheduled RTC alarm wake/reboot with the RTC-domain GPIO5 pull-up has not yet
+been observed. Sanitized panel photos, battery-side current measurements, and
+the battery polarity gate also remain pending.
 
 ## Static release budget
 
@@ -52,22 +67,12 @@ rustup run esp-1.95.0.0 llvm-size -A \
   target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
 ```
 
-The 2026-07-27 release build reports:
-
-| Region or allocation | Bytes | Interpretation |
-| --- | ---: | --- |
-| linked text | 157,957 | code plus read-only payload reported by `llvm-size` |
-| linked data | 7,340 | initialized RAM |
-| explicit `.bss` | 40 | zero-initialized statics |
-| linker `.stack` region | 328,208 | remaining reserved DRAM region, not measured use |
-| application framebuffer | 5,000 | fixed stack allocation, included in stack use |
-| offline pack source | 61,390 | flash-resident input before section/link packing |
-| complete debug ELF | 2,991,924 | not the flashed payload size |
-
-The linker leaves a 328,208-byte stack region after static placement, while the
-largest application-owned working buffer is 5,000 bytes. This is substantial
-static headroom for the fixed no-heap path. A hardware high-water measurement
-and panel photographs remain pending serial permission; the linker region must
-not be misreported as measured peak stack use.
+Record both `llvm-size` outputs against the exact release-candidate commit;
+linked sizes change when the hardware boundary changes and must not be copied
+from an earlier build. The fixed application framebuffer is 5,000 bytes. A
+linker-reported stack region is remaining address-space allocation, not a
+measurement of peak stack use. USB flashing, a daily-card render, and
+deep-sleep entry have passed, but a hardware high-water measurement and
+sanitized panel photographs remain pending.
 
 [issue-19]: https://github.com/timbrinded/pokeviewer/issues/19

@@ -22,7 +22,7 @@ assumptions are incompatible and must not be used.
 | Touch | Not populated on SKU 32299 |
 | RTC | PCF85063ATL, I²C address `0x51` |
 | Environment sensor | SHTC3, I²C address `0x70` |
-| Audio codec | ES8311, I²C address `0x18`; unused by Pokeviewer |
+| Audio codec | ES8311, I²C address `0x18`; playback/capture unused; software-suspended |
 | USB | Native ESP32-S3 USB Serial/JTAG on GPIO19/GPIO20 |
 | Battery/charger | 3.7 V lithium input and ETA6098 charge/power-path circuit |
 
@@ -42,7 +42,7 @@ or making the touch and non-touch SKUs behave differently.
 | 0 | BOOT button | input, active low | adult recovery wake only |
 | 3 | onboard LED | output | off in release firmware |
 | 4 | `BAT_ADC` | ADC1 channel 3; 2:1 divider | bounded diagnostic sample |
-| 5 | `RTC_INT` | input, active low | deep-sleep wake |
+| 5 | `RTC_INT` | input, active low | `Ext0` wake; RTC-domain pull-up enabled |
 | 6 | `EPD3V3_EN` | output, low enables | panel power |
 | 7 | touch reset | touch SKU only | reserved, never driven |
 | 8 | `EPD_BUSY` | input; high means busy | panel state |
@@ -63,7 +63,7 @@ or making the touch and non-touch SKUs behave differently.
 | 39 | SD clock | SDMMC | unused |
 | 40 | SD D0 | SDMMC | unused |
 | 41 | SD command | SDMMC | unused |
-| 42 | audio power enable | output, low enables | held high/off |
+| 42 | audio power enable | output, low enables | held low, including through deep sleep |
 | 45 | audio output | output | unused |
 | 46 | speaker amplifier enable | output | held off |
 | 47 | I²C SDA | bidirectional | RTC bus |
@@ -79,7 +79,7 @@ The schematic and V2 examples place these devices on GPIO47/GPIO48:
 
 | Address | Device | Required in v1 |
 | ---: | --- | --- |
-| `0x18` | ES8311 audio codec | no; rail remains off |
+| `0x18` | ES8311 audio codec | rail remains powered; vendor software-suspend applied |
 | `0x51` | PCF85063ATL RTC | yes |
 | `0x70` | SHTC3 temperature/humidity sensor | no |
 | `0x38` | FT6336 touch controller | must be absent on SKU 32299 |
@@ -93,10 +93,16 @@ required RTC address and must not infer board identity from a scan.
 - GPIO17 high holds the battery-controlled system path on; driving it low asks
   the board to power off.
 - GPIO6 low powers the e-paper rail. It must be high before deep sleep.
-- GPIO42 low powers the audio section. It remains high for all Pokeviewer
-  operation.
-- The PCF85063 interrupt on GPIO5 and the PWR/BOOT inputs are valid deep-sleep
-  wake sources.
+- GPIO42 low powers the audio section. Because the ES8311 shares SDA/SCL and
+  clamps the bus when unpowered, it must remain low and be held low through deep
+  sleep. Firmware applies the vendor ES8311 software-suspend sequence; the
+  audio rail remains powered while the panel rail is off. The rail is not
+  described as suspended; only the codec is software-suspended.
+- The PCF85063 interrupt on GPIO5 is an open-drain, active-low `Ext0` wake
+  source. Before sleep, firmware must enable GPIO5's RTC-domain pull-up and
+  disable its RTC-domain pull-down; configuring only the digital IO-mux pull-up
+  is insufficient after the pin switches to RTC_IO.
+- The PWR/BOOT inputs are reserved adult wake inputs.
 - The e-paper keeps its image after the panel rail and MCU are inactive.
 - Battery voltage is the calibrated GPIO4 reading multiplied by two. It is
   diagnostic, not a precise state-of-charge measurement.
@@ -128,17 +134,21 @@ of correct polarity.
 | --- | --- | --- |
 | V2 marking | owner-confirmed | sanitized photos pending |
 | USB controller identity | verified | `303a:1001`, serial omitted |
-| Chip/package identity | pending | serial permission blocks probe |
-| Flash size | pending | serial permission blocks probe |
+| Chip family/revision | verified | ESP32-S3 revision v0.2; device identifier omitted |
+| Package identity | pending | physical marking or PSRAM probe required |
+| Flash size | verified | 8 MB device probe |
 | PSRAM size/mode | pending | diagnostic firmware required |
-| Non-touch I²C population | pending | I²C diagnostic firmware required |
+| RTC at `0x51` | verified | set/read-back and valid daily boot |
+| Deep-sleep entry | verified | CRC `d227338a`; USB disconnected after entry |
+| GPIO5 RTC-domain pull-up | implemented, unqualified | scheduled wake observation required |
+| Scheduled RTC wake/reboot | pending | near-07:00 observation required |
+| Non-touch I²C population | pending | sanitized full-bus probe required |
 | Battery connector polarity | pending | physical multimeter check required |
 
-The current `/dev/ttyACM0` node is owned by the `uucp` group and the active user
-is not a member. Do not weaken the device node to world-writable permissions.
-Add the development user to the appropriate device group through the host's
-normal administration process, reconnect or re-login, then run the
-[sanitized probe procedure](probe-procedure.md).
+Serial access is operational through the host's normal device group; device
+permissions were not weakened. Complete the remaining
+[sanitized probe procedure](probe-procedure.md) without publishing a device
+path or identifier.
 
 ## Sources
 
@@ -147,8 +157,12 @@ normal administration process, reconnect or re-login, then run the
 - [Waveshare V2 examples at the pinned revision][vendor-commit]
 - [1.54-inch e-paper V2 datasheet][panel]
 - [PCF85063A datasheet][rtc]
+- [ES8311 datasheet][es8311]
+- [Pinned Waveshare ES8311 suspend sequence][es8311-suspend]
 - [ESP32-S3 datasheet][esp32s3]
 
+[es8311]: https://files.waveshare.com/wiki/common/ES8311.DS.pdf
+[es8311-suspend]: https://github.com/waveshareteam/ESP32-S3-ePaper-1.54/blob/3f96beedd2e8daa35996abd0c055a7d394336dfb/02_Example/Arduino/08_Audio_Test/src/esp_codec_dev/device/es8311/es8311.c#L241-L258
 [esp32s3]: https://documentation.espressif.com/esp32-s3_datasheet_en.pdf
 [issue-3]: https://github.com/timbrinded/pokeviewer/issues/3
 [panel]: https://files.waveshare.com/wiki/common/1.54inch_e-paper_V2_Datasheet.pdf
