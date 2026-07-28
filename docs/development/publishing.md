@@ -45,4 +45,4 @@ The final release notes state the exact V2/non-touch support boundary, fully
 offline 07:00 behavior, RTC-loss limitation, battery-runtime caveat, safety
 status, and unofficial project status.
 
-[github-environments]: https://docs.github.com/actions/deployment/targeting-different-environments/using-environments-for-deployment
+[github-environments]: https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments
