@@ -75,6 +75,9 @@ scripts/check-qualification-evidence.sh PATH
 The validator rejects missing files, pending/failed checklist rows, non-full
 commits or hashes, malformed/duplicate measurement and seven-day rows, failed
 thresholds, the wrong board revision, and common path/device/credential leaks.
+A structurally valid seven-day log must also match the existing Rust
+qualification schedule generator exactly, including each date, weekday,
+Pokémon, and framebuffer CRC.
 A synthetic passing fixture and deliberate failure cases run in host CI; they
 are validator tests, never physical qualification evidence.
 

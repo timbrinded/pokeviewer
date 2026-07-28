@@ -3,7 +3,8 @@ set -euo pipefail
 
 validator=scripts/check-qualification-evidence.sh
 fixture=tests/fixtures/qualification-pass
-work_dir=$(mktemp -d)
+mkdir -p target
+work_dir=$(mktemp -d "$PWD/target/qualification-test.XXXXXX")
 trap 'rm -rf -- "$work_dir"' EXIT
 
 "$validator" "$fixture"
@@ -31,6 +32,10 @@ expect_failure 'private host path'
 cp "$fixture/metadata.env" "$work_dir/metadata.env"
 sed -i 's/4f636e68/NOT_HEX_/' "$work_dir/seven-day.csv"
 expect_failure 'invalid framebuffer hash'
+
+cp "$fixture/seven-day.csv" "$work_dir/seven-day.csv"
+sed -i 's/95014601/12345678/' "$work_dir/seven-day.csv"
+expect_failure 'schedule mismatch'
 
 cp "$fixture/seven-day.csv" "$work_dir/seven-day.csv"
 sed -i 's/minimum_72h_mAh=9.791/minimum_72h_mAh=801/' "$work_dir/capacity.txt"

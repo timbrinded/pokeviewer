@@ -6,6 +6,12 @@ required=(
   metadata.env checklist.md measurements.csv capacity.txt
   seven-day.csv photos.csv
 )
+for tool in cargo cmp sed; do
+  if ! command -v "$tool" >/dev/null; then
+    echo "required tool is unavailable: $tool" >&2
+    exit 1
+  fi
+done
 
 for filename in "${required[@]}"; do
   if [[ ! -s "$evidence_dir/$filename" ]]; then
@@ -97,6 +103,17 @@ END { if (NR != 8) exit 1 }
   echo "seven-day schedule evidence is incomplete" >&2
   exit 1
 }
+mkdir -p target
+expected_schedule=$(mktemp "$PWD/target/qualification-schedule.XXXXXX")
+trap 'rm -f -- "$expected_schedule"' EXIT
+start_date=$(awk -F, 'NR == 2 { print $2 }' "$evidence_dir/seven-day.csv")
+cargo run --quiet --locked --package xtask -- \
+  qualification-schedule "$start_date" "$expected_schedule"
+sed -i 's/,PENDING$/,PASS/' "$expected_schedule"
+if ! cmp --silent "$expected_schedule" "$evidence_dir/seven-day.csv"; then
+  echo "seven-day evidence does not match the deterministic schedule" >&2
+  exit 1
+fi
 awk -F, '
 NR == 1 {
   if ($0 != "day,phase,filename,sha256,status") exit 1

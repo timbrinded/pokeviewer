@@ -8,7 +8,8 @@ fi
 
 archive=$1
 validator=scripts/check-rehearsal-evidence.sh
-work_dir=$(mktemp -d)
+mkdir -p target
+work_dir=$(mktemp -d "$PWD/target/rehearsal-test.XXXXXX")
 trap 'rm -rf -- "$work_dir"' EXIT
 
 cp docs/evidence/setup-screen/invalid-rtc-setup.png "$work_dir/setup.png"
