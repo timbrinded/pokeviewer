@@ -9,3 +9,5 @@ outcome; a later decision supersedes them and links in both directions.
 | [0001](0001-compile-an-offline-content-pack.md) | accepted | Compile a versioned offline content pack into `no_std` firmware |
 | [0002](0002-use-a-passive-0700-display-day.md) | accepted | Use a passive card with a 07:00 local display-day boundary |
 | [0003](0003-stage-an-awake-runtime-before-deep-sleep-integration.md) | accepted | Stage an awake runtime before deep-sleep integration |
+| [0004](0004-use-esp-idf-aligned-rtc-deep-sleep.md) | accepted | Use ESP-IDF-aligned RTC deep sleep |
+| [0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md) | accepted | Use no-wake deep sleep for terminal failures |

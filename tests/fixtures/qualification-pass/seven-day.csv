@@ -1,0 +1,8 @@
+day,date,weekday,dex_id,name,framebuffer_crc32,status
+1,2026-07-28,Tuesday,85,Dodrio,4f636e68,PASS
+2,2026-07-29,Wednesday,7,Squirtle,95014601,PASS
+3,2026-07-30,Thursday,80,Slowbro,9da8e38d,PASS
+4,2026-07-31,Friday,2,Ivysaur,f9820e97,PASS
+5,2026-08-01,Saturday,75,Graveler,004f8554,PASS
+6,2026-08-02,Sunday,148,Dragonair,75fa9a54,PASS
+7,2026-08-03,Monday,70,Weepinbell,33f8d99e,PASS

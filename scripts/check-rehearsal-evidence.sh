@@ -64,6 +64,19 @@ for key in archive_sha256 firmware_sha256 cli_sha256 content_pack_sha256; do
     exit 1
   fi
 done
+photo_keys=(
+  setup_photo_sha256
+  daily_card_photo_sha256
+  scheduled_refresh_photo_sha256
+  invalid_rtc_photo_sha256
+  failure_recovery_photo_sha256
+)
+for key in "${photo_keys[@]}"; do
+  if [[ ! "$(value "$key")" =~ ^[0-9a-f]{64}$ ]]; then
+    echo "$key must be a lowercase SHA-256 value" >&2
+    exit 1
+  fi
+done
 
 if [[ "$(value board)" != "$BOARD" ]]; then
   echo "rehearsal board does not match the supported V2 contract" >&2
@@ -124,6 +137,22 @@ if [[ "$(value firmware_sha256)" != "$firmware_hash" ||
   exit 1
 fi
 
+photo_files=(
+  setup.png
+  daily-card.png
+  scheduled-refresh.png
+  invalid-rtc.png
+  failure-recovery.png
+)
+for index in "${!photo_keys[@]}"; do
+  hash=$(sha256sum "$evidence_dir/${photo_files[$index]}")
+  hash=${hash%% *}
+  if [[ "$(value "${photo_keys[$index]}")" != "$hash" ]]; then
+    echo "recorded photograph hash does not match ${photo_files[$index]}" >&2
+    exit 1
+  fi
+done
+
 if awk '
   /\/dev\/(tty|serial)/ ||
   /\/home\// ||
@@ -137,11 +166,16 @@ if awk '
   exit 1
 fi
 
-if ! awk '
+if grep -Eq '^- \[ \]|FAIL' "$checklist" ||
+  ! awk '
   /^- \[x\]/ { complete += 1 }
   END { exit complete == 15 ? 0 : 1 }
 ' "$checklist"; then
   echo "rehearsal checklist is incomplete" >&2
+  exit 1
+fi
+if grep -EIRq 'REQUIRED|PENDING' "$values" "$transcript" "$checklist"; then
+  echo "rehearsal evidence still contains a placeholder" >&2
   exit 1
 fi
 

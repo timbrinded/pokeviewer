@@ -21,7 +21,8 @@ is complete.
 
 The workflow refuses any ref other than `main`, any commit other than its own
 checked-out SHA, an existing `v1.0.0` tag, an unsuccessful or mismatched
-candidate run, or open blocker issue #24, #26, or #27.
+candidate run, or any open implementation, qualification, documentation,
+candidate, or rehearsal issue in the v1 release chain (#9, #21, and #23–#27).
 
 ## Publication sequence
 
@@ -31,18 +32,17 @@ candidate run, or open blocker issue #24, #26, or #27.
 4. Publish the final non-prerelease.
 5. Download the public archive and checksum without release API credentials.
 6. Verify the public checksum and tag commit.
-7. Only then close root issue #1 and milestone #1.
+7. Only then close release issue #28, root issue #1, and milestone #1.
 
 The workflow does not compile, regenerate, rename, or substitute firmware,
-content, or CLI payloads. A failure before publication leaves at most a private
-draft and its reserved tag for maintainer inspection. After diagnosing the
-failure, an adult maintainer may delete both only while the release is still
-private; fix the source, produce and rehearse a new candidate, then restart.
-A failure after publication is a release incident and must not be hidden by
+content, or CLI payloads. If a step fails while the release is still a private
+draft, the workflow removes that draft and its tag so a corrected, newly
+qualified candidate can be retried. It never deletes a published release. A
+failure after publication is a release incident and must not be hidden by
 deleting evidence.
 
 The final release notes state the exact V2/non-touch support boundary, fully
 offline 07:00 behavior, RTC-loss limitation, battery-runtime caveat, safety
 status, and unofficial project status.
 
-[github-environments]: https://docs.github.com/actions/deployment/targeting-different-environments/using-environments-for-deployment
+[github-environments]: https://docs.github.com/en/actions/how-tos/deploy/configure-and-manage-deployments/manage-environments

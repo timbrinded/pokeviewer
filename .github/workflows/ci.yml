@@ -72,6 +72,10 @@ jobs:
         run: |
           set -o pipefail
           cargo test --workspace --locked 2>&1 | tee artifacts/host/test.log
+          scripts/test-battery-capacity.sh \
+            2>&1 | tee artifacts/host/battery-capacity-test.log
+          scripts/test-qualification-evidence.sh \
+            2>&1 | tee artifacts/host/qualification-evidence-test.log
 
       - name: Check locked workspace
         run: |
@@ -272,6 +276,10 @@ jobs:
             2>&1 | tee artifacts/firmware/timer-sleep-diagnostic-build.log
           cargo xtask rtc-alarm-assertion-diagnostic-build \
             2>&1 | tee artifacts/firmware/rtc-alarm-assertion-diagnostic-build.log
+          for failure in rtc panel alarm; do
+            cargo xtask failure-diagnostic-build "$failure" \
+              2>&1 | tee "artifacts/firmware/$failure-failure-diagnostic-build.log"
+          done
           cargo xtask usb-provisioning-build \
             2>&1 | tee artifacts/firmware/usb-provisioning-build.log
 
@@ -294,6 +302,9 @@ jobs:
           cargo xtask sleep-diagnostic-build
           cargo xtask timer-sleep-diagnostic-build
           cargo xtask rtc-alarm-assertion-diagnostic-build
+          for failure in rtc panel alarm; do
+            cargo xtask failure-diagnostic-build "$failure"
+          done
           cargo xtask usb-provisioning-build
           diff -u \
             artifacts/firmware/first/section-hashes.txt \
@@ -317,6 +328,9 @@ jobs:
             target/xtensa-esp32s3-none-elf/release/pokeviewer-sleep-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-timer-sleep-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-rtc-alarm-assertion-diagnostic
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-rtc-failure-diagnostic
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-panel-failure-diagnostic
+            target/xtensa-esp32s3-none-elf/release/pokeviewer-alarm-failure-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-usb-provisioning
           if-no-files-found: warn
           retention-days: 14

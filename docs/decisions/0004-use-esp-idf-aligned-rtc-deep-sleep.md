@@ -121,5 +121,7 @@ the release battery-capacity calculation remain separate release gates.
 - [ADR 0003](0003-stage-an-awake-runtime-before-deep-sleep-integration.md)
 - [RTC wake and deep-sleep qualification](../hardware/deep-sleep-qualification.md)
 - [07:00 runtime state machine](../hardware/wake-sleep-state-machine.md)
+- [ADR 0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md)
+  supersedes the awake terminal-failure behavior; normal RTC wake is unchanged.
 - [ESP-HAL PR 5807](https://github.com/esp-rs/esp-hal/pull/5807)
 - [ESP-IDF sleep implementation](https://github.com/espressif/esp-idf/blob/v5.5.1/components/esp_hw_support/sleep_modes.c)
