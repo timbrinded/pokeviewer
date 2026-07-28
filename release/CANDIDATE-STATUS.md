@@ -11,8 +11,7 @@ SD-card, or over-the-air update dependency.
 This is an adult-built, child-adjacent development-board project, not a
 certified finished toy. No board, enclosure, battery, charger, or cable is
 included. Battery runtime depends on the measured assembled device. Complete
-the polarity and safety gates before connecting a protected single-cell
-battery.
+the safety guidance before connecting a protected single-cell battery.
 
 Complete RTC power loss requires an adult to reconnect USB and set the local
 clock again. Read `USER-GUIDE.md`, `SAFETY.md`, and `TROUBLESHOOTING.md` before
