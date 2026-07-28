@@ -62,41 +62,41 @@ jobs:
       - name: Build first clean candidate
         run: |
           cargo clean
-          scripts/build-release-candidate.sh target/candidate-a
+          scripts/build-release-candidate.sh "$RUNNER_TEMP/candidate-a"
 
       - name: Build second clean candidate
         run: |
           cargo clean
-          scripts/build-release-candidate.sh target/candidate-b
+          scripts/build-release-candidate.sh "$RUNNER_TEMP/candidate-b"
 
       - name: Prove reproducibility
         run: |
           archive=pokeviewer-v1.0.0.tar.gz
           cmp \
-            "target/candidate-a/$archive" \
-            "target/candidate-b/$archive"
+            "$RUNNER_TEMP/candidate-a/$archive" \
+            "$RUNNER_TEMP/candidate-b/$archive"
           diff -u \
-            "target/candidate-a/$archive.sha256" \
-            "target/candidate-b/$archive.sha256"
-          mkdir -p target/release-candidate
-          cp "target/candidate-a/$archive" \
-            "target/candidate-a/$archive.sha256" \
-            target/release-candidate/
+            "$RUNNER_TEMP/candidate-a/$archive.sha256" \
+            "$RUNNER_TEMP/candidate-b/$archive.sha256"
+          mkdir -p "$RUNNER_TEMP/release-candidate"
+          cp "$RUNNER_TEMP/candidate-a/$archive" \
+            "$RUNNER_TEMP/candidate-a/$archive.sha256" \
+            "$RUNNER_TEMP/release-candidate/"
           {
             echo "source_commit=$GITHUB_SHA"
             echo "clean_builds=2"
-            cat "target/candidate-a/$archive.sha256"
-          } >target/release-candidate/reproducibility.txt
+            cat "$RUNNER_TEMP/candidate-a/$archive.sha256"
+          } >"$RUNNER_TEMP/release-candidate/reproducibility.txt"
 
       - name: Test rehearsal evidence gate
         run: |
           scripts/test-rehearsal-evidence.sh \
-            target/candidate-a/pokeviewer-v1.0.0.tar.gz
+            "$RUNNER_TEMP/candidate-a/pokeviewer-v1.0.0.tar.gz"
 
       - name: Upload retained candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: pokeviewer-v1.0.0-candidate-${{ github.sha }}
-          path: target/release-candidate
+          path: ${{ runner.temp }}/release-candidate
           if-no-files-found: error
           retention-days: 14
