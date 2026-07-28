@@ -3,7 +3,7 @@
 - Status: accepted for v1
 - Design issue: [U14 / #15][issue-15]
 - Renderer: `pokeviewer-core::render_daily_card`
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-28
 
 The selected card is a quiet, full-screen character card with exactly the four
 product-contract essentials. From top to bottom:
@@ -47,9 +47,11 @@ The [four representative actual-pixel cards][baseline] cover:
 
 The [151-card contact sheet][all-cards] places every exact 200 × 200 output in
 National Pokédex order with eight-pixel gutters. It was visually inspected at
-native pixels on 2026-07-27. No label is truncated, no bands overlap, and the
-four required groups remain distinct. The sheet intentionally contains no ID
-or caption inside a card because those would be unapproved fifth elements.
+native pixels on 2026-07-28 after the content-revision-2 palette-split
+regeneration. No label is truncated, no bands overlap, the sprites retain crisp
+pixel edges without dither patterns, and the four required groups remain
+distinct. The sheet intentionally contains no ID or caption inside a card
+because those would be unapproved fifth elements.
 
 An [actual-size print review page][print-review] renders the representative
 cards at the panel's nominal 1.54-inch diagonal size when printed at 100%

@@ -110,13 +110,16 @@ Record power-control levels on USB and on a verified-polarity protected battery:
 | audio rail | GPIO42 low while active and held low through sleep; codec software-suspended | firmware path passed; physical measurement pending |
 
 USB-only smoke testing has flashed the connected V2 board, set and read back a
-valid local datetime, rendered daily-card CRC `d227338a`, programmed the next
-07:00 alarm, and entered deep sleep after the GPIO5 RTC-mux cleanup; the USB
-connection disappeared as expected. That entry predates qualification of the
-explicit RTC-domain GPIO5 pull-up and does not prove wake reliability. The
-scheduled RTC wake/reboot, boundary values, GPIO5 alarm transition, rail
-measurements, battery polarity and operation, and sanitized photographs remain
-pending. Follow the [privacy and evidence rules](../privacy-and-evidence.md).
+valid local datetime, rendered content-revision-1 daily-card CRC `d227338a`,
+programmed the next 07:00 alarm, and entered deep sleep after the GPIO5 RTC-mux
+cleanup; the USB connection disappeared as expected. That entry predates
+qualification of the explicit RTC-domain GPIO5 pull-up and does not prove wake
+reliability. A separate 2026-07-28 content-revision-2 smoke flash rendered CRC
+`4f636e68` through the current awake-first firmware path; it does not alter the
+deep-sleep qualification status. The scheduled RTC wake/reboot, boundary
+values, GPIO5 alarm transition, rail measurements, battery polarity and
+operation, and sanitized photographs remain pending. Follow the
+[privacy and evidence rules](../privacy-and-evidence.md).
 
 RTC wake and current measurements continue in the
 [deep-sleep qualification](deep-sleep-qualification.md).

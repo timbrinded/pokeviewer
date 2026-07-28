@@ -31,8 +31,8 @@ firmware's complete offline National Pokédex 1–151 pack.
 | complete pack bytes | 61,390 |
 | firmware decode heap | 0 bytes |
 | display framebuffer | 5,000 bytes |
-| pack SHA-256 | `dd19d101fd5801d77e853f1c6cf682c5c46935a949afd386cb290e59142c681d` |
-| contact-sheet SHA-256 | `655ca204904a80926a6a481ca1a095bae7127b7c34b17391e866ac943bec962c` |
+| pack SHA-256 | `339c42d721d7b0d3eec53c4ef538f4014b825a692d9da89ed8f051693cb88cf3` |
+| contact-sheet SHA-256 | `9807c13d560c2bcc89d5dbf169529a1f03396f198fd2adc1d43907849b91a3dc` |
 
 Two conversions from the committed cache produced the same pack hash and
 passed a byte-for-byte `cmp`. `pokeviewer-core` validates the complete pack and

@@ -11,6 +11,7 @@ pub(super) const SPRITE_HEIGHT: usize = 56;
 pub(super) const SPRITE_BYTES: usize = SPRITE_WIDTH * SPRITE_HEIGHT / 8;
 pub(super) const NO_SECONDARY_TYPE: u8 = 0xff;
 const MAX_NAME_BYTES: usize = 16;
+const SOURCE_PALETTE_COLORS: usize = 4;
 
 #[derive(Deserialize)]
 struct PokemonResponse {
@@ -73,6 +74,13 @@ pub(super) struct ConvertedRecord {
     pub(super) source_width: usize,
     pub(super) source_height: usize,
     pub(super) sprite: Vec<u8>,
+}
+
+#[derive(Debug)]
+struct DecodedSprite {
+    width: usize,
+    height: usize,
+    pixels: Vec<[u8; 4]>,
 }
 
 pub(super) fn validate_source_bytes(
@@ -203,6 +211,56 @@ fn validate_name(id: u16, name: &str) -> TaskResult {
 }
 
 fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> {
+    let decoded = decode_sprite(id, bytes)?;
+    let palette = source_palette(id, &decoded.pixels)?;
+    let mut output = vec![0; SPRITE_BYTES];
+    let x_offset = (SPRITE_WIDTH - decoded.width) / 2;
+    let y_offset = (SPRITE_HEIGHT - decoded.height) / 2;
+    for (source_index, [red, green, blue, alpha]) in decoded.pixels.into_iter().enumerate() {
+        let color = [red, green, blue];
+        if alpha == 255 && palette[..SOURCE_PALETTE_COLORS / 2].contains(&color) {
+            let source_x = source_index % decoded.width;
+            let source_y = source_index / decoded.width;
+            let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
+            output[output_index / 8] |= 1 << (7 - output_index % 8);
+        }
+    }
+    Ok((output, decoded.width, decoded.height))
+}
+
+fn source_palette(id: u16, pixels: &[[u8; 4]]) -> TaskResult<Vec<[u8; 3]>> {
+    let mut palette = Vec::with_capacity(SOURCE_PALETTE_COLORS);
+    for &[red, green, blue, alpha] in pixels {
+        if alpha >= 128 && alpha != 255 {
+            return Err(format!(
+                "Pokémon ID {id}: sprite palette: visible pixels must be fully opaque"
+            ));
+        }
+        let color = [red, green, blue];
+        if alpha == 255 && !palette.contains(&color) {
+            palette.push(color);
+        }
+    }
+    palette.sort_by_key(|&[red, green, blue]| (luminance(red, green, blue), red, green, blue));
+    if palette.len() != SOURCE_PALETTE_COLORS {
+        return Err(format!(
+            "Pokémon ID {id}: sprite palette: expected exactly {SOURCE_PALETTE_COLORS} opaque colours, found {}",
+            palette.len()
+        ));
+    }
+    if palette.last() != Some(&[255, 255, 255]) {
+        return Err(format!(
+            "Pokémon ID {id}: sprite palette: lightest colour must be opaque white"
+        ));
+    }
+    Ok(palette)
+}
+
+fn luminance(red: u8, green: u8, blue: u8) -> u32 {
+    (299 * u32::from(red) + 587 * u32::from(green) + 114 * u32::from(blue) + 500) / 1000
+}
+
+fn decode_sprite(id: u16, bytes: &[u8]) -> TaskResult<DecodedSprite> {
     let mut decoder = png::Decoder::new(Cursor::new(bytes));
     decoder.set_transformations(Transformations::EXPAND | Transformations::STRIP_16);
     let mut reader = decoder
@@ -241,20 +299,11 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> 
         &decoded_buffer[..info.buffer_size()],
         source_width * source_height,
     )?;
-    let mut output = vec![0; SPRITE_BYTES];
-    let x_offset = (SPRITE_WIDTH - source_width) / 2;
-    let y_offset = (SPRITE_HEIGHT - source_height) / 2;
-    for (source_index, [red, green, blue, alpha]) in pixels.into_iter().enumerate() {
-        let luminance =
-            (299 * u32::from(red) + 587 * u32::from(green) + 114 * u32::from(blue) + 500) / 1000;
-        if alpha >= 128 && luminance < 128 {
-            let source_x = source_index % source_width;
-            let source_y = source_index / source_width;
-            let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
-            output[output_index / 8] |= 1 << (7 - output_index % 8);
-        }
-    }
-    Ok((output, source_width, source_height))
+    Ok(DecodedSprite {
+        width: source_width,
+        height: source_height,
+        pixels,
+    })
 }
 
 fn rgba_pixels(
@@ -322,7 +371,7 @@ mod tests {
         assert_eq!(record.primary_type, 4);
         assert_eq!(record.secondary_type, 7);
         assert_eq!(record.sprite.len(), SPRITE_BYTES);
-        assert_eq!(record.sprite[0], 0b1010_1010);
+        assert_eq!(record.sprite[0], 0b1100_1100);
     }
 
     #[test]
@@ -348,7 +397,38 @@ mod tests {
             parse_source(1, POKEMON, SPECIES, &fixture_png_with_dimensions(40, 40)).unwrap();
 
         assert!(record.sprite[..57].iter().all(|byte| *byte == 0));
-        assert_eq!(record.sprite[57], 0b1010_1010);
+        assert_eq!(record.sprite[57], 0b1100_1100);
+    }
+
+    #[test]
+    fn unexpected_source_palette_reports_id_and_rule() {
+        let png = fixture_png_with_palette(
+            56,
+            56,
+            &[[0, 0, 0, 255], [128, 128, 128, 255], [255, 255, 255, 255]],
+        );
+        let error = parse_source(1, POKEMON, SPECIES, &png).unwrap_err();
+
+        assert!(error.contains("Pokémon ID 1"));
+        assert!(error.contains("expected exactly 4 opaque colours"));
+    }
+
+    #[test]
+    fn semitransparent_source_pixel_reports_id_and_rule() {
+        let png = fixture_png_with_palette(
+            56,
+            56,
+            &[
+                [0, 0, 0, 255],
+                [85, 85, 85, 200],
+                [170, 170, 170, 255],
+                [255, 255, 255, 255],
+            ],
+        );
+        let error = parse_source(1, POKEMON, SPECIES, &png).unwrap_err();
+
+        assert!(error.contains("Pokémon ID 1"));
+        assert!(error.contains("visible pixels must be fully opaque"));
     }
 
     fn fixture_png() -> Vec<u8> {
@@ -356,6 +436,19 @@ mod tests {
     }
 
     fn fixture_png_with_dimensions(width: u32, height: u32) -> Vec<u8> {
+        fixture_png_with_palette(
+            width,
+            height,
+            &[
+                [0, 0, 0, 255],
+                [85, 85, 85, 255],
+                [170, 170, 170, 255],
+                [255, 255, 255, 255],
+            ],
+        )
+    }
+
+    fn fixture_png_with_palette(width: u32, height: u32, palette: &[[u8; 4]]) -> Vec<u8> {
         let mut png = Vec::new();
         {
             let mut encoder = png::Encoder::new(&mut png, width, height);
@@ -364,13 +457,7 @@ mod tests {
             let mut writer = encoder.write_header().unwrap();
             let pixel_count = usize::try_from(width * height).unwrap();
             let pixels: Vec<u8> = (0..pixel_count)
-                .flat_map(|index| {
-                    if index % 2 == 0 {
-                        [0, 0, 0, 255]
-                    } else {
-                        [255, 255, 255, 255]
-                    }
-                })
+                .flat_map(|index| palette[index % palette.len()])
                 .collect();
             writer.write_image_data(&pixels).unwrap();
         }

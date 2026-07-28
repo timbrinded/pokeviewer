@@ -9,9 +9,9 @@
       "weekday": "Monday",
       "framebuffer_file": "cards/monday-001.bin",
       "png_file": "cards/monday-001.png",
-      "framebuffer_crc32": "47f8d834",
-      "framebuffer_sha256": "e1f5271e860f3c13750bc0c36cf86e0b1f4a907a8860a2801d53bd1b2dad18ba",
-      "png_sha256": "22e0f5d8171479eb08342890b0dc9ab89b235a533db7c245a4756f88f1dfbf8b"
+      "framebuffer_crc32": "7e1a3bde",
+      "framebuffer_sha256": "fa5aaf361fb0510750f3a57506ab40e01ec8928fef95e13e24ba750655de6e24",
+      "png_sha256": "b3e25c75514d964863a2d74233ceca2cb8a31204a462fadab3298dcee6b6af42"
     },
     {
       "case": "tuesday-006",
@@ -31,9 +31,9 @@
       "weekday": "Wednesday",
       "framebuffer_file": "cards/wednesday-142.bin",
       "png_file": "cards/wednesday-142.png",
-      "framebuffer_crc32": "d68d8ba9",
-      "framebuffer_sha256": "43d4d23aabec0c9090b66976688285a14b4dac88cef7eb616c330c3b4857f4f3",
-      "png_sha256": "3fe2e6e71c095fef7d6398e2b023a6e903e82a5d29b5c6e69a2a10c10c1fd610"
+      "framebuffer_crc32": "4e8114de",
+      "framebuffer_sha256": "5f08381f670f649c5316371afa136e78c4862ddf13390306b0794dcc05a1489a",
+      "png_sha256": "8348b0766d49404cb83ef7a5ad80350c9fb61e2f11183890a80ff289d3693e84"
     },
     {
       "case": "thursday-029",
@@ -53,9 +53,9 @@
       "weekday": "Friday",
       "framebuffer_file": "cards/friday-122.bin",
       "png_file": "cards/friday-122.png",
-      "framebuffer_crc32": "d6356e9b",
-      "framebuffer_sha256": "f27642edcfa5f99042fefe926e51b6824465ad0b23c7a805641517bbd1ea93ed",
-      "png_sha256": "4a4923f7eef668304940afa50c20995befb19149ff244463a9ad86b90d2f826d"
+      "framebuffer_crc32": "7009f019",
+      "framebuffer_sha256": "d8ea680647d9b5fb910fc7a0131ca90d81e1131d003961e53c1b72b6a39ec7d8",
+      "png_sha256": "76bf14d3747e9f2e47933f7d68a21e91607e5a546f26360cc1a31bc5aff75c52"
     },
     {
       "case": "saturday-025",
@@ -64,9 +64,9 @@
       "weekday": "Saturday",
       "framebuffer_file": "cards/saturday-025.bin",
       "png_file": "cards/saturday-025.png",
-      "framebuffer_crc32": "eecccd3b",
-      "framebuffer_sha256": "604e5738d67098c6ceb1ca803cc869449545a7f026aa0ff563ee5140676e1d0f",
-      "png_sha256": "cd5b7064ec4826e6d6df6fd93e3210406a80bf254d4bd0e40f720875006b9ec6"
+      "framebuffer_crc32": "3b7e4c65",
+      "framebuffer_sha256": "e7ca1e07b59e7bcced719453ca45351c721e61950d43f35791bb0620076b8d9b",
+      "png_sha256": "f87c783154c0278b2def84f18fe1ce1890c1d0ac4f6c7768f166521a4243e496"
     },
     {
       "case": "sunday-151",
@@ -75,9 +75,9 @@
       "weekday": "Sunday",
       "framebuffer_file": "cards/sunday-151.bin",
       "png_file": "cards/sunday-151.png",
-      "framebuffer_crc32": "451233cf",
-      "framebuffer_sha256": "583a9009a72ece15d13d5c1c9d96204ed6692e9852f8d79334e3e153ffd6e943",
-      "png_sha256": "7994a183ebb6b7a2203427bb2346a16259192ff6acc54aeffc43cd9155117318"
+      "framebuffer_crc32": "b183948e",
+      "framebuffer_sha256": "bdc57c04600dcce26cdedd046f54b9190b2c2c11366760e5cef23d6e0016cb08",
+      "png_sha256": "85b0fbe0e2be27db5d7af35fcb3589ea10e94a086d66b9471bb39fe4178fbb3c"
     }
   ]
 }

@@ -100,9 +100,9 @@ the intended protected cell.
 
 The repository, host tests, artifact validation, templates, calculator, and
 evidence validator are usable. The connected V2 board reports an ESP32-S3
-revision v0.2 and 8 MB flash. Firmware flashed and verified over USB; protocol
-info and RTC set/read-back passed, and the board rendered daily-card CRC
-`d227338a`.
+revision v0.2 and 8 MB flash. Content-revision-2 firmware flashed and verified
+over USB on 2026-07-28; protocol info and RTC set/read-back passed, and the
+board rendered daily-card CRC `4f636e68`.
 
 Deep sleep has not passed. A 15-second observation of the attempted transition
 showed USB re-enumeration and another boot about 2.3 seconds later. The current

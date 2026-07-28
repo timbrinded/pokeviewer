@@ -59,8 +59,9 @@ The command reads only local files and writes:
 
 It validates all 151 IDs in order, exact URLs and paths, every source digest,
 name/type rules, bounded native PNG dimensions, deterministic centering on the
-56 × 56 output canvas, schedule v1, section bounds, and the 64 KiB pack limit.
-It builds twice in memory and fails if the bytes differ.
+56 × 56 output canvas, the exact four-colour source palette, deterministic
+darkest-two palette splitting, schedule v1, section bounds, and the 64 KiB pack
+limit. It builds twice in memory and fails if the bytes differ.
 
 Optional positional arguments select a reviewed cache and separate output
 files:
@@ -104,7 +105,8 @@ The host suite uses generated 56 × 56 PNG data and representative PokeAPI
 fixtures. It covers:
 
 - out-of-order type normalization;
-- exact one-bit conversion;
+- exact four-colour palette-split conversion;
+- rejection of unexpected source palettes;
 - malformed response IDs;
 - invalid sprite dimensions; and
 - byte-identical repeated pack serialization.

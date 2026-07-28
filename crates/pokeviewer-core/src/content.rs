@@ -1,6 +1,9 @@
 //! Allocation-free content-pack validation and lookup.
 
 const HEADER_LENGTH: usize = 32;
+const FORMAT_VERSION: u16 = 1;
+const CONTENT_REVISION: u32 = 2;
+const SCHEDULE_VERSION: u16 = 1;
 const RECORD_LENGTH: usize = 6;
 const RECORD_COUNT: usize = 151;
 const SPRITE_WIDTH: usize = 56;
@@ -140,7 +143,10 @@ impl<'a> ContentPack<'a> {
         if bytes.get(0..4) != Some(b"PKVW") {
             return Err(PackError::InvalidMagic);
         }
-        if read_u16(bytes, 4)? != 1 || read_u32(bytes, 8)? != 1 || read_u16(bytes, 12)? != 1 {
+        if read_u16(bytes, 4)? != FORMAT_VERSION
+            || read_u32(bytes, 8)? != CONTENT_REVISION
+            || read_u16(bytes, 12)? != SCHEDULE_VERSION
+        {
             return Err(PackError::UnsupportedVersion);
         }
         if usize::from(read_u16(bytes, 6)?) != HEADER_LENGTH
@@ -359,6 +365,17 @@ mod tests {
         assert_eq!(
             ContentPack::parse(&corrupted).unwrap_err(),
             PackError::InvalidChecksum
+        );
+    }
+
+    #[test]
+    fn superseded_content_revision_is_rejected() {
+        let mut superseded = std::vec::Vec::from(PACK);
+        superseded[8..12].copy_from_slice(&1_u32.to_le_bytes());
+
+        assert_eq!(
+            ContentPack::parse(&superseded).unwrap_err(),
+            PackError::UnsupportedVersion
         );
     }
 }

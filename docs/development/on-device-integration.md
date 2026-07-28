@@ -47,11 +47,12 @@ calendar date. Hardware diagnostics additionally log the RTC datetime. Neither
 path intentionally logs a device identifier or host path, but captured output
 must still be sanitized before publication.
 
-The connected V2 board rendered framebuffer CRC-32 `d227338a`, read the RTC,
-put the panel controller to sleep, and switched the panel rail off. The
-attempted low-power path did not prove stable deep sleep: a measured 15-second
-trace showed USB re-enumeration and another boot about 2.3 seconds later. USB
-disappearance alone is therefore not pass evidence.
+On 2026-07-28, the connected V2 board running content revision 2 rendered
+framebuffer CRC-32 `4f636e68`, read the RTC, put the panel controller to sleep,
+and switched the panel rail off. The earlier attempted low-power path did not
+prove stable deep sleep: a measured 15-second trace showed USB re-enumeration
+and another boot about 2.3 seconds later. USB disappearance alone is therefore
+not pass evidence.
 
 The current development build renders once, remains awake, and polls the RTC
 every 30 seconds until the strictly future 07:00 boundary. It is a bring-up

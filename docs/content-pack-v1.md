@@ -3,9 +3,9 @@
 - Status: accepted
 - Contract issue: [D09 / #10][issue-10]
 - Binary format version: 1
-- Content revision: 1
+- Content revision: 2
 - Schedule version: 1
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-28
 
 This contract defines the only Pokémon data consumed by v1 firmware and the
 mapping from local civil time to one daily record. It refines the accepted
@@ -50,11 +50,17 @@ maintainer cache. Conversion:
 2. centers the native source pixels on a transparent 56 × 56 output canvas
    without scaling, cropping, or interpolation; an odd spare pixel is placed
    on the right or bottom;
-3. treats alpha values below 128 as white;
-4. calculates integer luminance for other pixels as
+3. treats alpha values below 128 as white and excludes them from the source
+   palette;
+4. requires every other source pixel to be fully opaque;
+5. collects their distinct RGB values and requires exactly four source colours,
+   with white (`255, 255, 255`) as the lightest;
+6. orders those four colours by integer luminance,
    `(299 * red + 587 * green + 114 * blue + 500) / 1000`;
-5. writes black when luminance is below 128 and white otherwise; and
-6. applies no dithering.
+   ties are resolved by red, then green, then blue;
+7. writes the two darkest palette colours as black and the two lightest as
+   white; and
+8. applies no dithering.
 
 Output-canvas pixels serialize by row from top to bottom and within each row
 from left to right. The most-significant bit is the leftmost pixel, `1` is
@@ -81,7 +87,7 @@ concatenated UTF-8 name bytes
 | 0 | 4 | magic | ASCII `PKVW` |
 | 4 | 2 | format version | `1` |
 | 6 | 2 | header length | `32` |
-| 8 | 4 | content revision | `1` for the first accepted pack |
+| 8 | 4 | content revision | `2`; revision `1` used the superseded fixed-luminance conversion |
 | 12 | 2 | schedule version | `1` |
 | 14 | 2 | record count | `151` |
 | 16 | 2 | permutation count | `151` |

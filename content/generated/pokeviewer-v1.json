@@ -1,15 +1,15 @@
 {
   "converter_version": "1.0.0",
   "format_version": 1,
-  "content_revision": 1,
+  "content_revision": 2,
   "schedule_version": 1,
   "source_manifest_sha256": "0a1e5ad67bfefb5ace45638d1e581a9456fe733d8cb44c286a10c5aae03cb49f",
   "sprites_revision": "8dfa3d97e953caaafaafd4963eff7621811af08e",
   "pack_path": "pokeviewer-v1.pack",
   "pack_length": 61390,
-  "pack_sha256": "dd19d101fd5801d77e853f1c6cf682c5c46935a949afd386cb290e59142c681d",
+  "pack_sha256": "339c42d721d7b0d3eec53c4ef538f4014b825a692d9da89ed8f051693cb88cf3",
   "contact_sheet_path": "sprites-contact-sheet.png",
-  "contact_sheet_sha256": "655ca204904a80926a6a481ca1a095bae7127b7c34b17391e866ac943bec962c",
+  "contact_sheet_sha256": "9807c13d560c2bcc89d5dbf169529a1f03396f198fd2adc1d43907849b91a3dc",
   "validation": {
     "record_count": 151,
     "unique_id_count": 151,
