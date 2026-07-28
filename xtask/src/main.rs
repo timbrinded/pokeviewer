@@ -13,6 +13,7 @@ const ESP_TOOLCHAIN: &str = "esp-1.95.0.0";
 const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
 const ESP_TARGET: &str = "xtensa-esp32s3-none-elf";
 const RELEASE_FIRMWARE: &str = "pokeviewer-firmware";
+const HARDWARE_DIAGNOSTIC: &str = "pokeviewer-hardware-diagnostic";
 const SLEEP_DIAGNOSTIC: &str = "pokeviewer-sleep-diagnostic";
 const USB_PROVISIONING: &str = "pokeviewer-usb-provisioning";
 
@@ -25,6 +26,10 @@ fn main() -> ExitCode {
         }
         Some("firmware-build") => run_cargo(&firmware_args("build", RELEASE_FIRMWARE)),
         Some("firmware-flash") => run_cargo(&firmware_args("run", RELEASE_FIRMWARE)),
+        Some("firmware-diagnostic-build") => {
+            run_cargo(&firmware_args("build", HARDWARE_DIAGNOSTIC))
+        }
+        Some("firmware-diagnostic-flash") => run_cargo(&firmware_args("run", HARDWARE_DIAGNOSTIC)),
         Some("sleep-diagnostic-build") => run_cargo(&firmware_args("build", SLEEP_DIAGNOSTIC)),
         Some("sleep-diagnostic-flash") => run_cargo(&firmware_args("run", SLEEP_DIAGNOSTIC)),
         Some("usb-provisioning-build") => run_cargo(&firmware_args("build", USB_PROVISIONING)),
@@ -155,6 +160,10 @@ USAGE:
 COMMANDS:
     firmware-build    Build release firmware
     firmware-flash    Build, flash, and monitor release firmware
+    firmware-diagnostic-build
+                      Build RTC and panel bring-up diagnostic firmware
+    firmware-diagnostic-flash
+                      Build, flash, and monitor RTC and panel diagnostic firmware
     sleep-diagnostic-build
                       Build RTC wake/deep-sleep diagnostic firmware
     sleep-diagnostic-flash
@@ -188,7 +197,10 @@ COMMANDS:
 
 #[cfg(test)]
 mod tests {
-    use super::{ESP_TARGET, RELEASE_FIRMWARE, SLEEP_DIAGNOSTIC, USB_PROVISIONING, firmware_args};
+    use super::{
+        ESP_TARGET, HARDWARE_DIAGNOSTIC, RELEASE_FIRMWARE, SLEEP_DIAGNOSTIC, USB_PROVISIONING,
+        firmware_args,
+    };
 
     #[test]
     fn firmware_commands_select_the_embedded_target() {
@@ -205,6 +217,14 @@ mod tests {
 
         assert_eq!(args[1], "run");
         assert!(args.contains(&SLEEP_DIAGNOSTIC));
+    }
+
+    #[test]
+    fn hardware_diagnostic_selects_its_own_binary() {
+        let args = firmware_args("run", HARDWARE_DIAGNOSTIC);
+
+        assert_eq!(args[1], "run");
+        assert!(args.contains(&HARDWARE_DIAGNOSTIC));
     }
 
     #[test]
