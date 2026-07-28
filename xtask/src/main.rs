@@ -139,18 +139,6 @@ fn run_firmware_diagnostic(command: &str) -> ExitCode {
     run_cargo(&firmware_args(action, binary))
 }
 
-fn run_failure_diagnostic(command: &str, failure: &str) -> ExitCode {
-    let action = match command {
-        "failure-diagnostic-build" => "build",
-        "failure-diagnostic-flash" => "run",
-        _ => unreachable!("caller only passes failure diagnostic commands"),
-    };
-    match failure_diagnostic_binary(failure) {
-        Ok(binary) => run_cargo(&firmware_args(action, binary)),
-        Err(error) => fail(error),
-    }
-}
-
 fn failure_diagnostic_command(
     command: &str,
     arguments: &mut impl Iterator<Item = String>,
@@ -161,7 +149,15 @@ fn failure_diagnostic_command(
     if arguments.next().is_some() {
         return fail("failure diagnostic accepts exactly one failure kind");
     }
-    run_failure_diagnostic(command, &failure)
+    let action = match command {
+        "failure-diagnostic-build" => "build",
+        "failure-diagnostic-flash" => "run",
+        _ => unreachable!("caller only passes failure diagnostic commands"),
+    };
+    match failure_diagnostic_binary(&failure) {
+        Ok(binary) => run_cargo(&firmware_args(action, binary)),
+        Err(error) => fail(error),
+    }
 }
 
 fn failure_diagnostic_binary(failure: &str) -> Result<&'static str, &'static str> {
