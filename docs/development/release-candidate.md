@@ -32,7 +32,11 @@ prerelease, release, package, deployment, or public binary.
 
 The adjacent `.sha256` verifies the archive itself. The verifier rejects unsafe
 archive paths, missing or extra files, internal checksum failures, and a CLI
-version other than `1.0.0`.
+version other than `1.0.0`. It also cross-checks the board, targets, flash
+offset, protocol version, content versions, pack length, and pack SHA-256
+between build metadata, the generated content manifest, and the packaged
+payload. Content revision values are derived from the manifest rather than
+duplicated in the release script.
 
 Raw PokéAPI cache, diagnostic firmware, test output, machine paths, serial
 devices, secrets, and private logs are excluded by the explicit packaging

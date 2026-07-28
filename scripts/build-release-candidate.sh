@@ -17,7 +17,7 @@ if [[ -e "$output_dir" ]]; then
   exit 1
 fi
 
-for tool in cargo espflash git gzip sha256sum stat strings tar; do
+for tool in cargo espflash git gzip jq sha256sum stat strings tar; do
   if ! command -v "$tool" >/dev/null; then
     echo "required tool is unavailable: $tool" >&2
     exit 1
@@ -31,6 +31,10 @@ if [[ ${package_id##*#} != "$VERSION" ]]; then
 fi
 
 commit=$(git rev-parse --verify HEAD)
+if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
+  echo "release candidate must be built from a clean source tree" >&2
+  exit 1
+fi
 source_date_epoch=${SOURCE_DATE_EPOCH:-$(git show -s --format=%ct "$commit")}
 export SOURCE_DATE_EPOCH="$source_date_epoch"
 export ESPFLASH_SKIP_UPDATE_CHECK=true
@@ -97,6 +101,21 @@ fi
 
 content_hash=$(sha256sum "$bundle_dir/pokeviewer-v1.pack")
 content_hash=${content_hash%% *}
+manifest="$bundle_dir/content-manifest.json"
+content_format_version=$(jq -er '.format_version' "$manifest")
+content_revision=$(jq -er '.content_revision' "$manifest")
+schedule_version=$(jq -er '.schedule_version' "$manifest")
+manifest_pack_hash=$(jq -er '.pack_sha256' "$manifest")
+for value in "$content_format_version" "$content_revision" "$schedule_version"; do
+  if [[ ! "$value" =~ ^[0-9]+$ ]]; then
+    echo "content manifest contains a non-integer version" >&2
+    exit 1
+  fi
+done
+if [[ "$manifest_pack_hash" != "$content_hash" ]]; then
+  echo "content manifest pack hash does not match the packaged content" >&2
+  exit 1
+fi
 cat >"$bundle_dir/BUILD-METADATA.txt" <<EOF
 product_version=$VERSION
 source_commit=$commit
@@ -106,9 +125,9 @@ firmware_target=$TARGET
 firmware_flash_offset=0x0
 cli_target=x86_64-unknown-linux-gnu
 protocol_version=1
-content_format_version=1
-content_revision=1
-schedule_version=1
+content_format_version=$content_format_version
+content_revision=$content_revision
+schedule_version=$schedule_version
 content_pack_sha256=$content_hash
 rust_host=$(rustc --version)
 rust_xtensa=$(rustup run esp-1.95.0.0 rustc --version)
