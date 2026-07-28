@@ -3,7 +3,7 @@
 - Status: accepted for implementation; physical evidence incomplete
 - Hardware issue: [H02 / #3][issue-3]
 - Vendor source revision: [`3f96beedd2e8`][vendor-commit]
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-28
 
 Pokeviewer supports only the non-touch
 `ESP32-S3-ePaper-1.54-EN` V2 board, Waveshare SKU 32299. V1 firmware and pin
@@ -139,7 +139,7 @@ of correct polarity.
 | Flash size | verified | 8 MB device probe |
 | PSRAM size/mode | pending | diagnostic firmware required |
 | RTC at `0x51` | verified | set/read-back and valid daily boot |
-| Deep-sleep entry | verified | CRC `d227338a`; USB disconnected after entry |
+| Deep-sleep entry | unqualified | USB re-enumerated and booted again about 2.3 s after attempted entry |
 | GPIO5 RTC-domain pull-up | implemented, unqualified | scheduled wake observation required |
 | Scheduled RTC wake/reboot | pending | near-07:00 observation required |
 | Non-touch I²C population | pending | sanitized full-bus probe required |

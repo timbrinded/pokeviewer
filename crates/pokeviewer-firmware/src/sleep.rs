@@ -15,6 +15,24 @@ use esp_hal::{
 };
 use pokeviewer_esp32s3_pad_hold::hold_audio_power_pad;
 
+macro_rules! held_high_restorer {
+    ($function:ident, $pin:ty) => {
+        pub(crate) fn $function<'a>(pin: &'a mut $pin) -> Output<'a> {
+            let configured = Output::new(pin.reborrow(), Level::High, OutputConfig::default());
+            drop(configured);
+            pin.rtc_set_config(false, false, RtcFunction::Rtc);
+            pin.rtcio_pad_hold(false);
+            Output::new(pin.reborrow(), Level::High, OutputConfig::default())
+        }
+    };
+}
+
+// Restore GPIO17's high output before releasing its retained pad state.
+held_high_restorer!(restore_power_latch, GPIO17<'static>);
+
+// Restore GPIO6's high output before releasing its retained pad state.
+held_high_restorer!(restore_panel_power, GPIO6<'static>);
+
 pub(crate) struct SleepResources {
     pub(crate) rtc_interrupt: GPIO5<'static>,
     pub(crate) panel_power: GPIO6<'static>,
@@ -33,7 +51,8 @@ impl SleepResources {
             rtc_interrupt.reborrow(),
             InputConfig::default().with_pull(Pull::Up),
         );
-        if interrupt_input.is_low() {
+        let rtc_interrupt_low = interrupt_input.is_low();
+        if rtc_interrupt_low {
             esp_println::println!("sleep refused: RTC interrupt remained low");
             loop {
                 core::hint::spin_loop();
@@ -45,12 +64,12 @@ impl SleepResources {
         let panel_output =
             Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
         drop(panel_output);
-        panel_power.rtcio_pad_hold(true);
 
         let mut power_latch = self.power_latch;
         let latch_output =
             Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
         drop(latch_output);
+        panel_power.rtcio_pad_hold(true);
         power_latch.rtcio_pad_hold(true);
 
         let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
@@ -61,27 +80,5 @@ impl SleepResources {
         let mut low_power = HalRtc::new(self.low_power);
         Delay::new().delay_ms(100);
         low_power.sleep_deep(&[&wake]);
-    }
-
-    /// Enter indefinite deep sleep after a terminal failure.
-    ///
-    /// Reset, reflashing, or external power cycling is then required; firmware
-    /// cannot create an automatic failure loop.
-    pub(crate) fn sleep_without_wake(self) -> ! {
-        let mut panel_power = self.panel_power;
-        let panel_output =
-            Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
-        drop(panel_output);
-        panel_power.rtcio_pad_hold(true);
-        let mut power_latch = self.power_latch;
-        let latch_output =
-            Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
-        drop(latch_output);
-        power_latch.rtcio_pad_hold(true);
-        let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
-        hold_audio_power_pad();
-        let mut low_power = HalRtc::new(self.low_power);
-        Delay::new().delay_ms(100);
-        low_power.sleep_deep(&[]);
     }
 }

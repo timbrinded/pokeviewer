@@ -2,7 +2,7 @@
 
 - Status: blocked before day 1 by physical qualification prerequisites
 - Delivery issue: [Q23 / #24][issue-24]
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-28
 
 The seven-day run cannot be replaced by simulation. This document fixes its
 inputs and evidence so it can begin after the connected V2 board passes the
@@ -59,8 +59,10 @@ obtain second-adult review, and run:
 scripts/check-qualification-evidence.sh PATH
 ```
 
-Only a passing validator output may unblock release. Serial access, provisioning,
-rendering, and release-firmware deep-sleep entry have passed. The dedicated
+Only a passing validator output may unblock release. Serial access,
+provisioning, RTC reads, rendering, panel-controller sleep, and panel rail-off
+have passed. Deep sleep has not: the prior USB disappearance was followed by
+re-enumeration and another boot. Awake stability, the dedicated
 one-alarm/one-wake diagnostic, polarity check, battery-side measurements, and
 photographs remain prerequisites, so no day-1 evidence or pass status exists.
 

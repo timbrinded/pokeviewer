@@ -2,7 +2,7 @@
 
 - Status: implemented; hardware injection evidence pending
 - Delivery issue: [Q20 / #21][issue-21]
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-28
 
 Every expected failure has a stable adult-facing code, one wired diagnostic
 bit, at most one automatic hardware attempt per wake, and a terminal action.
@@ -10,23 +10,22 @@ bit, at most one automatic hardware attempt per wake, and a terminal action.
 | Failure | Code | Flag | Attempts | Screen | Terminal recovery |
 | --- | --- | ---: | ---: | --- | --- |
 | invalid/stopped/unreadable RTC | `RTC` | `0x0001` | 0 | setup instructions | wired `pokeviewerctl set`, verified read-back, software restart |
-| corrupt/incompatible pack | `PACK` | `0x0002` | 1 | `REFLASH` | indefinite deep sleep, then install a verified release |
-| panel init/refresh/BUSY | `PANEL` | `0x0004` | 1 | best effort only | indefinite deep sleep, inspect/reset |
-| daily alarm arm | `ALARM` | `0x0008` | 1 | best effort only | indefinite deep sleep, inspect/reset |
-| unsupported wake source | `WAKE` | `0x0010` | 0 | `RESET` | indefinite deep sleep, reset |
+| corrupt/incompatible pack | `PACK` | `0x0002` | 1 | `REFLASH` | remain awake, then install a verified release |
+| panel init/refresh/BUSY | `PANEL` | `0x0004` | 1 | best effort only | remain awake, inspect/reset |
+| daily alarm arm | `ALARM` | `0x0008` | 1 | best effort only | diagnostic/final-runtime reservation; remain awake during staged bring-up |
+| unsupported wake source | `WAKE` | `0x0010` | 0 | `RESET` | diagnostic/final-runtime reservation; remain awake during staged bring-up |
 
-Invalid RTC is the only failure that intentionally remains awake: it exposes
-`RTC` through the bounded wired diagnostics command and accepts only the
-versioned provisioning protocol. All terminal failures log only code, bit,
-attempt count, and rail state, then enter deep sleep with no automatic wake
-source. Reset, external power cycling, or reflashing is therefore required;
-there is no reboot, refresh, or retry loop.
+Invalid RTC exposes `RTC` through the bounded wired diagnostics command and
+accepts only the versioned provisioning protocol. During awake-first bring-up,
+all terminal failures log only code, bit, attempt count, and rail state, then
+remain awake with no automatic reset, refresh, sleep, or application retry.
+Reset, external power cycling, or reflashing is required.
 
 The panel adapter already bounds BUSY waits to 500 ten-millisecond polls. The
-runtime invokes initialization/full refresh once. Alarm configuration is
-invoked once after a successful frame. A panel failure cannot reliably render
-its own diagnostic; this limitation is explicit rather than pretending a
-failed output path succeeded.
+runtime invokes initialization/full refresh once. Normal awake mode does not
+configure the alarm; the dedicated sleep diagnostic retains that boundary. A
+panel failure cannot reliably render its own diagnostic; this limitation is
+explicit rather than pretending a failed output path succeeded.
 
 ## Fault-injection evidence
 

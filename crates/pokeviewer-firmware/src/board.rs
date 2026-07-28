@@ -4,7 +4,7 @@ use embassy_futures::block_on;
 use embedded_hal::delay::DelayNs;
 use esp_hal::{
     delay::Delay,
-    gpio::{Level, Output, OutputConfig, RtcPin},
+    gpio::{Level, Output, OutputConfig},
     i2c::master::{Config as I2cConfig, I2c},
     rtc_cntl::wakeup_cause,
     system::SleepSource,
@@ -16,7 +16,7 @@ use crate::{
     LocalDateTime, Pcf85063Rtc, Rtc,
     es8311::suspend_audio_codec,
     panel::{PanelDiagnostic, run_panel_diagnostics},
-    sleep::SleepResources,
+    sleep::{SleepResources, restore_panel_power, restore_power_latch},
     usb_protocol::UsbProtocolTransport,
 };
 
@@ -125,19 +125,9 @@ fn run_board_diagnostics(
 ) -> Result<(HardwareDiagnosticReport, SleepResources), &'static str> {
     let peripherals = esp_hal::init(esp_hal::Config::default());
     let mut power_latch_pin = peripherals.GPIO17;
-    power_latch_pin.rtcio_pad_hold(false);
-    let power_latch = Output::new(
-        power_latch_pin.reborrow(),
-        Level::High,
-        OutputConfig::default(),
-    );
+    let power_latch = restore_power_latch(&mut power_latch_pin);
     let mut panel_power_pin = peripherals.GPIO6;
-    panel_power_pin.rtcio_pad_hold(false);
-    let mut panel_power = Output::new(
-        panel_power_pin.reborrow(),
-        Level::High,
-        OutputConfig::default(),
-    );
+    let mut panel_power = restore_panel_power(&mut panel_power_pin);
     let mut audio_power_pin = peripherals.GPIO42;
     // Keep the shared-bus codec powered until all RTC transactions complete.
     let audio_power = Output::new(

@@ -20,6 +20,8 @@ use.
 
 This candidate is not physically qualified or approved for publication until
 the seven-day battery run and exact-artifact clean-host rehearsal are complete.
+The current awake-first firmware is a development baseline and is not the v1
+release candidate: stable deep sleep and RTC wake remain unqualified.
 It is an unofficial, non-commercial fan project and is not affiliated with,
 endorsed by, or sponsored by Nintendo, Creatures Inc., GAME FREAK inc., or The
 Pokémon Company International.

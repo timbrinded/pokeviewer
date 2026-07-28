@@ -1,8 +1,8 @@
 # On-device daily-card integration
 
-- Status: USB render/deep-sleep-entry smoke pass; wake and battery evidence pending
+- Status: awake-first build and physical stability gates passed; deep sleep pending
 - Delivery issue: [I18 / #19][issue-19]
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-28
 
 The release binary now composes the same repository-owned components used by
 host evidence:
@@ -18,10 +18,11 @@ host evidence:
    rail.
 
 The shared I²C bus requires GPIO42 to remain low, so the audio rail stays
-powered through deep sleep. Firmware applies the vendor ES8311 software-suspend
-sequence before using the RTC, holds GPIO42 low across sleep, and disables only
-the panel rail after refresh. The rail is powered; only the codec is
-software-suspended. Audio capture and playback are never configured.
+powered while the staged runtime remains awake. Firmware applies the vendor
+ES8311 software-suspend sequence before using the RTC, retains GPIO42 low as an
+ordinary output, and disables only the panel rail after refresh. The rail is
+powered; only the codec is software-suspended. Audio capture and playback are
+never configured.
 
 No Wi-Fi, BLE, SD, runtime API, heap-backed content loading, or child-facing
 input is initialized. In setup mode, the existing bounded USB protocol remains
@@ -46,12 +47,22 @@ calendar date. Hardware diagnostics additionally log the RTC datetime. Neither
 path intentionally logs a device identifier or host path, but captured output
 must still be sanitized before publication.
 
-On 2026-07-27, after restoring GPIO5 from its retained RTC mux before checking
-the interrupt, the connected V2 board rendered framebuffer CRC-32 `d227338a`
-and entered deep sleep; the USB connection disappeared as expected. A
-scheduled RTC alarm wake/reboot with the RTC-domain GPIO5 pull-up has not yet
-been observed. Sanitized panel photos, battery-side current measurements, and
-the battery polarity gate also remain pending.
+The connected V2 board rendered framebuffer CRC-32 `d227338a`, read the RTC,
+put the panel controller to sleep, and switched the panel rail off. The
+attempted low-power path did not prove stable deep sleep: a measured 15-second
+trace showed USB re-enumeration and another boot about 2.3 seconds later. USB
+disappearance alone is therefore not pass evidence.
+
+The current development build renders once, remains awake, and polls the RTC
+every 30 seconds until the strictly future 07:00 boundary. It is a bring-up
+baseline, not the v1 release behavior. On 2026-07-28, an ordinary boot remained
+continuously present over USB for 607 seconds with zero state changes. A
+synthetic near-07:00 run made one reset and refresh, planned the following
+day's boundary, then remained continuously present for 608 seconds with zero
+state changes.
+
+Sanitized panel photos, battery-side current measurements, the battery
+polarity gate, and isolated sleep/wake qualification remain pending.
 
 ## Static release budget
 
@@ -71,8 +82,8 @@ Record both `llvm-size` outputs against the exact release-candidate commit;
 linked sizes change when the hardware boundary changes and must not be copied
 from an earlier build. The fixed application framebuffer is 5,000 bytes. A
 linker-reported stack region is remaining address-space allocation, not a
-measurement of peak stack use. USB flashing, a daily-card render, and
-deep-sleep entry have passed, but a hardware high-water measurement and
-sanitized panel photographs remain pending.
+measurement of peak stack use. USB flashing and a daily-card render have
+passed. Deep sleep remains unqualified, and a hardware high-water measurement
+plus sanitized panel photographs remain pending.
 
 [issue-19]: https://github.com/timbrinded/pokeviewer/issues/19

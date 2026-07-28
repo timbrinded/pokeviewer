@@ -11,10 +11,10 @@ power if safe and follow the [safety guide](safety.md).
 | `ALARM` / `RESET` | next 07:00 alarm could not be armed | connect USB; inspect diagnostics/RTC; reset once |
 | `WAKE` / `RESET` | unsupported wake source | reset once; qualify wiring if repeated |
 
-Terminal failures enter deep sleep without an automatic wake, preventing a
-battery-draining reboot loop. A panel failure may leave the prior card visible
-because the failed output path cannot reliably display its own code; use the
-sanitized USB/log evidence during adult diagnosis.
+During awake-first bring-up, terminal failures remain awake without an
+automatic reset, refresh, sleep, or retry. A panel failure may leave the prior
+card visible because the failed output path cannot reliably display its own
+code; use the sanitized USB/log evidence during adult diagnosis.
 
 ## Common setup failures
 
@@ -29,6 +29,9 @@ sanitized USB/log evidence during adult diagnosis.
   validity; connect USB and read/set the clock.
 - no touch response: expected; the supported SKU has no touch controller.
 - no network setup: expected; v1 is fully offline.
+- USB repeatedly disappears and returns after an attempted sleep: failed sleep
+  qualification, not proof of a valid wake; record the interval and return to
+  the awake baseline.
 
 If a fault repeats after one reset, stop. Preserve only sanitized codes and
 hashes, then follow the [hardware qualification procedure](hardware/release-qualification.md).

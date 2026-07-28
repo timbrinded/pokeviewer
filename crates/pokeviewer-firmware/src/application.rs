@@ -55,6 +55,18 @@ pub struct WakePlan {
     pub refresh_required: bool,
 }
 
+/// Decision made from one awake-mode RTC poll.
+#[cfg(any(target_arch = "xtensa", test))]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub(crate) enum AwakePollDecision {
+    /// The planned rollover has not been reached.
+    Wait,
+    /// The planned rollover has been reached and the application should restart.
+    Restart,
+    /// The RTC could not provide a valid observation; retain the current card.
+    ReadFailure,
+}
+
 /// Plan one wake from validated RTC state and optional retained-card evidence.
 ///
 /// # Errors
@@ -86,6 +98,22 @@ pub(crate) fn planned_wake_reached(
     planned_wake: LocalDateTime,
 ) -> Result<bool, InvalidDateTime> {
     Ok(observed.to_primitive()? >= planned_wake.to_primitive()?)
+}
+
+/// Decide whether one awake-mode RTC observation requires a restart.
+#[cfg(any(target_arch = "xtensa", test))]
+pub(crate) fn decide_awake_poll(
+    observed: Option<LocalDateTime>,
+    planned_wake: LocalDateTime,
+) -> AwakePollDecision {
+    let Some(observed) = observed else {
+        return AwakePollDecision::ReadFailure;
+    };
+    match planned_wake_reached(observed, planned_wake) {
+        Ok(true) => AwakePollDecision::Restart,
+        Ok(false) => AwakePollDecision::Wait,
+        Err(_) => AwakePollDecision::ReadFailure,
+    }
 }
 
 /// Render one complete application frame from a fresh RTC assessment.
@@ -154,8 +182,9 @@ mod tests {
     };
 
     use super::{
-        ApplicationError, PACK, RetainedCard, Screen, plan_wake, planned_wake_reached,
-        render_rtc_frame, render_rtc_frame_from_pack, render_selection,
+        ApplicationError, AwakePollDecision, PACK, RetainedCard, Screen, decide_awake_poll,
+        plan_wake, planned_wake_reached, render_rtc_frame, render_rtc_frame_from_pack,
+        render_selection,
     };
 
     const MONDAY_BULBASAUR: &[u8; 5_000] =
@@ -374,6 +403,65 @@ mod tests {
                 plan.next_wake.day
             ),
             (63, 1, 2)
+        );
+    }
+
+    #[test]
+    fn awake_poll_restarts_once_at_the_strictly_future_rollover() {
+        let before = LocalDateTime {
+            year: 2026,
+            month: 7,
+            day: 28,
+            hour: 6,
+            minute: 59,
+            second: 59,
+        };
+        let first_plan = plan_wake(before, None).unwrap();
+
+        assert_eq!(
+            decide_awake_poll(Some(before), first_plan.next_wake),
+            AwakePollDecision::Wait
+        );
+        assert_eq!(
+            decide_awake_poll(Some(first_plan.next_wake), first_plan.next_wake),
+            AwakePollDecision::Restart
+        );
+
+        let after_restart = LocalDateTime {
+            second: 1,
+            ..first_plan.next_wake
+        };
+        let next_plan = plan_wake(after_restart, None).unwrap();
+        assert_eq!(next_plan.next_wake.day, 29);
+        assert_eq!(
+            decide_awake_poll(Some(after_restart), next_plan.next_wake),
+            AwakePollDecision::Wait
+        );
+    }
+
+    #[test]
+    fn awake_poll_failure_never_requests_a_restart() {
+        let planned_wake = LocalDateTime {
+            year: 2026,
+            month: 7,
+            day: 28,
+            hour: 7,
+            minute: 0,
+            second: 0,
+        };
+        assert_eq!(
+            decide_awake_poll(None, planned_wake),
+            AwakePollDecision::ReadFailure
+        );
+        assert_eq!(
+            decide_awake_poll(
+                Some(LocalDateTime {
+                    month: 13,
+                    ..planned_wake
+                }),
+                planned_wake
+            ),
+            AwakePollDecision::ReadFailure
         );
     }
 

@@ -126,15 +126,17 @@ minimum alongside those assumptions; do not present it as universal runtime.
 
 | Acceptance check | Status | Evidence |
 | --- | --- | --- |
-| release-firmware deep-sleep entry | passed | CRC `d227338a`; USB disconnected after entry |
+| release-firmware deep-sleep entry | failed/unqualified | a 15-second trace re-enumerated and booted again after about 2.3 s |
 | GPIO5 RTC-domain pull-up | pending | dedicated diagnostic sleep/wake run required |
 | one alarm, one `Ext0` wake | pending | dedicated diagnostic run required |
 | passive image retention | pending | before/after photos required |
 | refresh/active/sleep current | pending | battery-side measurement required |
 | daily energy and 72-hour capacity | pending | depends on measured values |
 
-USB serial access, the release-firmware render, and deep-sleep entry have
-passed. The scheduled RTC wake/reboot, dedicated near-07:00 diagnostic,
+USB serial access, RTC reads, the release-firmware render, panel-controller
+sleep, and panel rail-off have passed. USB disappearance by itself is not a
+deep-sleep pass; the observed re-enumeration/reset must not be relabelled as a
+wake. The dedicated timer-sleep and near-07:00 RTC-wake diagnostics,
 battery-side measurements, battery polarity gate, and retained-image photos
 remain pending. Follow the
 [privacy and evidence rules](../privacy-and-evidence.md) before publishing logs
