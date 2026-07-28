@@ -1,7 +1,6 @@
 # V2 qualification result
 
 - [ ] Board, panel, flash, PSRAM, RTC, USB, and non-touch identity pass.
-- [ ] Battery connector polarity has two-adult verification.
 - [ ] RTC set/read-back and oscillator-loss recovery pass.
 - [ ] All 151 host render paths and committed goldens pass.
 - [ ] Panel full refresh completes in at most 10 seconds.

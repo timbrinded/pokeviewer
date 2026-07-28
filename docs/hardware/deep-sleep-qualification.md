@@ -145,8 +145,7 @@ minimum alongside those assumptions; do not present it as universal runtime.
 
 USB disappearance alone remains insufficient evidence. The accepted wake proof
 combines timed USB state with the RTC-retained `Ext0` and alarm-flag verdict.
-Battery-side measurements, the battery polarity gate, and retained-image photos
-remain pending. Follow the
+Battery-side measurements and retained-image photos remain pending. Follow the
 [privacy and evidence rules](../privacy-and-evidence.md) before publishing logs
 or photos.
 

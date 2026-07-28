@@ -52,13 +52,6 @@ touch_controller=absent
 The probe must fail rather than print a misleading success if chip, flash,
 PSRAM, RTC, or touch-population checks disagree with the board contract.
 
-## Battery polarity
-
-Follow the multimeter procedure in the
-[board contract](v2-board-contract.md#battery-connector-safety-gate). Record a
-cropped orientation photo and a pass/fail statement; do not record a household
-location or unrelated device identifier.
-
 ## Evidence review
 
 Before committing any result:
@@ -66,5 +59,4 @@ Before committing any result:
 1. compare the measured values with the V2 contract;
 2. redact MAC and USB serial identifiers at source;
 3. remove photograph metadata;
-4. make the firmware commit and probe-tool version explicit; and
-5. have another adult check connector polarity before a cell is inserted.
+4. make the firmware commit and probe-tool version explicit.

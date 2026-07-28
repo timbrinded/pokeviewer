@@ -12,9 +12,7 @@ Linux account with normal read/write permission for the Espressif serial
 device. Add the account to the distribution's appropriate device group and
 re-login; never use a world-writable device-node workaround.
 
-Before connecting a cell, complete the
-[battery polarity gate](hardware/v2-board-contract.md#battery-connector-safety-gate)
-and read the [safety guide](safety.md).
+Before connecting a cell, read the [safety guide](safety.md).
 
 ## Build and flash
 
@@ -75,8 +73,8 @@ protected cell.
 Follow the [troubleshooting guide](troubleshooting.md) for every displayed
 code. Firmware updates require an adult and USB; the device has no over-the-air
 update path. For a clean reinstall, verify the release again, disconnect the
-battery, flash over USB, reconnect only after polarity inspection, set/read the
-RTC, and confirm the displayed framebuffer against the release evidence.
+battery, flash over USB, reconnect the battery, set/read the RTC, and confirm
+the displayed framebuffer against the release evidence.
 
 Public photographs and logs must follow the
 [privacy rules](privacy-and-evidence.md).

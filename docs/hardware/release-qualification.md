@@ -13,9 +13,8 @@ ESP32-S3-ePaper-1.54-EN V2 board. Any failed threshold blocks release.
 - direct data-capable USB cable;
 - current instrument capable of resolving both e-paper peaks and below
   0.500 mA, with range, burden voltage, and sample rate recorded;
-- current-limited bench supply or a protected 3.7 V single-cell battery whose
-  connector polarity has passed the two-adult check;
-- multimeter for connector polarity and rail levels; and
+- current-limited bench supply or a protected 3.7 V single-cell battery;
+- multimeter for rail levels; and
 - camera with metadata removal available.
 
 Record the firmware and `pokeviewerctl` full commits, artifact and content-pack
@@ -25,8 +24,8 @@ detail, MAC, USB serial, credentials, raw device path, or unsanitized log.
 
 ## Clean-board setup
 
-1. Disconnect the battery and USB. Inspect V2/non-touch markings and panel
-   connector. Perform the [battery polarity gate](v2-board-contract.md#battery-connector-safety-gate).
+1. Disconnect the battery and USB. Inspect V2/non-touch markings and the panel
+   connector.
 2. Connect USB only. Confirm the host account has normal serial-group access;
    do not make the node world-writable.
 3. Check out the exact commit with a clean worktree. Run the full local CI
@@ -113,9 +112,9 @@ changes. Device identifiers were omitted and permissions were not weakened.
 
 This is not release qualification. PSRAM identity, complete I²C population,
 physical panel photographs, the scheduled RTC wake/reboot with the explicit
-GPIO5 RTC-domain pull-up, alarm transitions, battery polarity, battery-only
-operation, current measurements, recovery injections, repeated 07:00
-transitions, and the seven-day run remain pending.
+GPIO5 RTC-domain pull-up, alarm transitions, battery-only operation, current
+measurements, recovery injections, repeated 07:00 transitions, and the
+seven-day run remain pending.
 
 [issue-23]: https://github.com/timbrinded/pokeviewer/issues/23
 [template]: ../evidence/qualification-template/

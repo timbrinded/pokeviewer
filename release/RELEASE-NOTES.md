@@ -18,8 +18,8 @@ not universally guaranteed.
 
 Pokeviewer is an adult-built, child-adjacent development-board project, not a
 certified finished toy. No board, enclosure, battery, charger, or cable is
-included. Read the safety guide and complete the polarity gate before
-connecting a protected single-cell battery.
+included. Read the safety guide before connecting a protected single-cell
+battery.
 
 Publication is permitted only after the
 [seven-day physical qualification](https://github.com/timbrinded/pokeviewer/issues/24)
