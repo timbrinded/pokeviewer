@@ -1,0 +1,182 @@
+name: Publish v1.0.0
+
+on:
+  workflow_dispatch:
+    inputs:
+      candidate_run_id:
+        description: Successful Release candidate workflow run ID
+        required: true
+        type: string
+      candidate_commit:
+        description: Full qualified and rehearsed commit SHA
+        required: true
+        type: string
+      confirmation:
+        description: Type PUBLISH v1.0.0
+        required: true
+        type: string
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: publish-v1.0.0
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    name: Publish exact qualified candidate
+    runs-on: ubuntu-latest
+    environment: production-release
+    env:
+      GH_TOKEN: ${{ github.token }}
+      TAG: v1.0.0
+    steps:
+      - name: Check out exact main commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 1
+
+      - name: Require configured reviewer protection
+        run: |
+          reviewer_rules=$(gh api \
+            "repos/$GITHUB_REPOSITORY/environments/production-release" \
+            --jq '[.protection_rules[] |
+              select(.type == "required_reviewers")] | length')
+          test "$reviewer_rules" -gt 0
+
+      - name: Require explicit immutable release target
+        env:
+          CANDIDATE_COMMIT: ${{ inputs.candidate_commit }}
+          CONFIRMATION: ${{ inputs.confirmation }}
+        run: |
+          test "$GITHUB_REF" = "refs/heads/main"
+          test "$CONFIRMATION" = "PUBLISH v1.0.0"
+          test "$CANDIDATE_COMMIT" = "$GITHUB_SHA"
+          test "$(git rev-parse HEAD)" = "$CANDIDATE_COMMIT"
+          test -z "$(git status --porcelain)"
+          if git ls-remote --exit-code --tags origin "refs/tags/$TAG"; then
+            echo "$TAG already exists" >&2
+            exit 1
+          fi
+
+      - name: Require closed release blockers
+        run: |
+          for issue in 24 26 27; do
+            test "$(gh issue view "$issue" --json state --jq .state)" = "CLOSED"
+          done
+
+      - name: Require exact successful candidate run
+        env:
+          CANDIDATE_COMMIT: ${{ inputs.candidate_commit }}
+          CANDIDATE_RUN_ID: ${{ inputs.candidate_run_id }}
+        run: |
+          test "$(gh run view "$CANDIDATE_RUN_ID" \
+            --json name --jq .name)" = "Release candidate"
+          test "$(gh run view "$CANDIDATE_RUN_ID" \
+            --json event --jq .event)" = "workflow_dispatch"
+          test "$(gh run view "$CANDIDATE_RUN_ID" \
+            --json conclusion --jq .conclusion)" = "success"
+          test "$(gh run view "$CANDIDATE_RUN_ID" \
+            --json headSha --jq .headSha)" = "$CANDIDATE_COMMIT"
+          mkdir -p target/candidate-download
+          gh run download "$CANDIDATE_RUN_ID" \
+            --name "pokeviewer-v1.0.0-candidate-$CANDIDATE_COMMIT" \
+            --dir target/candidate-download
+
+      - name: Verify exact candidate archive
+        run: |
+          archive=target/candidate-download/pokeviewer-v1.0.0.tar.gz
+          scripts/verify-release-candidate.sh "$archive"
+          mkdir -p target/publish
+          tar -xzf "$archive" -C target/publish
+          test "$(awk -F= '$1 == "source_commit" { print $2 }' \
+            target/publish/pokeviewer-v1.0.0/BUILD-METADATA.txt)" = "$GITHUB_SHA"
+
+      - name: Create private draft with exact assets
+        run: |
+          bundle=target/publish/pokeviewer-v1.0.0
+          archive=target/candidate-download/pokeviewer-v1.0.0.tar.gz
+          gh release create "$TAG" \
+            --draft \
+            --latest=false \
+            --target "$GITHUB_SHA" \
+            --title "Pokeviewer v1.0.0" \
+            --notes-file "$bundle/RELEASE-NOTES.md" \
+            "$archive" \
+            "$archive.sha256" \
+            "$bundle/pokeviewer-v1.0.0-esp32s3-v2.bin" \
+            "$bundle/pokeviewerctl-v1.0.0-x86_64-unknown-linux-gnu" \
+            "$bundle/pokeviewer-v1.pack" \
+            "$bundle/content-manifest.json" \
+            "$bundle/MANIFEST.txt" \
+            "$bundle/SHA256SUMS" \
+            "$bundle/FLASHING.md" \
+            "$bundle/RELEASE-NOTES.md" \
+            "$bundle/LICENSE" \
+            "$bundle/THIRD_PARTY_NOTICES.md"
+
+      - name: Audit draft downloads against candidate
+        run: |
+          mkdir -p target/draft-audit
+          gh release download "$TAG" --dir target/draft-audit
+          bundle=target/publish/pokeviewer-v1.0.0
+          candidate=target/candidate-download
+          cmp "$candidate/pokeviewer-v1.0.0.tar.gz" \
+            target/draft-audit/pokeviewer-v1.0.0.tar.gz
+          cmp "$candidate/pokeviewer-v1.0.0.tar.gz.sha256" \
+            target/draft-audit/pokeviewer-v1.0.0.tar.gz.sha256
+          for file in \
+            pokeviewer-v1.0.0-esp32s3-v2.bin \
+            pokeviewerctl-v1.0.0-x86_64-unknown-linux-gnu \
+            pokeviewer-v1.pack \
+            content-manifest.json \
+            MANIFEST.txt \
+            SHA256SUMS \
+            FLASHING.md \
+            RELEASE-NOTES.md \
+            LICENSE \
+            THIRD_PARTY_NOTICES.md; do
+            cmp "$bundle/$file" "target/draft-audit/$file"
+          done
+
+      - name: Publish final release
+        run: |
+          gh release edit "$TAG" --draft=false --latest
+
+      - name: Verify public unauthenticated download
+        run: |
+          mkdir -p target/public-audit
+          base="https://github.com/$GITHUB_REPOSITORY/releases/download/$TAG"
+          curl --fail --location --silent --show-error \
+            "$base/pokeviewer-v1.0.0.tar.gz" \
+            --output target/public-audit/pokeviewer-v1.0.0.tar.gz
+          curl --fail --location --silent --show-error \
+            "$base/pokeviewer-v1.0.0.tar.gz.sha256" \
+            --output target/public-audit/pokeviewer-v1.0.0.tar.gz.sha256
+          (
+            cd target/public-audit
+            sha256sum --check pokeviewer-v1.0.0.tar.gz.sha256
+          )
+          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = "false"
+          test "$(gh release view "$TAG" \
+            --json isPrerelease --jq .isPrerelease)" = "false"
+          test "$(git ls-remote origin "refs/tags/$TAG" | cut -f1)" \
+            = "$GITHUB_SHA"
+
+      - name: Close delivery issue and milestone
+        run: |
+          release_url="https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
+          gh issue close 1 \
+            --comment "Published and publicly verified: $release_url"
+          gh api \
+            --method PATCH \
+            "repos/$GITHUB_REPOSITORY/milestones/1" \
+            -f state=closed
+          {
+            echo "Published $release_url"
+            echo "Tag commit: $GITHUB_SHA"
+            echo "Candidate run: ${{ inputs.candidate_run_id }}"
+          } >>"$GITHUB_STEP_SUMMARY"

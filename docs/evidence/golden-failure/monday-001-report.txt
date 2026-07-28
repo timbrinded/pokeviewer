@@ -1,0 +1,4 @@
+changed_pixels=1
+changed_coordinates=(100,100)
+expected_sha256=e1f5271e860f3c13750bc0c36cf86e0b1f4a907a8860a2801d53bd1b2dad18ba
+actual_sha256=72a685500fae864eadc7e2ad5c544e967c57575dae18a35b2ddc4e988fc41212

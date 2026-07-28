@@ -1,0 +1,72 @@
+# E-paper panel bring-up
+
+This procedure qualifies the non-touch 1.54-inch V2 panel before application
+integration. It is diagnostic firmware, not the final daily-card experience.
+
+## Fixed configuration
+
+- driver: `epd_waveshare::epd1in54_v2::Epd1in54`;
+- SPI2 at 10 MHz, mode 0;
+- SCK GPIO12, MOSI GPIO13, CS GPIO11;
+- DC GPIO10, reset GPIO9, BUSY GPIO8;
+- active-low panel power on GPIO6;
+- one 5,000-byte, one-bit framebuffer; and
+- full refresh only.
+
+BUSY is active high. The board adapter polls every 10 ms and terminates a wait
+after 500 polls, giving a five-second upper bound. A timeout is printed as a
+failure and the panel rail is switched off. The combined diagnostic keeps
+GPIO42 low because switching off the ES8311 rail clamps the shared RTC I²C bus.
+Firmware applies the vendor ES8311 software-suspend sequence and keeps the
+audio rail powered while this diagnostic remains awake; only the codec is
+software-suspended, and only the panel rail is switched off. The separate
+sleep diagnostic qualifies rail retention through deep sleep.
+
+## Run
+
+Build and flash using the pinned toolchain:
+
+```sh
+cargo xtask firmware-diagnostic-build
+cargo xtask firmware-diagnostic-flash
+```
+
+The diagnostic displays, in order:
+
+1. full white;
+2. full black;
+3. a 20-pixel checkerboard;
+4. a two-pixel border; and
+5. a centered text identification frame.
+
+The first four frames remain visible for two seconds after refresh. The final
+text frame is retained after the driver enters sleep and GPIO6 disables the
+panel rail.
+
+Expected terminal output is one of:
+
+```text
+hardware diagnostics complete; RTC=<sanitized local datetime>; alarm_was_pending=<bool>; panel rail off
+hardware diagnostics failed: <bounded reason>
+```
+
+The combined diagnostic validates the RTC before reporting success. Provision a
+valid RTC datetime first; an oscillator-stop indication is intentionally a
+failure. The panel sequence still runs if RTC validation fails so one hardware
+fault does not hide evidence about the other subsystem.
+
+## Qualification evidence
+
+Do not mark hardware bring-up complete until all rows have sanitized evidence.
+
+| Check | Required evidence | Status |
+| --- | --- | --- |
+| five patterns | clear, correctly oriented photos | pending |
+| clipping | border visible on all four edges | pending |
+| BUSY polarity | logic trace or measured levels | pending |
+| refresh bound | measured duration below five seconds | pending |
+| passive image | final frame visible with GPIO6 high | pending |
+| panel current | refresh and rail-off measurements | pending |
+
+Follow the [privacy and evidence rules](../privacy-and-evidence.md). Exclude USB
+serials, MAC addresses, home paths, and unsanitized terminal output.

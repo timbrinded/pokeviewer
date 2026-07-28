@@ -1,0 +1,17 @@
+# Clean-host rehearsal checklist
+
+- [ ] Fresh supported x86-64 Linux host
+- [ ] Candidate downloaded from retained manual workflow artifact
+- [ ] Outer and internal SHA-256 checks passed before execution
+- [ ] Exact non-touch V2 hardware confirmed
+- [ ] Flash erased and merged image written at `0x0`
+- [ ] Bundled CLI version and handshake matched
+- [ ] RTC set and matching read-back observed
+- [ ] Correct daily card, deep sleep, and scheduled refresh observed
+- [ ] Invalid-RTC recovery completed from bundled documentation
+- [ ] Bounded panel-failure recovery completed safely
+- [ ] Transcript and photographs sanitized
+- [ ] No undocumented command or source-tree shortcut used
+- [ ] No unresolved release blocker
+- [ ] Adult reviewer one signed the private original
+- [ ] Adult reviewer two signed the private original

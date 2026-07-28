@@ -1,0 +1,30 @@
+[graph]
+all-features = false
+
+[advisories]
+ignore = [
+    { id = "RUSTSEC-2024-0436", reason = "paste is a transitive dependency of the pinned ESP-HAL correction with no safe upgrade" },
+]
+
+[licenses]
+allow = [
+    "Apache-2.0",
+    "ISC",
+    "MIT",
+    "Unicode-3.0",
+    "Zlib",
+]
+confidence-threshold = 0.8
+
+[bans]
+multiple-versions = "allow"
+wildcards = "deny"
+
+[sources]
+unknown-registry = "deny"
+unknown-git = "deny"
+allow-registry = ["https://github.com/rust-lang/crates.io-index"]
+allow-git = [
+    "https://github.com/esp-rs/esp-hal",
+    "https://github.com/esp-rs/esp-pacs",
+]

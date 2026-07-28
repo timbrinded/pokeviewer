@@ -1,0 +1,5 @@
+Run scripts/calculate-battery-capacity.sh with measured values.
+minimum_72h_mAh=PENDING
+intended_cell_rated_mAh=PENDING
+usable_capacity_fraction=PENDING
+status=PENDING
