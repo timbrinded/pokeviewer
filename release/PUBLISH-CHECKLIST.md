@@ -12,5 +12,6 @@
 - [ ] Draft assets downloaded and compared before publication
 - [ ] Public unauthenticated archive download and checksum passed
 - [ ] Public release page reviewed for private information
+- [ ] Release issue #28 closed only after public audit
 - [ ] Root issue #1 closed only after public audit
 - [ ] Milestone #1 closed only after public audit

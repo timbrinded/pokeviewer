@@ -64,7 +64,7 @@ jobs:
 
       - name: Require closed release blockers
         run: |
-          for issue in 24 26 27; do
+          for issue in 9 21 23 24 25 26 27; do
             test "$(gh issue view "$issue" --json state --jq .state)" = "CLOSED"
           done
 
@@ -166,9 +166,11 @@ jobs:
           test "$(git ls-remote origin "refs/tags/$TAG" | cut -f1)" \
             = "$GITHUB_SHA"
 
-      - name: Close delivery issue and milestone
+      - name: Close release and delivery issues and milestone
         run: |
           release_url="https://github.com/$GITHUB_REPOSITORY/releases/tag/$TAG"
+          gh issue close 28 \
+            --comment "Published and publicly verified: $release_url"
           gh issue close 1 \
             --comment "Published and publicly verified: $release_url"
           gh api \
@@ -180,3 +182,11 @@ jobs:
             echo "Tag commit: $GITHUB_SHA"
             echo "Candidate run: ${{ inputs.candidate_run_id }}"
           } >>"$GITHUB_STEP_SUMMARY"
+
+      - name: Remove failed private draft
+        if: failure()
+        run: |
+          if [[ "$(gh release view "$TAG" --json isDraft --jq .isDraft \
+            2>/dev/null)" = "true" ]]; then
+            gh release delete "$TAG" --cleanup-tag --yes
+          fi
