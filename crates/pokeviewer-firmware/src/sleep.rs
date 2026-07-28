@@ -43,30 +43,45 @@ pub(crate) struct SleepResources {
 }
 
 impl SleepResources {
+    /// Enter deep sleep indefinitely, with external reset as the only exit.
+    pub(crate) fn sleep_without_wake(self) -> ! {
+        let Self {
+            rtc_interrupt: _,
+            panel_power,
+            power_latch,
+            audio_power,
+            low_power,
+        } = self;
+        retain_power_rails(panel_power, power_latch, audio_power);
+        let mut low_power = HalRtc::new(low_power);
+        Delay::new().delay_ms(100);
+        low_power.sleep_deep(&[]);
+    }
+
     /// Enter deep sleep with only the ESP32-S3 RTC timer as a wake source.
     pub(crate) fn sleep_with_timer(self, duration: Duration) -> ! {
-        let mut panel_power = self.panel_power;
-        let panel_output =
-            Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
-        drop(panel_output);
-        panel_power.rtcio_pad_hold(true);
-
-        let mut power_latch = self.power_latch;
-        let latch_output =
-            Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
-        drop(latch_output);
-        power_latch.rtcio_pad_hold(true);
-
-        let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
-        hold_audio_power_pad();
+        let Self {
+            rtc_interrupt: _,
+            panel_power,
+            power_latch,
+            audio_power,
+            low_power,
+        } = self;
+        retain_power_rails(panel_power, power_latch, audio_power);
         let timer = TimerWakeupSource::new(duration);
-        let mut low_power = HalRtc::new(self.low_power);
+        let mut low_power = HalRtc::new(low_power);
         Delay::new().delay_ms(100);
         low_power.sleep_deep(&[&timer]);
     }
 
     pub(crate) fn sleep(self) -> ! {
-        let mut rtc_interrupt = self.rtc_interrupt;
+        let Self {
+            mut rtc_interrupt,
+            panel_power,
+            power_latch,
+            audio_power,
+            low_power,
+        } = self;
         // Deep-sleep wake restarts the digital core, so the prior EXT0
         // source's Drop cannot restore this retained pad to the GPIO path.
         rtc_interrupt.rtc_set_config(true, false, RtcFunction::Rtc);
@@ -83,25 +98,29 @@ impl SleepResources {
         }
         drop(interrupt_input);
 
-        let mut panel_power = self.panel_power;
-        let panel_output =
-            Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
-        drop(panel_output);
-
-        let mut power_latch = self.power_latch;
-        let latch_output =
-            Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
-        drop(latch_output);
-        panel_power.rtcio_pad_hold(true);
-        power_latch.rtcio_pad_hold(true);
-
-        let _audio_power = Output::new(self.audio_power, Level::Low, OutputConfig::default());
-        hold_audio_power_pad();
+        retain_power_rails(panel_power, power_latch, audio_power);
         rtc_interrupt.rtcio_pullup(true);
         rtc_interrupt.rtcio_pulldown(false);
         let wake = Ext0WakeupSource::new(rtc_interrupt, WakeupLevel::Low);
-        let mut low_power = HalRtc::new(self.low_power);
+        let mut low_power = HalRtc::new(low_power);
         Delay::new().delay_ms(100);
         low_power.sleep_deep(&[&wake]);
     }
+}
+
+fn retain_power_rails(
+    mut panel_power: GPIO6<'static>,
+    mut power_latch: GPIO17<'static>,
+    audio_power: GPIO42<'static>,
+) {
+    let panel_output = Output::new(panel_power.reborrow(), Level::High, OutputConfig::default());
+    drop(panel_output);
+    panel_power.rtcio_pad_hold(true);
+
+    let latch_output = Output::new(power_latch.reborrow(), Level::High, OutputConfig::default());
+    drop(latch_output);
+    power_latch.rtcio_pad_hold(true);
+
+    let _audio_power = Output::new(audio_power, Level::Low, OutputConfig::default());
+    hold_audio_power_pad();
 }

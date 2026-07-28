@@ -48,7 +48,7 @@ detail, MAC, USB serial, credentials, raw device path, or unsanitized log.
 | rollover planning | host boundary tests plus synthetic near-07:00 diagnostic | exactly one boundary transition and a strictly future next alarm |
 | daily wake | build/flash with `cargo xtask sleep-diagnostic-build` and `cargo xtask sleep-diagnostic-flash`; set to 06:59:30 and observe | GPIO5 RTC-domain pull-up enabled with pull-down disabled; prior card before 07:00; one new card at/after 07:00; one `Ext0` wake |
 | reset/power loss | reset before/after 07:00; remove/restore power | correct display day and next alarm on every recovery |
-| failure codes | safe RTC/panel/alarm injections | expected code/flag; at most one attempt; terminal low-power state |
+| failure codes | `failure-diagnostic-flash` for RTC/panel/alarm | expected code/retained frame; at most one attempt; USB remains absent in no-wake deep sleep |
 | active duration | current trace, boot to settled sleep | at most 30 s |
 | deep sleep | battery-input current after 60 s settled | at most 0.500 mA |
 | 72-hour sizing | repository calculator and intended cell | rated usable capacity is at least calculated minimum |

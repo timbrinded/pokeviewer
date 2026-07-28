@@ -11,10 +11,11 @@ power if safe and follow the [safety guide](safety.md).
 | `ALARM` / `RESET` | next 07:00 alarm could not be armed | connect USB; inspect diagnostics/RTC; reset once |
 | `WAKE` / `RESET` | unsupported wake source | reset once; qualify wiring if repeated |
 
-During awake-first bring-up, terminal failures remain awake without an
-automatic reset, refresh, sleep, or retry. A panel failure may leave the prior
-card visible because the failed output path cannot reliably display its own
-code; use the sanitized USB/log evidence during adult diagnosis.
+Terminal failures other than USB-capable RTC setup enter no-wake deep sleep
+after one bounded attempt. They do not automatically reset, refresh, or retry;
+use an external reset or power cycle only after completing the documented
+adult action. A panel failure leaves the prior card visible because the failed
+output path cannot reliably display its own code.
 
 ## Common setup failures
 

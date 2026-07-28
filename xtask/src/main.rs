@@ -14,6 +14,9 @@ const ESP_TOOLCHAIN_ARG: &str = "+esp-1.95.0.0";
 const ESP_TARGET: &str = "xtensa-esp32s3-none-elf";
 const RELEASE_FIRMWARE: &str = "pokeviewer-firmware";
 const HARDWARE_DIAGNOSTIC: &str = "pokeviewer-hardware-diagnostic";
+const RTC_FAILURE_DIAGNOSTIC: &str = "pokeviewer-rtc-failure-diagnostic";
+const PANEL_FAILURE_DIAGNOSTIC: &str = "pokeviewer-panel-failure-diagnostic";
+const ALARM_FAILURE_DIAGNOSTIC: &str = "pokeviewer-alarm-failure-diagnostic";
 const RTC_ALARM_ASSERTION_DIAGNOSTIC: &str = "pokeviewer-rtc-alarm-assertion-diagnostic";
 const SLEEP_DIAGNOSTIC: &str = "pokeviewer-sleep-diagnostic";
 const TIMER_SLEEP_DIAGNOSTIC: &str = "pokeviewer-timer-sleep-diagnostic";
@@ -40,6 +43,9 @@ fn main() -> ExitCode {
             | "usb-provisioning-build"
             | "usb-provisioning-flash"),
         ) => run_firmware_diagnostic(command),
+        Some(command @ ("failure-diagnostic-build" | "failure-diagnostic-flash")) => {
+            failure_diagnostic_command(command, &mut arguments)
+        }
         Some("content-fetch") => {
             let cache_dir = arguments.next();
             if arguments.next().is_some() {
@@ -133,6 +139,40 @@ fn run_firmware_diagnostic(command: &str) -> ExitCode {
     run_cargo(&firmware_args(action, binary))
 }
 
+fn run_failure_diagnostic(command: &str, failure: &str) -> ExitCode {
+    let action = match command {
+        "failure-diagnostic-build" => "build",
+        "failure-diagnostic-flash" => "run",
+        _ => unreachable!("caller only passes failure diagnostic commands"),
+    };
+    match failure_diagnostic_binary(failure) {
+        Ok(binary) => run_cargo(&firmware_args(action, binary)),
+        Err(error) => fail(error),
+    }
+}
+
+fn failure_diagnostic_command(
+    command: &str,
+    arguments: &mut impl Iterator<Item = String>,
+) -> ExitCode {
+    let Some(failure) = arguments.next() else {
+        return fail("failure diagnostic requires rtc, panel, or alarm");
+    };
+    if arguments.next().is_some() {
+        return fail("failure diagnostic accepts exactly one failure kind");
+    }
+    run_failure_diagnostic(command, &failure)
+}
+
+fn failure_diagnostic_binary(failure: &str) -> Result<&'static str, &'static str> {
+    match failure {
+        "rtc" => Ok(RTC_FAILURE_DIAGNOSTIC),
+        "panel" => Ok(PANEL_FAILURE_DIAGNOSTIC),
+        "alarm" => Ok(ALARM_FAILURE_DIAGNOSTIC),
+        _ => Err("failure diagnostic requires rtc, panel, or alarm"),
+    }
+}
+
 fn task_result(result: Result<(), String>) -> ExitCode {
     match result {
         Ok(()) => ExitCode::SUCCESS,
@@ -199,6 +239,10 @@ COMMANDS:
                       Build timer-only deep-sleep isolation firmware
     timer-sleep-diagnostic-flash
                       Build, flash, and monitor timer-only sleep firmware
+    failure-diagnostic-build <rtc|panel|alarm>
+                      Build a safe terminal-failure diagnostic
+    failure-diagnostic-flash <rtc|panel|alarm>
+                      Build, flash, and monitor a terminal-failure diagnostic
     usb-provisioning-build
                       Build the bounded wired RTC provisioning firmware
     usb-provisioning-flash
@@ -229,10 +273,10 @@ COMMANDS:
 #[cfg(test)]
 mod tests {
     use super::{
-        ESP_TARGET, HARDWARE_DIAGNOSTIC, RELEASE_FIRMWARE, RTC_ALARM_ASSERTION_DIAGNOSTIC,
-        SLEEP_DIAGNOSTIC, TIMER_SLEEP_DIAGNOSTIC, USB_PROVISIONING, firmware_args,
+        ALARM_FAILURE_DIAGNOSTIC, ESP_TARGET, HARDWARE_DIAGNOSTIC, PANEL_FAILURE_DIAGNOSTIC,
+        RELEASE_FIRMWARE, RTC_ALARM_ASSERTION_DIAGNOSTIC, RTC_FAILURE_DIAGNOSTIC, SLEEP_DIAGNOSTIC,
+        TIMER_SLEEP_DIAGNOSTIC, USB_PROVISIONING, failure_diagnostic_binary, firmware_args,
     };
-
     #[test]
     fn firmware_commands_select_the_embedded_target() {
         let args = firmware_args("build", RELEASE_FIRMWARE);
@@ -280,5 +324,19 @@ mod tests {
 
         assert_eq!(args[1], "build");
         assert!(args.contains(&USB_PROVISIONING));
+    }
+
+    #[test]
+    fn failure_diagnostic_kinds_select_their_own_binaries() {
+        assert_eq!(failure_diagnostic_binary("rtc"), Ok(RTC_FAILURE_DIAGNOSTIC));
+        assert_eq!(
+            failure_diagnostic_binary("panel"),
+            Ok(PANEL_FAILURE_DIAGNOSTIC)
+        );
+        assert_eq!(
+            failure_diagnostic_binary("alarm"),
+            Ok(ALARM_FAILURE_DIAGNOSTIC)
+        );
+        assert!(failure_diagnostic_binary("content").is_err());
     }
 }

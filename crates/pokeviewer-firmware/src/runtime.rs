@@ -6,6 +6,8 @@ use esp_hal::{
     delay::Delay,
     gpio::{Level, Output, OutputConfig},
     i2c::master::{Config as I2cConfig, I2c},
+    rtc_cntl::wakeup_cause,
+    system::SleepSource,
     time::Rate,
 };
 use pokeviewer_core::{Framebuffer, RecoveryState, SetupReason, assess_rtc};
@@ -42,14 +44,26 @@ pub fn run_pokeviewer() -> ! {
 
     macro_rules! terminal {
         ($failure:expr) => {{
-            idle_after_failure($failure, panel_power, power_latch, audio_power);
+            drop(panel_power);
+            drop(power_latch);
+            drop(audio_power);
+            sleep_after_failure(
+                $failure,
+                SleepResources {
+                    rtc_interrupt: peripherals.GPIO5,
+                    panel_power: panel_power_pin,
+                    power_latch: power_latch_pin,
+                    audio_power: audio_power_pin,
+                    low_power: peripherals.LPWR,
+                },
+            );
         }};
     }
 
-    macro_rules! invalid_rtc {
-        () => {{
+    macro_rules! display_terminal {
+        ($failure:expr) => {{
             let mut framebuffer = Framebuffer::default();
-            render_failure_screen(&mut framebuffer, FailureKind::InvalidRtc)
+            render_failure_screen(&mut framebuffer, $failure)
                 .expect("fixed recovery labels must render");
             panel_power.set_low();
             let _ = refresh_panel_frame(
@@ -63,8 +77,12 @@ pub fn run_pokeviewer() -> ! {
                 &framebuffer,
             );
             panel_power.set_high();
-            terminal!(FailureKind::InvalidRtc);
+            terminal!($failure);
         }};
+    }
+
+    if !matches!(wakeup_cause(), SleepSource::Undefined | SleepSource::Ext0) {
+        display_terminal!(FailureKind::UnexpectedWake);
     }
 
     let mut i2c = match I2c::new(
@@ -75,10 +93,10 @@ pub fn run_pokeviewer() -> ! {
             .with_sda(peripherals.GPIO47)
             .with_scl(peripherals.GPIO48)
             .into_async(),
-        Err(_) => invalid_rtc!(),
+        Err(_) => display_terminal!(FailureKind::InvalidRtc),
     };
     if block_on(suspend_audio_codec(&mut i2c)).is_err() {
-        invalid_rtc!();
+        display_terminal!(FailureKind::InvalidRtc);
     }
     let mut rtc = Pcf85063Rtc::new(i2c);
     let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
@@ -195,23 +213,15 @@ fn serve_setup(
     }
 }
 
-fn idle_after_failure(
-    failure: FailureKind,
-    _panel_power: Output<'_>,
-    _power_latch: Output<'_>,
-    _audio_power: Output<'_>,
-) -> ! {
+fn sleep_after_failure(failure: FailureKind, resources: SleepResources) -> ! {
     let policy = failure.policy();
     esp_println::println!(
-        "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; awake=true",
+        "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; deep_sleep=true; wake_sources=none",
         policy.code,
         policy.diagnostic_flag,
         policy.max_attempts,
     );
-    let mut delay = Delay::new();
-    loop {
-        delay.delay_ms(1_000);
-    }
+    resources.sleep_without_wake();
 }
 
 fn map_rtc_error<BusError>(error: Pcf85063RtcError<BusError>) -> SetupReason {

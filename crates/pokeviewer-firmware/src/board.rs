@@ -10,13 +10,15 @@ use esp_hal::{
     system::{Cpu, SleepSource},
     time::{Duration, Rate},
 };
+use pokeviewer_core::Framebuffer;
 use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
 use portable_atomic::{AtomicU32, Ordering};
 
 use crate::{
-    LocalDateTime, Pcf85063Rtc, Rtc,
+    FailureKind, LocalDateTime, Pcf85063Rtc, Rtc,
     es8311::suspend_audio_codec,
-    panel::{PanelDiagnostic, run_panel_diagnostics},
+    panel::{PanelDiagnostic, refresh_panel_frame, run_panel_diagnostics},
+    render_failure_screen,
     sleep::{SleepResources, restore_panel_power, restore_power_latch},
     usb_protocol::UsbProtocolTransport,
 };
@@ -39,6 +41,74 @@ pub struct HardwareDiagnosticReport {
 /// Run RTC and panel bring-up diagnostics while enforcing board power states.
 pub fn run_hardware_diagnostics() -> Result<HardwareDiagnosticReport, &'static str> {
     run_board_diagnostics(PanelDiagnostic::Full, true).map(|(report, _)| report)
+}
+
+/// Safely inject one terminal policy and prove its no-wake deep-sleep boundary.
+pub fn run_failure_diagnostic(failure: FailureKind) -> ! {
+    let peripherals = esp_hal::init(esp_hal::Config::default());
+    let mut power_latch_pin = peripherals.GPIO17;
+    let power_latch = restore_power_latch(&mut power_latch_pin);
+    let mut panel_power_pin = peripherals.GPIO6;
+    let mut panel_power = restore_panel_power(&mut panel_power_pin);
+    let mut audio_power_pin = peripherals.GPIO42;
+    let audio_power = Output::new(
+        audio_power_pin.reborrow(),
+        Level::Low,
+        OutputConfig::default(),
+    );
+    release_audio_power_pad();
+
+    let codec_suspended = I2c::new(
+        peripherals.I2C0,
+        I2cConfig::default().with_frequency(Rate::from_khz(100)),
+    )
+    .map(|i2c| {
+        i2c.with_sda(peripherals.GPIO47)
+            .with_scl(peripherals.GPIO48)
+            .into_async()
+    })
+    .is_ok_and(|mut i2c| block_on(suspend_audio_codec(&mut i2c)).is_ok());
+
+    let display_refreshed = if failure == FailureKind::Panel {
+        false
+    } else {
+        let mut framebuffer = Framebuffer::default();
+        render_failure_screen(&mut framebuffer, failure)
+            .expect("fixed recovery labels must render");
+        panel_power.set_low();
+        let refreshed = refresh_panel_frame(
+            peripherals.SPI2,
+            peripherals.GPIO8,
+            peripherals.GPIO9,
+            peripherals.GPIO10,
+            peripherals.GPIO11,
+            peripherals.GPIO12,
+            peripherals.GPIO13,
+            &framebuffer,
+        )
+        .is_ok();
+        panel_power.set_high();
+        refreshed
+    };
+
+    let policy = failure.policy();
+    esp_println::println!(
+        "failure diagnostic; injected_code={}; display_refreshed={display_refreshed}; retained_prior_frame={}; codec_suspended={codec_suspended}; attempts={}; terminal_deep_sleep=true; wake_sources=none",
+        policy.code,
+        failure == FailureKind::Panel,
+        policy.max_attempts,
+    );
+    drop(panel_power);
+    drop(power_latch);
+    drop(audio_power);
+    SleepResources {
+        rtc_interrupt: peripherals.GPIO5,
+        panel_power: panel_power_pin,
+        power_latch: power_latch_pin,
+        audio_power: audio_power_pin,
+        low_power: peripherals.LPWR,
+    }
+    .sleep_without_wake();
 }
 
 /// Refresh one frame, validate RTC state, and enter active-low RTC deep sleep.
