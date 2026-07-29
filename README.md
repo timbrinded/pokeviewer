@@ -1,113 +1,247 @@
 # Pokeviewer
 
-Pokeviewer is a battery-powered, fully offline Pokémon-of-the-day display for
-the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 board.
+Pokeviewer is a battery-powered, fully offline Pokémon-of-the-day display.
+It supports only the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 board.
 
-The v1 implementation is feature-complete in source; physical qualification
-and release publication remain gated. The authoritative scope is the
-[v1 product contract](docs/product-contract.md); work is tracked under
-the [v1.0.0 delivery issue](https://github.com/timbrinded/pokeviewer/issues/1).
-Firmware supports only the
-[documented V2 board contract](docs/hardware/v2-board-contract.md).
-Panel diagnostics follow the
-[e-paper bring-up procedure](docs/hardware/panel-bring-up.md), and RTC
-qualification follows the
-[PCF85063 bring-up procedure](docs/hardware/rtc-bring-up.md). The separate
-[deep-sleep qualification](docs/hardware/deep-sleep-qualification.md) covers
-RTC wake behavior and battery measurements.
+The device shows the weekday, a Pokémon Yellow sprite, the English name, and
+the canonical type or types. The device does not use Wi-Fi or BLE.
 
-## V1 experience
+## Quick start
 
-Once a day at 07:00 local time, the device:
+These instructions install the official
+[Pokeviewer v1.0.0 release](https://github.com/timbrinded/pokeviewer/releases/tag/v1.0.0).
+They require an x86-64 Linux computer.
 
-1. wakes from deep sleep;
-2. selects the next entry from a fixed 151-day Generation I rotation;
-3. displays the weekday, Pokémon Yellow sprite, English name, and current
-   canonical type or types; and
-4. returns to deep sleep while the e-paper retains the card.
+The ESP32-S3 ROM contains the factory download bootloader. This procedure
+writes Pokeviewer firmware to flash memory.
 
-There is no child-facing interaction and no runtime network access.
+### 1. Prepare the equipment
+
+Get these items:
+
+- the supported V2 board;
+- a data-capable USB cable;
+- a compatible protected battery; and
+- an x86-64 Linux computer with `curl`, `tar`, `sha256sum`, and Cargo.
+
+Read the [safety guide](docs/safety.md) before you connect the battery.
+
+Install the pinned flash utility:
+
+```console
+cargo install espflash --version 4.5.0 --locked
+espflash --version
+```
+
+The second command must report `espflash 4.5.0`.
+
+### 2. Download and verify the release
+
+Open a terminal.
+
+Run these commands:
+
+```console
+mkdir pokeviewer-v1.0.0-install
+cd pokeviewer-v1.0.0-install
+
+curl --fail --location --remote-name \
+  https://github.com/timbrinded/pokeviewer/releases/download/v1.0.0/pokeviewer-v1.0.0.tar.gz
+curl --fail --location --remote-name \
+  https://github.com/timbrinded/pokeviewer/releases/download/v1.0.0/pokeviewer-v1.0.0.tar.gz.sha256
+
+sha256sum --check pokeviewer-v1.0.0.tar.gz.sha256
+tar -xzf pokeviewer-v1.0.0.tar.gz
+cd pokeviewer-v1.0.0
+sha256sum --check SHA256SUMS
+```
+
+Stop if a checksum command reports a failure.
+
+### 3. Start download mode
+
+1. Disconnect the battery.
+2. Disconnect the USB cable.
+3. Press and hold the `BOOT` button.
+4. Connect the USB cable.
+5. Continue to hold `BOOT` for two seconds.
+6. Release `BOOT`.
+
+Find the serial device:
+
+```console
+ls /dev/ttyACM*
+```
+
+Set `DEVICE` to the path that the command shows:
+
+```console
+export DEVICE=/dev/ttyACM0
+```
+
+On Arch Linux, the serial-device group is usually `uucp`.
+On Debian and Ubuntu, the group is usually `dialout`.
+
+If Linux denies access, add your account to the applicable group.
+
+Use one of these commands:
+
+```console
+# Arch Linux
+sudo usermod --append --groups uucp "$USER"
+
+# Debian or Ubuntu
+sudo usermod --append --groups dialout "$USER"
+```
+
+Run only the command for your Linux distribution.
+Then sign out and sign in.
+
+Do not run the flash commands with `sudo`.
+Do not make the serial device world-writable.
+
+### 4. Flash the firmware
+
+Confirm that `espflash` detects an ESP32-S3:
+
+```console
+espflash board-info \
+  --chip esp32s3 \
+  --port "$DEVICE" \
+  --before no-reset \
+  --after no-reset
+```
+
+Erase the flash memory:
+
+```console
+espflash erase-flash \
+  --chip esp32s3 \
+  --port "$DEVICE" \
+  --before no-reset \
+  --after no-reset
+```
+
+Write the release firmware:
+
+```console
+espflash write-bin \
+  --chip esp32s3 \
+  --port "$DEVICE" \
+  --before no-reset \
+  --after no-reset \
+  0x0 pokeviewer-v1.0.0-esp32s3-v2.bin
+```
+
+Wait for the command to report a successful write.
+
+### 5. Start the firmware
+
+1. Disconnect the USB cable.
+2. Keep the battery disconnected.
+3. Wait ten seconds.
+4. Make sure that you do not press `BOOT`.
+5. Connect the USB cable normally.
+6. Wait for the screen to show `SET TIME`.
+
+This power cycle stops download mode and starts the installed firmware.
+
+### 6. Set the local time
+
+Set the command path:
+
+```console
+export CLI=./pokeviewerctl-v1.0.0-x86_64-unknown-linux-gnu
+chmod u+x "$CLI"
+```
+
+If the serial path changed, set `DEVICE` to the new path.
+
+Confirm communication with the device:
+
+```console
+"$CLI" info --device "$DEVICE"
+```
+
+Make sure that the Linux computer shows the correct local time.
+
+Choose one time command.
+
+To use the Linux local time, run:
+
+```console
+"$CLI" set-rtc \
+  --device "$DEVICE" \
+  --datetime "$(date +%Y-%m-%dT%H:%M:%S)"
+```
+
+To use a test time, replace the example value:
+
+```console
+"$CLI" set-rtc \
+  --device "$DEVICE" \
+  --datetime 2030-01-02T06:59:30
+```
+
+Use the `YYYY-MM-DDTHH:MM:SS` format.
+Do not add a time-zone suffix.
+
+The command reads the RTC after the write.
+The firmware then restarts, updates the display, and enters deep sleep.
+The USB command interface stops after a successful time update.
+
+Connect the battery before you disconnect the USB cable.
+
+## Change the time later
+
+You do not have to flash the firmware again.
+
+1. Disconnect the USB cable.
+2. Disconnect the battery.
+3. Wait ten seconds.
+4. Connect only the USB cable.
+5. Wait for the screen to show `SET TIME`.
+6. Repeat the local-time procedure.
+7. Connect the battery before you disconnect the USB cable.
+
+The USB command interface is available only while the screen shows
+`SET TIME`.
+
+## Normal operation
+
+At 07:00 local time, the device wakes and shows the card for the new day.
+The device then enters deep sleep. The e-paper panel keeps the card visible
+without panel power.
+
+The firmware contains all 151 Generation I entries.
+The device does not require an account, an SD card, or internet access.
+The supported board does not have a touchscreen.
 
 ## Important notices
 
-Pokeviewer is an unofficial, non-commercial fan project. It is not affiliated
-with, endorsed by, or sponsored by Nintendo, Creatures Inc., GAME FREAK inc.,
-or The Pokémon Company International.
+Pokeviewer is an unofficial, non-commercial fan project.
+Nintendo, Creatures Inc., GAME FREAK inc., and The Pokémon Company
+International do not endorse or sponsor this project.
 
-The project's MIT license will cover original source code only. Pokémon names,
-characters, artwork, sprites, and related media are third-party property and
-are excluded from that license. See [Third-party notices](THIRD_PARTY_NOTICES.md)
-before redistributing a build or asset pack.
+The MIT license covers only the original source code.
+It does not cover Pokémon names, characters, artwork, sprites, or related
+media. Read [Third-party notices](THIRD_PARTY_NOTICES.md) before you
+redistribute a build or an asset pack.
 
-Public project evidence must follow the
-[privacy and evidence rules](docs/privacy-and-evidence.md).
+The development board is not a certified children's toy.
+An adult must assemble, inspect, charge, and supervise the device.
 
-## Adult guides
+## Documentation
 
 - [Setup and operation](docs/user-guide.md)
 - [Safety](docs/safety.md)
 - [Troubleshooting and recovery](docs/troubleshooting.md)
-- [Release download and verification](docs/release-verification.md)
-- [Clean-host release rehearsal](docs/hardware/clean-host-rehearsal.md)
-- [Legal and third-party media](THIRD_PARTY_NOTICES.md)
+- [Release verification](docs/release-verification.md)
+- [Product contract](docs/product-contract.md)
+- [Architecture decisions](docs/decisions/README.md)
+- [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-## Decisions
+## Local development
 
-Significant decisions are recorded in the
-[architecture decision log](docs/decisions/README.md). The accepted
-[content-pack and daily-schedule contract](docs/content-pack-v1.md) defines the
-offline wire format and deterministic 151-day rotation.
-The reviewed inputs, generated pack, validation report, and sprite contact
-sheet are indexed in the [content directory](content/README.md).
-
-## Development
-
-The repository is a Cargo workspace:
-
-| Package | Responsibility |
-| --- | --- |
-| `pokeviewer-core` | deterministic `no_std` domain and rendering logic |
-| `pokeviewer-firmware` | supported-board hardware integration |
-| `pokeviewerctl` | Linux USB provisioning and diagnostics |
-| `xtask` | repository-local automation |
-
-From the repository root:
-
-```console
-cargo fmt --all --check
-cargo clippy --workspace --all-targets --locked -- -D warnings
-cargo test --workspace --locked
-cargo xtask help
-```
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for development and review rules.
-Embedded setup, builds, flashing, and monitoring are documented in the
-[toolchain guide](docs/development/toolchain.md). See the
-[CI guide](docs/development/ci.md) for automated checks and artifacts. Explicit
-cache refresh and offline pack conversion are documented in the
-[content tooling guide](docs/development/content-tooling.md).
-The [shared-renderer guide](docs/development/rendering.md) documents the exact
-panel buffer, host evidence command, and renderer memory budget.
-The [release-candidate guide](docs/development/release-candidate.md) documents
-the read-only manual bundle workflow and reproducibility proof.
-The [publishing guide](docs/development/publishing.md) documents the gated final
-release audit.
-The selected [v1 daily-card design](docs/design/daily-card-v1.md) fixes the
-four-element visual hierarchy and indexes the complete 151-card review sheet.
-Exact framebuffer regressions are covered by the
-[visual-golden workflow](docs/development/visual-testing.md).
-Wired RTC provisioning uses the versioned
-[USB protocol](docs/usb-protocol-v1.md) and Linux `pokeviewerctl` utility.
-Invalid clocks are governed by the
-[RTC setup and recovery contract](docs/rtc-recovery.md).
-The normal V2 firmware composition and current memory budget are documented in
-[on-device integration](docs/development/on-device-integration.md).
-Battery operation follows the
-[07:00 wake-refresh-sleep state machine](docs/hardware/wake-sleep-state-machine.md);
-capacity must be calculated from [measured current](docs/hardware/battery-sizing.md).
-Expected faults follow the
-[bounded failure and recovery contract](docs/hardware/failure-recovery.md).
-Hardware releases must pass the
-[V2 qualification procedure](docs/hardware/release-qualification.md).
-The unattended acceptance run follows the
-[seven-day physical protocol](docs/hardware/seven-day-run.md).
+For local development information, read
+[CONTRIBUTING.md](CONTRIBUTING.md).
