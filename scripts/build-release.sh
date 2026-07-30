@@ -1,7 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly VERSION="1.1.0"
 readonly TARGET="xtensa-esp32s3-none-elf"
 readonly FIRMWARE="target/$TARGET/release/pokeviewer-firmware"
 readonly CLI="target/release/pokeviewerctl"
@@ -25,14 +24,22 @@ for tool in cargo espflash git gzip jq sha256sum stat strings tar; do
 done
 
 package_id=$(cargo pkgid --locked -p pokeviewer-core)
-if [[ ${package_id##*#} != "$VERSION" ]]; then
-  echo "workspace version does not match release version $VERSION" >&2
+readonly VERSION="${package_id##*#}"
+if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+  echo "workspace version is not a release version: $VERSION" >&2
+  exit 1
+fi
+IFS= read -r release_notes_heading <release/RELEASE-NOTES.md
+IFS= read -r flashing_heading <release/FLASHING.md
+if [[ "$release_notes_heading" != "# Pokeviewer v$VERSION" ||
+  "$flashing_heading" != "# Flash Pokeviewer v$VERSION" ]]; then
+  echo "release document headings do not match v$VERSION" >&2
   exit 1
 fi
 
 commit=$(git rev-parse --verify HEAD)
 if [[ -n "$(git status --porcelain --untracked-files=normal)" ]]; then
-  echo "release candidate must be built from a clean source tree" >&2
+  echo "release must be built from a clean source tree" >&2
   exit 1
 fi
 source_date_epoch=${SOURCE_DATE_EPOCH:-$(git show -s --format=%ct "$commit")}
@@ -82,7 +89,6 @@ cp content/generated/pokeviewer-v1.pack "$bundle_dir/"
 cp content/generated/pokeviewer-v1.json "$bundle_dir/content-manifest.json"
 cp release/FLASHING.md "$bundle_dir/"
 cp release/RELEASE-NOTES.md "$bundle_dir/"
-cp release/CANDIDATE-STATUS.md "$bundle_dir/"
 cp docs/user-guide.md "$bundle_dir/USER-GUIDE.md"
 cp docs/safety.md "$bundle_dir/SAFETY.md"
 cp docs/troubleshooting.md "$bundle_dir/TROUBLESHOOTING.md"
@@ -142,7 +148,6 @@ payloads=(
   "BUILD-METADATA.txt"
   "FLASHING.md"
   "RELEASE-NOTES.md"
-  "CANDIDATE-STATUS.md"
   "USER-GUIDE.md"
   "SAFETY.md"
   "TROUBLESHOOTING.md"
@@ -152,7 +157,7 @@ payloads=(
 )
 
 {
-  echo "Pokeviewer release candidate manifest"
+  echo "Pokeviewer release manifest"
   echo "version=$VERSION"
   echo "source_commit=$commit"
   echo "file_count=${#payloads[@]}"
@@ -189,5 +194,5 @@ tar \
   sha256sum "$bundle_name.tar.gz" >"$bundle_name.tar.gz.sha256"
 )
 
-scripts/verify-release-candidate.sh "$archive"
+scripts/verify-release.sh "$archive"
 echo "created $archive"

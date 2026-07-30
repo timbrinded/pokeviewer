@@ -30,9 +30,10 @@ output path cannot reliably display its own code.
   validity; connect USB and read/set the clock.
 - no touch response: expected; the supported SKU has no touch controller.
 - no network setup: expected; v1 is fully offline.
-- USB repeatedly disappears and returns after an attempted sleep: failed sleep
-  qualification, not proof of a valid wake; record the interval and return to
-  the awake baseline.
+- USB repeatedly disappears and returns after an attempted sleep: invalid sleep
+  behavior, not proof of a valid wake; record the interval and return to the
+  awake baseline.
 
 If a fault repeats after one reset, stop. Preserve only sanitized codes and
-hashes, then follow the [hardware qualification procedure](hardware/release-qualification.md).
+hashes, then use the
+[optional hardware validation guide](hardware/validation.md).

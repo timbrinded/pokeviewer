@@ -13,3 +13,4 @@ outcome; a later decision supersedes them and links in both directions.
 | [0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md) | accepted | Use no-wake deep sleep for terminal failures |
 | [0006](0006-use-pwr-gated-parent-setup-and-storage-mode.md) | accepted | Use PWR-gated parent setup and storage mode |
 | [0007](0007-use-a-generic-lipo-ocv-battery-estimate.md) | accepted | Use a generic LiPo OCV battery estimate |
+| [0008](0008-publish-releases-from-one-verified-workflow.md) | proposed | Publish releases from one verified workflow |

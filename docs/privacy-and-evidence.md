@@ -29,9 +29,9 @@ revealing as little personal or device-identifying information as possible.
 Redaction must be irreversible in the published artifact. Overlaying a box in
 an editable document is not sufficient.
 
-## Repository and release checks
+## Repository checks
 
-Pull-request and release reviews must check:
+Pull-request review must check:
 
 - documentation examples use placeholders rather than real identifiers;
 - CI logs and uploaded artifacts do not collect prohibited fields;

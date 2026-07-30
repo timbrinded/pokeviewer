@@ -10,16 +10,12 @@
 
 ## Validation
 
-- [ ] `cargo fmt --all --check`
-- [ ] `cargo clippy --workspace --all-targets -- -D warnings`
-- [ ] `cargo test --workspace`
-- [ ] Documentation updated and links checked
-- [ ] Hardware evidence attached or explicitly not required
-- [ ] Unslop review complete
-- [ ] Thermo-nuclear code-quality review complete
+<!-- List the checks that ran. CI also checks the merged commit. -->
 
-## Evidence and privacy
+## Hardware effect
 
-- [ ] No child/household information, credentials, MAC addresses, USB serials,
-      or private raw logs are present
-- [ ] Third-party assets and license boundaries are documented
+<!-- State "none" or describe one bounded device check. -->
+
+## Privacy and licences
+
+<!-- Identify relevant privacy or third-party asset changes. -->

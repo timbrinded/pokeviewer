@@ -16,10 +16,9 @@ Before connecting a cell, read the [safety guide](safety.md).
 
 ## Install a release bundle
 
-For the release rehearsal, obtain `pokeviewer-v1.1.0.tar.gz` and its adjacent
-`pokeviewer-v1.1.0.tar.gz.sha256` from the retained candidate workflow
-artifact. After publication, download those same files from the official
-GitHub release. Verify and extract the archive:
+Download `pokeviewer-v1.1.0.tar.gz` and its adjacent
+`pokeviewer-v1.1.0.tar.gz.sha256` from the official GitHub release. Verify and
+extract the archive:
 
 ```console
 sha256sum --check pokeviewer-v1.1.0.tar.gz.sha256
@@ -135,7 +134,7 @@ Follow the [troubleshooting guide](troubleshooting.md) for every displayed
 code. Firmware updates require an adult and USB; the device has no over-the-air
 update path. For a clean reinstall, verify the release again, disconnect the
 battery, flash over USB, reconnect the battery, set/read the RTC, and confirm
-the displayed framebuffer against the release evidence.
+that the daily card is correct.
 
 Public photographs and logs must follow the
 [privacy rules](privacy-and-evidence.md).

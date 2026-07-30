@@ -32,14 +32,6 @@ certified finished toy. No board, enclosure, battery, charger, or cable is
 included. Battery runtime is not guaranteed. Read the safety guide before you
 connect a protected single-cell battery.
 
-Publication requires the remaining v1.1.0 device qualification and the
-artifact-only isolated-environment rehearsal to pass. Hardware behavior is
-qualified on installed firmware with the same firmware source and generated
-content as the release candidate. The exact candidate bytes are not flashed
-to, or read back from, the assembled device. Physical RTC, panel, and alarm
-failure diagnostics are not performed on the assembled device. Physical images
-remain private. Public evidence states only that reviewed images were provided.
-
 This is an unofficial, non-commercial fan project and is not affiliated with,
 endorsed by, or sponsored by Nintendo, Creatures Inc., GAME FREAK inc., or The
 Pokémon Company International.
