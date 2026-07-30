@@ -9,6 +9,7 @@ use crate::{LocalDateTime, Rtc};
 const CONTROL_2_IDLE: u8 = 0x07;
 const CONTROL_2_ALARM_ENABLED: u8 = 0x87;
 const TIMER_DISABLED_LOW_POWER: u8 = 0x18;
+const SOFTWARE_RESET: u8 = 0x58;
 
 /// Errors surfaced by the PCF85063A adapter.
 #[derive(Debug)]
@@ -92,6 +93,18 @@ where
             .map_err(Pcf85063RtcError::Driver)
     }
 
+    async fn invalidate(&mut self) -> Result<(), Self::Error> {
+        self.driver
+            .write_register(Register::CONTROL_1, SOFTWARE_RESET)
+            .await
+            .map_err(Pcf85063RtcError::Driver)?;
+        match self.read_datetime().await {
+            Err(Pcf85063RtcError::OscillatorStopped) => Ok(()),
+            Ok(_) => Err(Pcf85063RtcError::OscillatorStopped),
+            Err(error) => Err(error),
+        }
+    }
+
     async fn configure_daily_alarm(&mut self) -> Result<(), Self::Error> {
         self.driver
             .disable_all_alarms()
@@ -153,7 +166,7 @@ mod tests {
 
     use super::{
         BitFlags, CONTROL_2_ALARM_ENABLED, CONTROL_2_IDLE, Pcf85063Rtc, Pcf85063RtcError, Register,
-        TIMER_DISABLED_LOW_POWER,
+        SOFTWARE_RESET, TIMER_DISABLED_LOW_POWER,
     };
     use crate::{
         LocalDateTime, Rtc,
@@ -279,6 +292,29 @@ mod tests {
         assert_eq!(
             i2c.register_writes.last(),
             Some(&(DEVICE_ADDRESS, Register::CONTROL_2, CONTROL_2_ALARM_ENABLED))
+        );
+    }
+
+    #[test]
+    fn software_reset_invalidates_time_and_verifies_the_oscillator_stop_flag() {
+        let mut i2c = RecordingI2c::new();
+        i2c.set_register(Register::SECONDS, 0x80);
+        let mut rtc = Pcf85063Rtc::new(i2c);
+
+        block_on_ready(rtc.invalidate()).unwrap();
+
+        let i2c = rtc.release();
+        assert_eq!(i2c.register(Register::CONTROL_1), SOFTWARE_RESET);
+        assert_eq!(i2c.register(Register::SECONDS), 0x80);
+        assert_eq!(
+            i2c.attempted_writes,
+            std::vec![
+                (
+                    DEVICE_ADDRESS,
+                    std::vec![Register::CONTROL_1, SOFTWARE_RESET]
+                ),
+                (DEVICE_ADDRESS, std::vec![Register::SECONDS]),
+            ]
         );
     }
 }

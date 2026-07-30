@@ -1,8 +1,8 @@
 # V2 release qualification procedure
 
-- Status: blocked; power, failure-injection, and seven-day gates pending
+- Status: blocked; remaining v1.1.0 device, failure-injection, and seven-day gates pending
 - Delivery issue: [Q22 / #23][issue-23]
-- Last reviewed: 2026-07-28
+- Last reviewed: 2026-07-30
 
 This procedure is the hardware release gate for the exact non-touch Waveshare
 ESP32-S3-ePaper-1.54-EN V2 board. Any failed threshold blocks release.
@@ -11,16 +11,13 @@ ESP32-S3-ePaper-1.54-EN V2 board. Any failed threshold blocks release.
 
 - Linux host with the repository-pinned Rust, `espup`, and `espflash`;
 - direct data-capable USB cable;
-- current instrument capable of resolving both e-paper peaks and below
-  0.500 mA, with range, burden voltage, and sample rate recorded;
-- current-limited bench supply or a protected 3.7 V single-cell battery;
-- multimeter for rail levels; and
+- the intended protected 3.7 V single-cell battery; and
 - camera with metadata removal available.
 
 Record the firmware and `pokeviewerctl` full commits, artifact and content-pack
-SHA-256, V2 marking, supply voltage/current limit, instrument model/range/sample
-rate, and second-adult reviewer role. Never record a child's identity, home
-detail, MAC, USB serial, credentials, raw device path, or unsanitized log.
+SHA-256, V2 marking, supply condition, and second-adult reviewer role. Never
+record a child's identity, home detail, MAC, USB serial, credentials, raw
+device path, or unsanitized log.
 
 ## Clean-board setup
 
@@ -41,17 +38,19 @@ detail, MAC, USB serial, credentials, raw device path, or unsanitized log.
 | --- | --- | --- |
 | exact target | markings, contract probe, I²C population | V2, ESP32-S3-PICO-1-N8R8, 8 MB flash/PSRAM, `0x51` RTC, no `0x38` touch |
 | RTC | set, read-back, oscillator-loss injection | exact read-back; invalid state shows `RTC`; no plausible card |
-| USB | info/get/set/diagnostics | protocol v1 responses within two seconds; no wireless initialized |
-| content/render | host matrix plus representative panel photos | all 151 pass; physical bytes/hash match expected golden |
+| USB | info/get/set/diagnostics/storage | startup handshake within six seconds; first parent command within 12 seconds; later responses within two seconds; no wireless initialized |
+| content/render | host matrix plus generated PNGs and representative panel images | all 151 pass; normal, recharge, and unavailable battery states match expected goldens |
 | panel | full refresh and BUSY timing | completes once within 10 s; no clipping/ghosting; rail off afterward |
 | active boot | release firmware over USB | one refresh, then USB disappears on deep-sleep entry within 30 s and does not re-enumerate before the alarm |
 | rollover planning | host boundary tests plus synthetic near-07:00 diagnostic | exactly one boundary transition and a strictly future next alarm |
-| daily wake | build/flash with `cargo xtask sleep-diagnostic-build` and `cargo xtask sleep-diagnostic-flash`; set to 06:59:30 and observe | GPIO5 RTC-domain pull-up enabled with pull-down disabled; prior card before 07:00; one new card at/after 07:00; one `Ext0` wake |
+| daily wake | build/flash with `cargo xtask sleep-diagnostic-build` and `cargo xtask sleep-diagnostic-flash`; set to 06:59:30 and observe | GPIO5 RTC-domain pull-up enabled with pull-down disabled; prior card before 07:00; one new card at/after 07:00; one RTC `Ext1` wake with GPIO5 status |
+| PWR tap | press and release PWR before three seconds | no panel refresh and no visible change |
+| parent session | connect USB, start CLI with `--wait-for-device`, and hold PWR | continuous three-second hold plus valid framed request opens a two-minute session |
+| simultaneous wake | hold PWR across a synthetic 07:00 alarm | daily refresh completes before parent-session evaluation |
+| storage mode | use the confirmed CLI command in a parent session | response succeeds; `SET TIME` appears; RTC oscillator-stop flag verifies; GPIO17 drops; no ESP wake source remains |
+| battery estimate | host curve/filter tests plus battery-only screen observations | 10 percent steps; low warning enters below 15 percent and clears at or above 20 percent; invalid sample shows `?%` |
 | reset/power loss | reset before/after 07:00; remove/restore power | correct display day and next alarm on every recovery |
 | failure codes | `failure-diagnostic-flash` for RTC/panel/alarm | expected code/retained frame; at most one attempt; USB remains absent in no-wake deep sleep |
-| active duration | current trace, boot to settled sleep | at most 30 s |
-| deep sleep | battery-input current after 60 s settled | at most 0.500 mA |
-| 72-hour sizing | repository calculator and intended cell | rated usable capacity is at least calculated minimum |
 
 For panel/alarm fault injection, use a reversible test fixture and current
 limit; never short a rail or connector. If an injection cannot be made safely,
@@ -73,51 +72,53 @@ scripts/check-qualification-evidence.sh PATH
 ```
 
 The validator rejects missing files, pending/failed checklist rows, non-full
-commits or hashes, malformed/duplicate measurement and seven-day rows, failed
-thresholds, the wrong board revision, and common path/device/credential leaks.
+commits or hashes, malformed or duplicate seven-day rows, failed thresholds,
+the wrong board revision, and common path/device/credential leaks.
 A structurally valid seven-day log must also match the existing Rust
 qualification schedule generator exactly, including each date, weekday,
 Pokémon, and framebuffer CRC.
 A synthetic passing fixture and deliberate failure cases run in host CI; they
 are validator tests, never physical qualification evidence.
 
-## Capacity calculation
+## Battery scope
 
-Use battery-input measurements, one event per day, and a justified usable
-capacity fraction:
-
-```console
-scripts/calculate-battery-capacity.sh \
-  SLEEP_MA ACTIVE_MA ACTIVE_SECONDS REFRESH_MA REFRESH_SECONDS USABLE_FRACTION
-```
-
-Illustrative arithmetic only—not a board measurement:
-
-```console
-scripts/calculate-battery-capacity.sh 0.100 80 2 120 5 0.80
-```
-
-This yields a minimum of `9.791 mAh` for those hypothetical inputs. The release
-record must replace them with measured V2 values and compare the result with
-the intended protected cell.
+The v1.1.0 screen uses a generic LiPo open-circuit-voltage estimate. Manual
+current measurement, discharge testing, runtime certification, charger
+certification, and a universal capacity claim are out of scope. Qualification
+must test the display states and hysteresis. It must not present the estimate
+as a fuel gauge or safety control.
 
 ## Current dry-run result
 
-The repository, host tests, artifact validation, templates, calculator, and
-evidence validator are usable. The connected V2 board reports an ESP32-S3
-revision v0.2 and 8 MB flash. Content-revision-2 firmware flashed and verified
-over USB on 2026-07-28; protocol info and RTC set/read-back passed, and the
-board rendered daily-card CRC `4f636e68`.
+The repository, host tests, artifact validation, templates, and evidence
+validator are usable. The connected V2 board reports an ESP32-S3 revision v0.2
+and 8 MB flash. Content-revision-2 firmware flashed and verified over USB on
+2026-07-28; protocol info and RTC set/read-back passed, and the board rendered
+daily-card CRC `4f636e68`.
 
-The corrected ESP-IDF-aligned implementation passed timer-only deep sleep, the
-PCF alarm/GPIO5 assertion sequence, and one alarm-driven `Ext0` wake with the
-alarm flag asserted. Production then refreshed once, entered deep sleep, and
-did not re-enumerate during the bounded 45-second observation. Private physical
-evidence also confirms a readable retained card while unplugged.
+The v1.0.0 ESP-IDF-aligned implementation passed timer-only deep sleep, the PCF
+alarm/GPIO5 assertion sequence, and one alarm-driven `Ext0` wake with the alarm
+flag asserted. Production then refreshed once, entered deep sleep, and did not
+re-enumerate during the bounded 45-second observation. Private physical images
+were provided and fulfill the readable retained-card requirement. The images
+are not published.
 
-This is not release qualification. Battery-only operation, battery-side current
-measurements, safe recovery injections, repeated 07:00 transitions, and the
-seven-day run remain pending.
+Battery-only RTC operation and a synthetic 06:59 to 07:00 transition passed.
+The card changed once at the scheduled alarm and remained visible. A later
+overnight battery-only transition also passed. The battery screen showed a
+plausible 10 percent step without the low-battery warning.
+
+The v1.1.0 PWR-gated parent setup also passed on 2026-07-30. A continuous PWR
+hold with an active `set-rtc --wait-for-device` command showed `SET TIME`,
+returned the RTC read-back, restored the card, and entered normal operation.
+A later PWR hold without an active framed command left the retained card
+unchanged. Private physical images were provided and fulfill these
+readable-display requirements. The images are not published.
+
+This is not complete v1.1.0 release qualification. Storage mode, simultaneous
+alarm and PWR wake, safe recovery injections, two more clean-reset synthetic
+07:00 transitions, the remaining seven-day run, and the exact-artifact
+clean-host rehearsal remain pending.
 
 [issue-23]: https://github.com/timbrinded/pokeviewer/issues/23
 [template]: ../evidence/qualification-template/

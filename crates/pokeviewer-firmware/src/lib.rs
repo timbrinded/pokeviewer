@@ -8,6 +8,8 @@ pub use pokeviewer_core::{
 
 mod application;
 #[cfg(target_arch = "xtensa")]
+mod battery_sensor;
+#[cfg(target_arch = "xtensa")]
 mod board;
 #[cfg(any(target_arch = "xtensa", test))]
 mod bounded_busy;
@@ -28,6 +30,7 @@ mod sleep;
 mod test_i2c;
 #[cfg(target_arch = "xtensa")]
 mod usb_protocol;
+mod wake;
 
 pub use application::{
     ApplicationError, RenderedFrame, RetainedCard, Screen, WakePlan, plan_wake, render_rtc_frame,
@@ -41,12 +44,13 @@ pub use board::{
 pub use failure::{FailureKind, FailurePolicy, RecoveryAction, render_failure_screen};
 #[cfg(target_arch = "xtensa")]
 pub use pcf85063::{Pcf85063Rtc, Pcf85063RtcError};
-pub use protocol::handle_protocol_request;
+pub use protocol::{ProtocolAction, ProtocolOutcome, handle_protocol_request};
 pub use rtc::{FakeRtc, FakeRtcError, Rtc};
 #[cfg(target_arch = "xtensa")]
 pub use runtime::run_pokeviewer;
 #[cfg(target_arch = "xtensa")]
 pub use usb_protocol::{UsbProtocolError, UsbProtocolTransport};
+pub use wake::{WakeDecision, WakeInput, decide_wake};
 
 /// Exact hardware target supported by release firmware.
 pub const BOARD_TARGET: &str = "Waveshare ESP32-S3-ePaper-1.54-EN V2";

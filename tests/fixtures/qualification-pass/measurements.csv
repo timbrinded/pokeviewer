@@ -1,4 +1,0 @@
-phase,current_ma,duration_seconds,instrument_range,sample_rate_hz,status
-refresh,120,5,200mA,1000,PASS
-awake_idle,80,2,200mA,1000,PASS
-deep_sleep,0.100,60,2mA,1000,PASS

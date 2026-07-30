@@ -7,8 +7,8 @@
 - [x] 07:00 produces exactly one refresh and one return to deep sleep.
 - [x] Reset and power-loss recovery converge to the correct card.
 - [x] `RTC`, `PACK`, `PANEL`, `ALARM`, and `WAKE` recovery evidence passes.
-- [x] Settled deep-sleep current is at most 0.500 mA.
-- [x] Boot-to-sleep active duration is at most 30 seconds.
-- [x] Intended protected-cell capacity meets the calculated 72-hour minimum.
+- [x] PWR tap, PWR hold, and parent-session behavior pass.
+- [x] Storage mode clears the RTC and disables wake sources.
+- [x] Normal, low, and unavailable battery display states pass.
 - [x] Three repeated short runs and the full seven-day run pass.
 - [x] Evidence privacy review and teardown pass.

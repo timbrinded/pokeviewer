@@ -1,8 +1,8 @@
 # Exact-artifact clean-host rehearsal
 
-This is the release-blocking procedure for issue #27. Do not start until the
-seven-day qualification is complete and the manual `Release candidate`
-workflow has produced a retained artifact from the intended commit.
+This is the release-blocking procedure for v1.1.0. Do not start until the
+device qualification is complete and the manual `Release candidate` workflow
+has produced a retained artifact from the intended commit.
 
 Use a fresh supported x86-64 Linux installation with no Pokeviewer checkout,
 workspace build output, maintainer shell history, or previously installed
@@ -22,13 +22,13 @@ five photographs before anything is made public.
 
 ## Download and verify
 
-1. Download the retained `pokeviewer-v1.0.0-candidate-COMMIT` artifact from the
+1. Download the retained `pokeviewer-v1.1.0-candidate-COMMIT` artifact from the
    successful manual workflow run.
 2. Verify and extract it exactly as described in
    [release verification](../release-verification.md).
 3. Confirm `BUILD-METADATA.txt` names the intended commit, exact V2/non-touch
    board, protocol 1, content format 1, schedule 1, and flash offset `0x0`.
-4. Confirm the bundled CLI reports `pokeviewerctl 1.0.0`.
+4. Confirm the bundled CLI reports `pokeviewerctl 1.1.0`.
 5. Record the archive, firmware, CLI, and content-pack hashes without recording
    the local download path.
 
@@ -47,6 +47,7 @@ With the battery disconnected and the board connected over USB:
 6. Photograph the correct daily card and compare it with the deterministic
    schedule/frame hash for that local display date.
 7. Confirm the device enters deep sleep.
+8. Connect the protected battery before you disconnect USB.
 
 Commands in the private transcript must replace the serial path with `DEVICE`
 before saving.
@@ -62,10 +63,20 @@ display dates and frame CRC.
 
 Exercise these paths using only bundled documentation:
 
-1. Remove all power long enough for RTC validity to be lost. Reconnect USB,
+1. Tap `PWR`. Confirm that the retained card does not change.
+2. Connect USB, start the bundled CLI with `--wait-for-device`, and hold `PWR`
+   for three seconds. Confirm the setup screen, valid handshake, RTC write,
+   matching read-back, normal card, and return to deep sleep.
+3. Repeat the parent-session entry. Use the bundled CLI to enter storage mode.
+   Confirm that the RTC becomes invalid, the board power latch drops, and no
+   ESP wake source remains. Press `PWR` and confirm the setup screen.
+4. Confirm the normal battery value. Use diagnostic injection to confirm the
+   recharge and unavailable display states. Do not use manual voltage,
+   current, or discharge measurements.
+5. Remove all power long enough for RTC validity to be lost. Reconnect USB,
    photograph the setup screen, set the RTC with the bundled CLI, require
    read-back, and confirm normal rendering resumes.
-2. With all power disconnected, disconnect the panel flex cable. Reconnect USB
+6. With all power disconnected, disconnect the panel flex cable. Reconnect USB
    once and confirm the bounded `PANEL` policy without repeated resets.
    Disconnect power, restore and inspect the cable, then reset once and confirm
    recovery. Photograph only the safe, unpowered connection state and recovered
@@ -81,7 +92,7 @@ Run from a separate trusted checkout used only to validate evidence:
 ```console
 scripts/check-rehearsal-evidence.sh \
   evidence/private/rehearsal-COMMIT \
-  DOWNLOAD/pokeviewer-v1.0.0.tar.gz
+  DOWNLOAD/pokeviewer-v1.1.0.tar.gz
 ```
 
 The script verifies the candidate, cross-checks its commit and payload hashes,

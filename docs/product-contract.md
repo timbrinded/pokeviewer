@@ -1,11 +1,11 @@
-# V1 product contract
+# Product contract
 
 - Status: accepted
 - Decision issue: [P01 / #2][issue-2]
-- Last reviewed: 2026-07-27
+- Last reviewed: 2026-07-29
 
-This document is the authoritative product boundary for v1. Any change to a
-locked decision requires a dedicated decision issue before implementation.
+This document is the authoritative product boundary. Any change to a locked
+decision requires an accepted decision record before implementation.
 
 ## Supported device
 
@@ -27,18 +27,25 @@ and V2 examples are not interchangeable.
 - The onboard PCF85063 RTC owns local wall-clock time and the daily alarm.
 - Full battery exhaustion may invalidate the RTC. An adult restores it over
   wired USB using the Linux x86-64 `pokeviewerctl` utility.
+- An adult can also correct a valid RTC through a PWR-gated USB session.
 - The device wakes for the 07:00 local display-day boundary, refreshes only
   when needed, and returns to deep sleep.
 - E-paper retains the complete prior card until a successful refresh.
+- A normal PWR tap does not change the display.
+- BOOT is used only for service flashing with the battery disconnected.
 
 ## Daily card
 
-Every normal card contains exactly four information groups:
+Every normal card contains four primary information groups:
 
 1. weekday;
 2. Pokémon Yellow front sprite;
 3. English Pokémon name; and
 4. current canonical type or types.
+
+The card also contains non-interactive battery status. It shows an approximate
+percentage in 10% steps. Below the recharge threshold, it also shows a custom
+lightning icon and `CHARGE!`. An unavailable estimate shows `?%`.
 
 The content set is National Pokédex IDs 1 through 151. A fixed, versioned,
 non-repeating permutation selects one entry per display day and repeats after
@@ -53,8 +60,8 @@ weekday with yesterday's Pokémon.
 V1 has no:
 
 - runtime internet access, Wi-Fi, Bluetooth, accounts, telemetry, or cloud;
-- touch support, child-facing buttons, menus, choices, scores, streaks, or
-  games;
+- touch support, child-facing button actions, menus, choices, scores, streaks,
+  or games;
 - audio, speech, animation, greyscale, colour, or partial-refresh effects;
 - SD-card dependency or runtime content update;
 - localization, descriptions, stats, moves, evolutions, or generations after
@@ -64,9 +71,15 @@ V1 has no:
 - guaranteed battery runtime independent of the selected battery's measured
   capacity and condition.
 
+Battery percentage is a generic LiPo voltage estimate. It is not a fuel gauge
+and does not control shutdown, charging, or safety. The board has no dedicated
+USB VBUS-sense input. Firmware cannot distinguish a full battery from USB
+power with no battery. The USB-only development state can therefore show
+`100%`.
+
 ## Distribution
 
-V1 publishes one final `v1.0.0` GitHub release, not a prerelease. It contains:
+Each final GitHub release contains:
 
 - one merged, ready-to-flash image for the supported V2 board;
 - one Linux x86-64 `pokeviewerctl` binary;

@@ -8,8 +8,8 @@ the canonical type or types. The device does not use Wi-Fi or BLE.
 
 ## Quick start
 
-These instructions install the official
-[Pokeviewer v1.0.0 release](https://github.com/timbrinded/pokeviewer/releases/tag/v1.0.0).
+These instructions install Pokeviewer v1.1.0 from the official
+[Pokeviewer releases](https://github.com/timbrinded/pokeviewer/releases) page.
 They require an x86-64 Linux computer.
 
 The ESP32-S3 ROM contains the factory download bootloader. This procedure
@@ -42,17 +42,17 @@ Open a terminal.
 Run these commands:
 
 ```console
-mkdir pokeviewer-v1.0.0-install
-cd pokeviewer-v1.0.0-install
+mkdir pokeviewer-v1.1.0-install
+cd pokeviewer-v1.1.0-install
 
 curl --fail --location --remote-name \
-  https://github.com/timbrinded/pokeviewer/releases/download/v1.0.0/pokeviewer-v1.0.0.tar.gz
+  https://github.com/timbrinded/pokeviewer/releases/download/v1.1.0/pokeviewer-v1.1.0.tar.gz
 curl --fail --location --remote-name \
-  https://github.com/timbrinded/pokeviewer/releases/download/v1.0.0/pokeviewer-v1.0.0.tar.gz.sha256
+  https://github.com/timbrinded/pokeviewer/releases/download/v1.1.0/pokeviewer-v1.1.0.tar.gz.sha256
 
-sha256sum --check pokeviewer-v1.0.0.tar.gz.sha256
-tar -xzf pokeviewer-v1.0.0.tar.gz
-cd pokeviewer-v1.0.0
+sha256sum --check pokeviewer-v1.1.0.tar.gz.sha256
+tar -xzf pokeviewer-v1.1.0.tar.gz
+cd pokeviewer-v1.1.0
 sha256sum --check SHA256SUMS
 ```
 
@@ -130,7 +130,7 @@ espflash write-bin \
   --port "$DEVICE" \
   --before no-reset \
   --after no-reset \
-  0x0 pokeviewer-v1.0.0-esp32s3-v2.bin
+  0x0 pokeviewer-v1.1.0-esp32s3-v2.bin
 ```
 
 Wait for the command to report a successful write.
@@ -151,7 +151,7 @@ This power cycle stops download mode and starts the installed firmware.
 Set the command path:
 
 ```console
-export CLI=./pokeviewerctl-v1.0.0-x86_64-unknown-linux-gnu
+export CLI=./pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu
 chmod u+x "$CLI"
 ```
 
@@ -172,7 +172,7 @@ To use the Linux local time, run:
 ```console
 "$CLI" set-rtc \
   --device "$DEVICE" \
-  --datetime "$(date +%Y-%m-%dT%H:%M:%S)"
+  --now
 ```
 
 To use a test time, replace the example value:
@@ -194,18 +194,47 @@ Connect the battery before you disconnect the USB cable.
 
 ## Change the time later
 
-You do not have to flash the firmware again.
+You do not have to flash the firmware again. Keep the battery connected.
 
-1. Disconnect the USB cable.
-2. Disconnect the battery.
-3. Wait ten seconds.
-4. Connect only the USB cable.
-5. Wait for the screen to show `SET TIME`.
-6. Repeat the local-time procedure.
-7. Connect the battery before you disconnect the USB cable.
+1. Connect a data-capable USB cable.
+2. Start this command:
 
-The USB command interface is available only while the screen shows
-`SET TIME`.
+   ```console
+   "$CLI" set-rtc \
+     --device "$DEVICE" \
+     --now \
+     --wait-for-device
+   ```
+
+3. Press and hold `PWR` for at least three seconds.
+4. Release `PWR` when the screen shows `SET TIME`.
+5. Wait for the command to show the RTC read-back.
+
+The command waits for the exact device path for up to 60 seconds. It also
+allows time for the `SET TIME` screen to refresh before it sends the time.
+A `PWR` press or hold without an active command has no visible effect. The
+`BOOT` button is for service and flashing only.
+
+## Prepare the device for storage
+
+Storage mode clears the RTC. The next start shows `SET TIME`.
+
+1. Connect a data-capable USB cable.
+2. Start this command:
+
+   ```console
+   "$CLI" enter-storage \
+     --device "$DEVICE" \
+     --confirm-time-loss \
+     --wait-for-device
+   ```
+
+3. Press and hold `PWR` for at least three seconds.
+4. Release `PWR` when the screen shows `SET TIME`.
+5. Wait for the command to confirm storage mode.
+
+The firmware then drops the power latch. Disconnect USB to complete the
+power-off. A later `PWR` press starts the device.
 
 ## Normal operation
 
@@ -216,6 +245,12 @@ without panel power.
 The firmware contains all 151 Generation I entries.
 The device does not require an account, an SD card, or internet access.
 The supported board does not have a touchscreen.
+
+The top corner shows a coarse battery estimate in 10 percent steps. The
+estimate is not a fuel gauge. At a low estimate, the screen also shows the
+lightning icon and `CHARGE!`. If the ADC reading is not plausible, the screen
+shows `?%`. The board has no dedicated USB-power sense input. USB operation
+with no battery can therefore show `100%`.
 
 ## Important notices
 

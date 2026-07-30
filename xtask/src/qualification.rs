@@ -2,14 +2,21 @@
 
 use std::{fmt::Write as _, fs};
 
-use pokeviewer_core::{ContentPack, LocalDateTime, Weekday, next_rollover, select_daily_pokemon};
+use pokeviewer_core::{
+    BatteryStatus, ContentPack, LocalDateTime, Weekday, next_rollover, select_daily_pokemon,
+};
 
-use crate::render::render_record;
+use crate::render::render_record_with_battery;
 
 const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v1.pack");
 
-pub(crate) fn schedule_command(start: &str, output: Option<&str>) -> Result<(), String> {
-    let schedule = build_schedule(parse_date(start)?)?;
+pub(crate) fn schedule_command(
+    start: &str,
+    output: Option<&str>,
+    battery_percentages: Option<&str>,
+) -> Result<(), String> {
+    let percentages = battery_percentages.map_or(Ok([50; 7]), parse_battery_percentages)?;
+    let schedule = build_schedule(parse_date(start)?, percentages)?;
     match output {
         Some(path) => {
             fs::write(path, schedule)
@@ -20,25 +27,39 @@ pub(crate) fn schedule_command(start: &str, output: Option<&str>) -> Result<(), 
     Ok(())
 }
 
-fn build_schedule(mut datetime: LocalDateTime) -> Result<String, String> {
+fn build_schedule(
+    mut datetime: LocalDateTime,
+    battery_percentages: [u8; 7],
+) -> Result<String, String> {
     let pack = ContentPack::parse(PACK).map_err(|error| format!("invalid pack: {error:?}"))?;
-    let mut output = String::from("day,date,weekday,dex_id,name,framebuffer_crc32,status\n");
+    let mut output =
+        String::from("day,date,weekday,dex_id,name,battery_percent,framebuffer_crc32,status\n");
     for day in 1..=7 {
         let selection = select_daily_pokemon(datetime)
             .map_err(|_| "qualification date is outside the schedule range")?;
         let record = pack
             .scheduled_record(selection.cycle_index)
             .map_err(|error| format!("invalid scheduled record: {error:?}"))?;
-        let framebuffer = render_record(&pack, record.dex_id, selection.display_date.weekday)?;
+        let battery_percent = battery_percentages[day - 1];
+        let framebuffer = render_record_with_battery(
+            &pack,
+            record.dex_id,
+            selection.display_date.weekday,
+            BatteryStatus::Estimated {
+                percent: battery_percent,
+                recharge: battery_percent <= 10,
+            },
+        )?;
         writeln!(
             output,
-            "{day},{:04}-{:02}-{:02},{},{},{},{:08x},PENDING",
+            "{day},{:04}-{:02}-{:02},{},{},{},{},{:08x},PENDING",
             selection.display_date.year,
             selection.display_date.month,
             selection.display_date.day,
             weekday_label(selection.display_date.weekday),
             record.dex_id,
             record.name,
+            battery_percent,
             framebuffer.crc32(),
         )
         .map_err(|_| "failed to format qualification schedule")?;
@@ -46,6 +67,24 @@ fn build_schedule(mut datetime: LocalDateTime) -> Result<String, String> {
             .map_err(|_| "seven-day schedule crosses the supported RTC range")?;
     }
     Ok(output)
+}
+
+fn parse_battery_percentages(value: &str) -> Result<[u8; 7], String> {
+    let values = value
+        .split(',')
+        .map(|value| {
+            let percent = value
+                .parse::<u8>()
+                .map_err(|_| "battery percentages must be integers from 0 to 100")?;
+            if percent > 100 || percent % 10 != 0 {
+                return Err("battery percentages must use 10 percent steps from 0 to 100");
+            }
+            Ok(percent)
+        })
+        .collect::<Result<Vec<_>, _>>()?;
+    values
+        .try_into()
+        .map_err(|_| "exactly seven battery percentages are required".to_owned())
 }
 
 fn parse_date(value: &str) -> Result<LocalDateTime, String> {
@@ -90,15 +129,25 @@ const fn weekday_label(weekday: Weekday) -> &'static str {
 
 #[cfg(test)]
 mod tests {
-    use super::{build_schedule, parse_date};
+    use super::{build_schedule, parse_battery_percentages, parse_date};
 
     #[test]
     fn seven_day_schedule_is_complete_and_deterministic() {
-        let schedule = build_schedule(parse_date("2026-01-01").unwrap()).unwrap();
+        let schedule = build_schedule(parse_date("2026-01-01").unwrap(), [50; 7]).unwrap();
         assert_eq!(schedule.lines().count(), 8);
         assert!(schedule.contains("1,2026-01-01,Thursday,1,Bulbasaur,"));
         assert!(schedule.contains("7,2026-01-07,Wednesday,"));
         assert_eq!(schedule.matches(",PENDING").count(), 7);
+    }
+
+    #[test]
+    fn battery_buckets_are_explicit_and_change_the_frame_hash() {
+        let percentages = parse_battery_percentages("100,80,60,40,20,10,0").unwrap();
+        let schedule = build_schedule(parse_date("2026-01-01").unwrap(), percentages).unwrap();
+        assert!(schedule.contains(",100,"));
+        assert!(schedule.contains(",10,"));
+        assert!(parse_battery_percentages("50,50").is_err());
+        assert!(parse_battery_percentages("55,50,50,50,50,50,50").is_err());
     }
 
     #[test]

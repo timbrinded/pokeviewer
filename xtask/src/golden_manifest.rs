@@ -1,6 +1,6 @@
 //! Reviewed golden-case definitions and serialized manifest shape.
 
-use pokeviewer_core::Weekday;
+use pokeviewer_core::{BatteryStatus, Weekday};
 use serde::{Deserialize, Serialize};
 
 #[derive(Clone, Copy)]
@@ -8,43 +8,71 @@ pub(super) struct GoldenSpec {
     pub(super) slug: &'static str,
     pub(super) dex_id: u8,
     pub(super) weekday: Weekday,
+    pub(super) battery_status: BatteryStatus,
 }
 
-pub(super) const CASES: [GoldenSpec; 7] = [
+const NORMAL_BATTERY: BatteryStatus = BatteryStatus::Estimated {
+    percent: 50,
+    recharge: false,
+};
+
+pub(super) const CASES: [GoldenSpec; 9] = [
     GoldenSpec {
         slug: "monday-001",
         dex_id: 1,
         weekday: Weekday::Monday,
+        battery_status: NORMAL_BATTERY,
     },
     GoldenSpec {
         slug: "tuesday-006",
         dex_id: 6,
         weekday: Weekday::Tuesday,
+        battery_status: NORMAL_BATTERY,
     },
     GoldenSpec {
         slug: "wednesday-142",
         dex_id: 142,
         weekday: Weekday::Wednesday,
+        battery_status: NORMAL_BATTERY,
     },
     GoldenSpec {
         slug: "thursday-029",
         dex_id: 29,
         weekday: Weekday::Thursday,
+        battery_status: NORMAL_BATTERY,
     },
     GoldenSpec {
         slug: "friday-122",
         dex_id: 122,
         weekday: Weekday::Friday,
+        battery_status: NORMAL_BATTERY,
     },
     GoldenSpec {
         slug: "saturday-025",
         dex_id: 25,
         weekday: Weekday::Saturday,
+        battery_status: NORMAL_BATTERY,
     },
     GoldenSpec {
         slug: "sunday-151",
         dex_id: 151,
         weekday: Weekday::Sunday,
+        battery_status: NORMAL_BATTERY,
+    },
+    GoldenSpec {
+        slug: "battery-recharge-025",
+        dex_id: 25,
+        weekday: Weekday::Monday,
+        battery_status: BatteryStatus::Estimated {
+            percent: 10,
+            recharge: true,
+        },
+    },
+    GoldenSpec {
+        slug: "battery-unavailable-025",
+        dex_id: 25,
+        weekday: Weekday::Monday,
+        battery_status: BatteryStatus::Unavailable,
     },
 ];
 
@@ -61,6 +89,7 @@ pub(super) struct GoldenCase {
     pub(super) dex_id: u8,
     pub(super) name: String,
     pub(super) weekday: String,
+    pub(super) battery_status: String,
     pub(super) framebuffer_file: String,
     pub(super) png_file: String,
     pub(super) framebuffer_crc32: String,

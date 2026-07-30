@@ -1,8 +1,8 @@
 # Visual golden testing
 
 Visual tests compare exact panel-native bytes, not lossy screenshots or
-subjective image scores. Seven reviewed cases cover all weekdays and distinct
-v1 layout risks.
+subjective image scores. Nine reviewed cases cover all weekdays, distinct
+layout risks, the low-battery warning, and unavailable battery data.
 
 ## Normal check
 

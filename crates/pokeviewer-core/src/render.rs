@@ -1,8 +1,8 @@
 //! Hardware-independent renderer for the 200 × 200 monochrome panel buffer.
 
 use crate::{
-    CONTENT_SPRITE_BYTES, DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES, PokemonType, Weekday,
-    font,
+    BatteryStatus, CONTENT_SPRITE_BYTES, DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES,
+    PokemonType, Weekday, font,
 };
 
 const NAME_MAX_BYTES: usize = 16;
@@ -13,9 +13,13 @@ const SPRITE_SCALE: usize = 2;
 const WEEKDAY_Y: usize = 3;
 const SPRITE_Y: usize = 21;
 const NAME_Y: usize = 139;
-const SINGLE_TYPE_Y: usize = 177;
-const PRIMARY_TYPE_Y: usize = 166;
-const SECONDARY_TYPE_Y: usize = 183;
+const SINGLE_TYPE_Y: usize = 173;
+const PRIMARY_TYPE_Y: usize = 162;
+const SECONDARY_TYPE_Y: usize = 178;
+const BATTERY_X_MARGIN: usize = 3;
+const BATTERY_Y: usize = 3;
+const RECHARGE_Y: usize = 192;
+const LIGHTNING_GLYPH: [u8; font::HEIGHT] = [0x04, 0x0c, 0x1c, 0x06, 0x0c, 0x08, 0x10];
 
 /// Typed input accepted by the shared daily-card renderer.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -30,6 +34,8 @@ pub struct DailyCard<'a> {
     pub secondary_type: Option<PokemonType>,
     /// Decoded 56 × 56 sprite, with `1` representing black.
     pub sprite: &'a [u8; CONTENT_SPRITE_BYTES],
+    /// Coarse non-interactive battery status.
+    pub battery_status: BatteryStatus,
 }
 
 /// Predictable renderer failures detected before the framebuffer is changed.
@@ -45,6 +51,8 @@ pub enum RenderError {
     DuplicateType,
     /// Text does not fit the fixed 200-pixel layout.
     TextTooWide,
+    /// Battery percentage is not a 10% step from 0 through 100.
+    InvalidBatteryStatus,
 }
 
 /// Panel-native 200 × 200 one-bit framebuffer.
@@ -126,6 +134,7 @@ pub fn render_daily_card(
         WEEKDAY_Y,
         WEEKDAY_SCALE,
     );
+    draw_battery_status(framebuffer, card.battery_status);
     draw_sprite(framebuffer, card.sprite);
     draw_centered_text(framebuffer, card.name, NAME_Y, NAME_SCALE);
     match card.secondary_type {
@@ -149,6 +158,12 @@ pub fn render_daily_card(
             SINGLE_TYPE_Y,
             TYPE_SCALE,
         ),
+    }
+    if matches!(
+        card.battery_status,
+        BatteryStatus::Estimated { recharge: true, .. }
+    ) {
+        draw_recharge_status(framebuffer);
     }
     Ok(())
 }
@@ -193,8 +208,46 @@ fn validate_card(card: DailyCard<'_>) -> Result<(), RenderError> {
     if card.secondary_type == Some(card.primary_type) {
         return Err(RenderError::DuplicateType);
     }
+    if !card.battery_status.is_valid() {
+        return Err(RenderError::InvalidBatteryStatus);
+    }
     validate_text(card.name, NAME_SCALE)?;
     Ok(())
+}
+
+fn draw_battery_status(framebuffer: &mut Framebuffer, status: BatteryStatus) {
+    let label = match status {
+        BatteryStatus::Estimated { percent: 0, .. } => "0%",
+        BatteryStatus::Estimated { percent: 10, .. } => "10%",
+        BatteryStatus::Estimated { percent: 20, .. } => "20%",
+        BatteryStatus::Estimated { percent: 30, .. } => "30%",
+        BatteryStatus::Estimated { percent: 40, .. } => "40%",
+        BatteryStatus::Estimated { percent: 50, .. } => "50%",
+        BatteryStatus::Estimated { percent: 60, .. } => "60%",
+        BatteryStatus::Estimated { percent: 70, .. } => "70%",
+        BatteryStatus::Estimated { percent: 80, .. } => "80%",
+        BatteryStatus::Estimated { percent: 90, .. } => "90%",
+        BatteryStatus::Estimated { percent: 100, .. } => "100%",
+        BatteryStatus::Estimated { .. } => unreachable!("battery status is validated"),
+        BatteryStatus::Unavailable => "?%",
+    };
+    let width = text_width(label.chars().count(), 1);
+    draw_text(
+        framebuffer,
+        label,
+        DISPLAY_WIDTH - BATTERY_X_MARGIN - width,
+        BATTERY_Y,
+        1,
+    );
+}
+
+fn draw_recharge_status(framebuffer: &mut Framebuffer) {
+    const LABEL: &str = "CHARGE!";
+    let label_width = text_width(LABEL.chars().count(), 1);
+    let total_width = font::WIDTH + 2 + label_width;
+    let x = (DISPLAY_WIDTH - total_width) / 2;
+    draw_glyph(framebuffer, LIGHTNING_GLYPH, x, RECHARGE_Y, 1);
+    draw_text(framebuffer, LABEL, x + font::WIDTH + 2, RECHARGE_Y, 1);
 }
 
 fn validate_text(text: &str, scale: usize) -> Result<(), RenderError> {
@@ -218,16 +271,21 @@ fn draw_text(framebuffer: &mut Framebuffer, text: &str, x: usize, y: usize, scal
     let advance = (font::WIDTH + 1) * scale;
     for (character_index, character) in text.chars().enumerate() {
         let glyph = font::glyph(character).expect("text is validated before drawing");
-        for (row, row_bits) in glyph.iter().copied().enumerate() {
-            for column in 0..font::WIDTH {
-                if row_bits & (1 << (font::WIDTH - 1 - column)) != 0 {
-                    fill_scaled_pixel(
-                        framebuffer,
-                        x + character_index * advance + column * scale,
-                        y + row * scale,
-                        scale,
-                    );
-                }
+        draw_glyph(framebuffer, *glyph, x + character_index * advance, y, scale);
+    }
+}
+
+fn draw_glyph(
+    framebuffer: &mut Framebuffer,
+    glyph: [u8; font::HEIGHT],
+    x: usize,
+    y: usize,
+    scale: usize,
+) {
+    for (row, row_bits) in glyph.iter().copied().enumerate() {
+        for column in 0..font::WIDTH {
+            if row_bits & (1 << (font::WIDTH - 1 - column)) != 0 {
+                fill_scaled_pixel(framebuffer, x + column * scale, y + row * scale, scale);
             }
         }
     }

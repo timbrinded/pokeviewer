@@ -2,6 +2,7 @@
 #![forbid(unsafe_code)]
 #![doc = "Deterministic domain and rendering logic shared by firmware and host tests."]
 
+mod battery;
 mod content;
 mod font;
 mod protocol;
@@ -9,8 +10,13 @@ mod recovery;
 mod render;
 mod schedule;
 
+pub use battery::{
+    BATTERY_SAMPLE_COUNT, BatteryEstimate, BatteryStatus, GENERIC_LIPO_OCV_UV, estimate_battery,
+    filtered_battery_mv,
+};
 pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
 pub use protocol::{
+    CAP_DIAGNOSTICS, CAP_ENTER_STORAGE, CAP_HANDSHAKE, CAP_READ_RTC, CAP_SET_RTC, CAPABILITIES,
     Command, EncodedFrame, FIRMWARE_VERSION, FrameAccumulator, FrameError, FrameKind,
     ProtocolFrame, Status, decode_datetime, encode_datetime,
 };

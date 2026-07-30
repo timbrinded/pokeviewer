@@ -24,8 +24,8 @@ printf '%s\n' \
   'Commands use DEVICE and contain no private identifiers.' \
   >"$work_dir/terminal.txt"
 
-metadata=$(tar -xOf "$archive" pokeviewer-v1.0.0/BUILD-METADATA.txt)
-sums=$(tar -xOf "$archive" pokeviewer-v1.0.0/SHA256SUMS)
+metadata=$(tar -xOf "$archive" pokeviewer-v1.1.0/BUILD-METADATA.txt)
+sums=$(tar -xOf "$archive" pokeviewer-v1.1.0/SHA256SUMS)
 value_from_metadata() {
   local key=$1
   awk -F= -v key="$key" '$1 == key { print substr($0, length(key) + 2) }' \
@@ -47,8 +47,8 @@ archive_hash=${archive_hash%% *}
 cat >"$work_dir/rehearsal.env" <<EOF
 candidate_commit=$(value_from_metadata source_commit)
 archive_sha256=$archive_hash
-firmware_sha256=$(hash_from_sums pokeviewer-v1.0.0-esp32s3-v2.bin)
-cli_sha256=$(hash_from_sums pokeviewerctl-v1.0.0-x86_64-unknown-linux-gnu)
+firmware_sha256=$(hash_from_sums pokeviewer-v1.1.0-esp32s3-v2.bin)
+cli_sha256=$(hash_from_sums pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu)
 content_pack_sha256=$(hash_from_sums pokeviewer-v1.pack)
 setup_photo_sha256=$(file_hash setup.png)
 daily_card_photo_sha256=$(file_hash daily-card.png)
@@ -65,6 +65,10 @@ rtc_readback=PASS
 daily_card=PASS
 deep_sleep=PASS
 scheduled_refresh=PASS
+pwr_short_press=PASS
+parent_session=PASS
+storage_mode=PASS
+battery_display=PASS
 invalid_rtc_recovery=PASS
 panel_failure_recovery=PASS
 documentation_only=PASS

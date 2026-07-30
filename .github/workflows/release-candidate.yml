@@ -18,7 +18,7 @@ jobs:
       contents: read
 
   candidate:
-    name: Reproducible v1.0.0 candidate
+    name: Reproducible v1.1.0 candidate
     needs: release-tests
     runs-on: ubuntu-latest
     steps:
@@ -71,7 +71,7 @@ jobs:
 
       - name: Prove reproducibility
         run: |
-          archive=pokeviewer-v1.0.0.tar.gz
+          archive=pokeviewer-v1.1.0.tar.gz
           cmp \
             "$RUNNER_TEMP/candidate-a/$archive" \
             "$RUNNER_TEMP/candidate-b/$archive"
@@ -91,12 +91,12 @@ jobs:
       - name: Test rehearsal evidence gate
         run: |
           scripts/test-rehearsal-evidence.sh \
-            "$RUNNER_TEMP/candidate-a/pokeviewer-v1.0.0.tar.gz"
+            "$RUNNER_TEMP/candidate-a/pokeviewer-v1.1.0.tar.gz"
 
       - name: Upload retained candidate
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: pokeviewer-v1.0.0-candidate-${{ github.sha }}
+          name: pokeviewer-v1.1.0-candidate-${{ github.sha }}
           path: ${{ runner.temp }}/release-candidate
           if-no-files-found: error
           retention-days: 14

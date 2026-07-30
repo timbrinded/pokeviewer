@@ -3,7 +3,7 @@
 use esp_hal::{Blocking, peripherals::USB_DEVICE, usb::usb_serial_jtag::UsbSerialJtag};
 use pokeviewer_core::{FrameAccumulator, FrameError};
 
-use crate::{Rtc, handle_protocol_request};
+use crate::{ProtocolAction, Rtc, handle_protocol_request};
 
 const MAX_RX_BYTES_PER_POLL: usize = 64;
 
@@ -14,6 +14,15 @@ pub enum UsbProtocolError {
     InvalidFrame(FrameError),
     /// USB transmit failed.
     Transport,
+}
+
+/// Results from one bounded transport poll.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct UsbPoll {
+    /// Complete requests handled in this poll.
+    pub handled: usize,
+    /// Deferred runtime action, if a command requested one.
+    pub action: ProtocolAction,
 }
 
 /// Owned CDC-ACM transport with a fixed incremental decoder.
@@ -43,11 +52,12 @@ impl UsbProtocolTransport {
         &mut self,
         rtc: &mut R,
         diagnostic_flags: u16,
-    ) -> Result<usize, UsbProtocolError>
+        allow_storage: bool,
+    ) -> Result<UsbPoll, UsbProtocolError>
     where
         R: Rtc,
     {
-        let mut handled = 0;
+        let mut result = UsbPoll::default();
         for _ in 0..MAX_RX_BYTES_PER_POLL {
             let Ok(byte) = self.usb.read_byte() else {
                 break;
@@ -56,15 +66,19 @@ impl UsbProtocolTransport {
                 continue;
             };
             let request = frame.map_err(UsbProtocolError::InvalidFrame)?;
-            let response = handle_protocol_request(rtc, request, diagnostic_flags)
+            let outcome = handle_protocol_request(rtc, request, diagnostic_flags, allow_storage)
                 .await
                 .map_err(UsbProtocolError::InvalidFrame)?;
             self.usb
-                .write(response.encode().as_bytes())
+                .write(outcome.response.encode().as_bytes())
                 .map_err(|_| UsbProtocolError::Transport)?;
-            handled += 1;
+            result.handled += 1;
+            if outcome.action != ProtocolAction::None {
+                result.action = outcome.action;
+                break;
+            }
         }
-        Ok(handled)
+        Ok(result)
     }
 
     /// Discard a partial request after a provisioning timeout.

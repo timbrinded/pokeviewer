@@ -22,6 +22,7 @@ fn every_command_round_trips_with_request_id_and_payload() {
         Command::ReadRtc,
         Command::SetRtc,
         Command::Diagnostics,
+        Command::EnterStorage,
     ] {
         let frame =
             ProtocolFrame::new(0x1234, FrameKind::Request, command, &encode_datetime(NOW)).unwrap();
