@@ -79,6 +79,20 @@ Set `DEVICE` to the path that the command shows:
 export DEVICE=/dev/ttyACM0
 ```
 
+**Troubleshooting: battery connected.** If `ls` finds no board, the installed
+firmware is in deep sleep. Prepare the bundled CLI and wait for the device:
+
+```console
+chmod u+x ./pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu
+./pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu info \
+  --device "$DEVICE" \
+  --wait-for-device
+```
+
+Hold `PWR` for at least three seconds, then release it. The path returns for a
+two-minute parent USB session. This wakes the installed firmware; it does not
+start download mode.
+
 On Arch Linux, the serial-device group is usually `uucp`.
 On Debian and Ubuntu, the group is usually `dialout`.
 
@@ -191,19 +205,6 @@ The firmware then restarts, updates the display, and enters deep sleep.
 The USB command interface stops after a successful time update.
 
 Connect the battery before you disconnect the USB cable.
-
-## Wake USB with the battery connected
-
-When the firmware is in deep sleep, `ls /dev/ttyACM*` finds no board. This is
-expected. Connect USB and start:
-
-```console
-"$CLI" info --device "$DEVICE" --wait-for-device
-```
-
-Press and hold `PWR` for at least three seconds, then release it. The command
-waits for the device, verifies the firmware, and opens a two-minute parent USB
-session.
 
 ## Change the time later
 
