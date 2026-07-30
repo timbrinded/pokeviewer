@@ -93,6 +93,10 @@ pass_keys=(
   daily_card
   deep_sleep
   scheduled_refresh
+  pwr_short_press
+  parent_session
+  storage_mode
+  battery_display
   invalid_rtc_recovery
   panel_failure_recovery
   documentation_only
@@ -116,18 +120,18 @@ if [[ "$(value archive_sha256)" != "$archive_hash" ]]; then
 fi
 
 metadata=$(tar -xOf "$archive" \
-  pokeviewer-v1.0.0/BUILD-METADATA.txt)
+  pokeviewer-v1.1.0/BUILD-METADATA.txt)
 metadata_commit=$(awk -F= '$1 == "source_commit" { print $2 }' <<<"$metadata")
 if [[ "$commit" != "$metadata_commit" ]]; then
   echo "recorded commit does not match candidate metadata" >&2
   exit 1
 fi
 
-sums=$(tar -xOf "$archive" pokeviewer-v1.0.0/SHA256SUMS)
-firmware_hash=$(awk '$2 == "pokeviewer-v1.0.0-esp32s3-v2.bin" { print $1 }' \
+sums=$(tar -xOf "$archive" pokeviewer-v1.1.0/SHA256SUMS)
+firmware_hash=$(awk '$2 == "pokeviewer-v1.1.0-esp32s3-v2.bin" { print $1 }' \
   <<<"$sums")
 cli_hash=$(awk \
-  '$2 == "pokeviewerctl-v1.0.0-x86_64-unknown-linux-gnu" { print $1 }' \
+  '$2 == "pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu" { print $1 }' \
   <<<"$sums")
 pack_hash=$(awk '$2 == "pokeviewer-v1.pack" { print $1 }' <<<"$sums")
 if [[ "$(value firmware_sha256)" != "$firmware_hash" ||
@@ -169,7 +173,7 @@ fi
 if grep -Eq '^- \[ \]|FAIL' "$checklist" ||
   ! awk '
   /^- \[x\]/ { complete += 1 }
-  END { exit complete == 15 ? 0 : 1 }
+  END { exit complete == 19 ? 0 : 1 }
 ' "$checklist"; then
   echo "rehearsal checklist is incomplete" >&2
   exit 1

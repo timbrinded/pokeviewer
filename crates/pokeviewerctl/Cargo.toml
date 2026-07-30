@@ -9,8 +9,12 @@ rust-version.workspace = true
 version.workspace = true
 
 [dependencies]
-pokeviewer-core = { version = "=1.0.0", path = "../pokeviewer-core" }
+jiff = { version = "=0.2.35", default-features = true }
+pokeviewer-core = { version = "=1.1.0", path = "../pokeviewer-core" }
 serial2 = { version = "=0.2.37", default-features = false }
+
+[dev-dependencies]
+serial2 = { version = "=0.2.37", default-features = false, features = ["unix"] }
 
 [lints]
 workspace = true

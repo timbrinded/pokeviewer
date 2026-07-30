@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly VERSION="1.0.0"
+readonly VERSION="1.1.0"
 readonly TARGET="xtensa-esp32s3-none-elf"
 readonly FIRMWARE="target/$TARGET/release/pokeviewer-firmware"
 readonly CLI="target/release/pokeviewerctl"

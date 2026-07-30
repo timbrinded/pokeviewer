@@ -90,6 +90,9 @@ required RTC address and must not infer board identity from a scan.
 ## Power behavior
 
 - USB VBUS and the battery feed the board power path.
+- The board does not route USB VBUS to a dedicated ESP32-S3 sense input.
+  USB Serial/JTAG traffic does not identify the power source. Firmware cannot
+  distinguish USB power with no battery from a full battery reliably.
 - GPIO17 high holds the battery-controlled system path on; driving it low asks
   the board to power off.
 - GPIO6 low powers the e-paper rail. It must be high before deep sleep.

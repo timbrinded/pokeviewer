@@ -11,7 +11,20 @@ pub const MAX_FRAME_BYTES: usize = HEADER_BYTES + MAX_PAYLOAD_BYTES + CHECKSUM_B
 /// Supported USB protocol version.
 pub const PROTOCOL_VERSION: u8 = 1;
 /// Product version reported by v1 firmware over USB.
-pub const FIRMWARE_VERSION: [u8; 3] = [1, 0, 0];
+pub const FIRMWARE_VERSION: [u8; 3] = [1, 1, 0];
+/// Firmware can negotiate protocol metadata.
+pub const CAP_HANDSHAKE: u8 = 1 << 0;
+/// Firmware can read the RTC.
+pub const CAP_READ_RTC: u8 = 1 << 1;
+/// Firmware can set the RTC.
+pub const CAP_SET_RTC: u8 = 1 << 2;
+/// Firmware can report diagnostics.
+pub const CAP_DIAGNOSTICS: u8 = 1 << 3;
+/// Firmware can invalidate the RTC and enter storage mode.
+pub const CAP_ENTER_STORAGE: u8 = 1 << 4;
+/// Capabilities implemented by this firmware version.
+pub const CAPABILITIES: u8 =
+    CAP_HANDSHAKE | CAP_READ_RTC | CAP_SET_RTC | CAP_DIAGNOSTICS | CAP_ENTER_STORAGE;
 
 /// Direction encoded in a protocol frame.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -35,6 +48,8 @@ pub enum Command {
     SetRtc = 3,
     /// Read a bounded diagnostic bit field.
     Diagnostics = 4,
+    /// Invalidate the RTC and enter no-wake storage mode.
+    EnterStorage = 5,
 }
 
 /// Stable response status codes.
@@ -305,6 +320,7 @@ fn decode_command(value: u8) -> Result<Command, FrameError> {
         2 => Ok(Command::ReadRtc),
         3 => Ok(Command::SetRtc),
         4 => Ok(Command::Diagnostics),
+        5 => Ok(Command::EnterStorage),
         _ => Err(FrameError::InvalidCommand),
     }
 }

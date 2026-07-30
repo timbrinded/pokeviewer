@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-readonly VERSION="1.0.0"
+readonly VERSION="1.1.0"
 readonly BUNDLE="pokeviewer-v$VERSION"
 
 if [[ $# -ne 1 ]]; then

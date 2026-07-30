@@ -7,8 +7,8 @@ use std::{
 };
 
 use pokeviewer_core::{
-    ContentPack, DISPLAY_HEIGHT, DISPLAY_WIDTH, DailyCard, Framebuffer, Weekday, render_daily_card,
-    render_setup_screen,
+    BatteryStatus, ContentPack, DISPLAY_HEIGHT, DISPLAY_WIDTH, DailyCard, Framebuffer, Weekday,
+    render_daily_card, render_setup_screen,
 };
 use pokeviewer_firmware::{FailureKind, render_failure_screen};
 
@@ -25,6 +25,10 @@ const SAMPLES: [(u8, Weekday); 4] = [
     (83, Weekday::Wednesday),
     (29, Weekday::Thursday),
 ];
+pub(crate) const REVIEW_BATTERY_STATUS: BatteryStatus = BatteryStatus::Estimated {
+    percent: 50,
+    recharge: false,
+};
 
 pub(crate) fn samples_command(output_dir: Option<&str>) -> TaskResult {
     let output_dir = PathBuf::from(output_dir.unwrap_or(DEFAULT_OUTPUT));
@@ -149,6 +153,15 @@ pub(crate) fn render_record(
     dex_id: u8,
     weekday: Weekday,
 ) -> Result<Framebuffer, String> {
+    render_record_with_battery(pack, dex_id, weekday, REVIEW_BATTERY_STATUS)
+}
+
+pub(crate) fn render_record_with_battery(
+    pack: &ContentPack<'_>,
+    dex_id: u8,
+    weekday: Weekday,
+    battery_status: BatteryStatus,
+) -> Result<Framebuffer, String> {
     let record = pack
         .record(dex_id)
         .map_err(|error| format!("invalid record {dex_id}: {error:?}"))?;
@@ -161,6 +174,7 @@ pub(crate) fn render_record(
             primary_type: record.primary_type,
             secondary_type: record.secondary_type,
             sprite: record.sprite,
+            battery_status,
         },
     )
     .map_err(|error| format!("record {dex_id} did not render: {error:?}"))?;

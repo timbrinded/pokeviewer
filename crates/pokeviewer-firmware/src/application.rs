@@ -1,9 +1,9 @@
 //! Allocation-free composition of RTC, content, schedule, and rendering.
 
 use pokeviewer_core::{
-    ContentPack, DailyCard, DailySelection, DisplayDate, Framebuffer, InvalidDateTime,
-    LocalDateTime, PackError, RecoveryState, RenderError, SetupReason, assess_rtc, next_rollover,
-    render_daily_card, render_setup_screen, select_daily_pokemon,
+    BatteryStatus, ContentPack, DailyCard, DailySelection, DisplayDate, Framebuffer,
+    InvalidDateTime, LocalDateTime, PackError, RecoveryState, RenderError, SetupReason, assess_rtc,
+    next_rollover, render_daily_card, render_setup_screen, select_daily_pokemon,
 };
 
 const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
@@ -124,13 +124,15 @@ pub(crate) fn decide_awake_poll(
 /// the adult setup screen and are successful application outcomes.
 pub fn render_rtc_frame(
     reading: Result<LocalDateTime, SetupReason>,
+    battery_status: BatteryStatus,
     framebuffer: &mut Framebuffer,
 ) -> Result<RenderedFrame, ApplicationError> {
-    render_rtc_frame_from_pack(reading, PACK, framebuffer)
+    render_rtc_frame_from_pack(reading, battery_status, PACK, framebuffer)
 }
 
 fn render_rtc_frame_from_pack(
     reading: Result<LocalDateTime, SetupReason>,
+    battery_status: BatteryStatus,
     pack_bytes: &[u8],
     framebuffer: &mut Framebuffer,
 ) -> Result<RenderedFrame, ApplicationError> {
@@ -141,7 +143,7 @@ fn render_rtc_frame_from_pack(
         }
         RecoveryState::Ready(selection) => {
             let pack = ContentPack::parse(pack_bytes).map_err(ApplicationError::Content)?;
-            render_selection(&pack, selection, framebuffer)?;
+            render_selection(&pack, selection, battery_status, framebuffer)?;
             Screen::Daily(selection)
         }
     };
@@ -154,6 +156,7 @@ fn render_rtc_frame_from_pack(
 fn render_selection(
     pack: &ContentPack<'_>,
     selection: DailySelection,
+    battery_status: BatteryStatus,
     framebuffer: &mut Framebuffer,
 ) -> Result<(), ApplicationError> {
     let record = pack
@@ -170,6 +173,7 @@ fn render_selection(
             primary_type: record.primary_type,
             secondary_type: record.secondary_type,
             sprite: record.sprite,
+            battery_status,
         },
     )
     .map_err(ApplicationError::Render)
@@ -178,7 +182,8 @@ fn render_selection(
 #[cfg(test)]
 mod tests {
     use pokeviewer_core::{
-        ContentPack, DailySelection, DisplayDate, Framebuffer, LocalDateTime, SetupReason, Weekday,
+        BatteryStatus, ContentPack, DailySelection, DisplayDate, Framebuffer, LocalDateTime,
+        SetupReason, Weekday,
     };
 
     use super::{
@@ -197,6 +202,10 @@ mod tests {
         include_bytes!("../../../tests/goldens/cards/friday-122.bin");
     const SATURDAY_PIKACHU: &[u8; 5_000] =
         include_bytes!("../../../tests/goldens/cards/saturday-025.bin");
+    const TEST_BATTERY: BatteryStatus = BatteryStatus::Estimated {
+        percent: 50,
+        recharge: false,
+    };
 
     #[test]
     fn published_epoch_vector_renders_the_expected_complete_card() {
@@ -210,6 +219,7 @@ mod tests {
                 minute: 0,
                 second: 0,
             }),
+            TEST_BATTERY,
             &mut framebuffer,
         )
         .unwrap();
@@ -237,6 +247,7 @@ mod tests {
             render_selection(
                 &pack,
                 selection(cycle_index, dex_id, weekday),
+                TEST_BATTERY,
                 &mut framebuffer,
             )
             .unwrap();
@@ -253,6 +264,7 @@ mod tests {
             render_selection(
                 &pack,
                 selection(u8::try_from(cycle_index).unwrap(), dex_id, Weekday::Sunday),
+                TEST_BATTERY,
                 &mut framebuffer,
             )
             .unwrap();
@@ -262,8 +274,12 @@ mod tests {
     #[test]
     fn invalid_rtc_renders_setup_instead_of_a_card() {
         let mut framebuffer = Framebuffer::default();
-        let result =
-            render_rtc_frame(Err(SetupReason::OscillatorStopped), &mut framebuffer).unwrap();
+        let result = render_rtc_frame(
+            Err(SetupReason::OscillatorStopped),
+            BatteryStatus::Unavailable,
+            &mut framebuffer,
+        )
+        .unwrap();
 
         assert_eq!(result.screen, Screen::Setup(SetupReason::OscillatorStopped));
         assert_eq!(result.crc32, 0x34e3_1d2e);
@@ -282,6 +298,7 @@ mod tests {
                 minute: 0,
                 second: 0,
             }),
+            TEST_BATTERY,
             b"corrupt",
             &mut framebuffer,
         );

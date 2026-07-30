@@ -1,83 +1,114 @@
 {
-  "schema_version": 1,
-  "renderer_version": 1,
+  "schema_version": 2,
+  "renderer_version": 2,
   "cases": [
     {
       "case": "monday-001",
       "dex_id": 1,
       "name": "Bulbasaur",
       "weekday": "Monday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/monday-001.bin",
       "png_file": "cards/monday-001.png",
-      "framebuffer_crc32": "7e1a3bde",
-      "framebuffer_sha256": "fa5aaf361fb0510750f3a57506ab40e01ec8928fef95e13e24ba750655de6e24",
-      "png_sha256": "b3e25c75514d964863a2d74233ceca2cb8a31204a462fadab3298dcee6b6af42"
+      "framebuffer_crc32": "23a6f48c",
+      "framebuffer_sha256": "80be72c2bec3081616a713fe9637a5afe7d27687f8232d7a567da659419878ad",
+      "png_sha256": "9698d6094d29a6baaf7f12a0f9c29149872915b753b12e8ed111ff5fb465dce1"
     },
     {
       "case": "tuesday-006",
       "dex_id": 6,
       "name": "Charizard",
       "weekday": "Tuesday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/tuesday-006.bin",
       "png_file": "cards/tuesday-006.png",
-      "framebuffer_crc32": "944c4e30",
-      "framebuffer_sha256": "fea6e487dc1579168d9e85b7b0519155a93b7f4e3cd282f406b8180af3783009",
-      "png_sha256": "1ccb59254f69cbcf75fe00277c36f3bdf42c979f743315e154b50cd412ae15ae"
+      "framebuffer_crc32": "fb194c4e",
+      "framebuffer_sha256": "71ac52ad1e6542f5b4032b10ab650df1e59760d9fbae0b251796196a0618d5a9",
+      "png_sha256": "fbd1878f7b218e606036b5d119fbcd6329464cb6722bf62fe1f51736635b7a13"
     },
     {
       "case": "wednesday-142",
       "dex_id": 142,
       "name": "Aerodactyl",
       "weekday": "Wednesday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/wednesday-142.bin",
       "png_file": "cards/wednesday-142.png",
-      "framebuffer_crc32": "4e8114de",
-      "framebuffer_sha256": "5f08381f670f649c5316371afa136e78c4862ddf13390306b0794dcc05a1489a",
-      "png_sha256": "8348b0766d49404cb83ef7a5ad80350c9fb61e2f11183890a80ff289d3693e84"
+      "framebuffer_crc32": "47274da1",
+      "framebuffer_sha256": "0ff68dd06e70f7a25b8da14494d0c811e33dbb5d53909671277f747a4ee7f49a",
+      "png_sha256": "3de58b8e979f0860952b8b5be6fac5c13fb813da613e7a7f95198ce916138a64"
     },
     {
       "case": "thursday-029",
       "dex_id": 29,
       "name": "Nidoran♀",
       "weekday": "Thursday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/thursday-029.bin",
       "png_file": "cards/thursday-029.png",
-      "framebuffer_crc32": "148de2c2",
-      "framebuffer_sha256": "b41e1c9b92bd5cae9df67b87e5207ff6f5efca73ca03c5a0e9e03fbce2564fa7",
-      "png_sha256": "4ac870ff3b33016d2fac0da6fa1c1d84a5e79c368a5db3c954b0d59cdbc58679"
+      "framebuffer_crc32": "b687168f",
+      "framebuffer_sha256": "c418bb73cf3581cf19cdda3bccd644a5b6e86bdf67a824a06ffbb674954de62e",
+      "png_sha256": "31e0a9a4b9ed4542df09cfc3383b3f79097baf986228aa808de8ce6b8a70f244"
     },
     {
       "case": "friday-122",
       "dex_id": 122,
       "name": "Mr. Mime",
       "weekday": "Friday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/friday-122.bin",
       "png_file": "cards/friday-122.png",
-      "framebuffer_crc32": "7009f019",
-      "framebuffer_sha256": "d8ea680647d9b5fb910fc7a0131ca90d81e1131d003961e53c1b72b6a39ec7d8",
-      "png_sha256": "76bf14d3747e9f2e47933f7d68a21e91607e5a546f26360cc1a31bc5aff75c52"
+      "framebuffer_crc32": "ed259995",
+      "framebuffer_sha256": "32b831787eaaac7b42fa38f10c39c16d8f6a669c79c6b803f9d2308f8bd0c787",
+      "png_sha256": "5a37465f220e461e74c1f1417f65bcb22f7d481e9f2073b018639b1c4b057647"
     },
     {
       "case": "saturday-025",
       "dex_id": 25,
       "name": "Pikachu",
       "weekday": "Saturday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/saturday-025.bin",
       "png_file": "cards/saturday-025.png",
-      "framebuffer_crc32": "3b7e4c65",
-      "framebuffer_sha256": "e7ca1e07b59e7bcced719453ca45351c721e61950d43f35791bb0620076b8d9b",
-      "png_sha256": "f87c783154c0278b2def84f18fe1ce1890c1d0ac4f6c7768f166521a4243e496"
+      "framebuffer_crc32": "c156f328",
+      "framebuffer_sha256": "714b7b49b2fdd2011bd2980f8fcc5d13ecc966d968f0206403b30aa930c7e53f",
+      "png_sha256": "c1413819e6735acb07402c7b4e468ad01588f166eb3bc5823fc836ab593df5a9"
     },
     {
       "case": "sunday-151",
       "dex_id": 151,
       "name": "Mew",
       "weekday": "Sunday",
+      "battery_status": "50%",
       "framebuffer_file": "cards/sunday-151.bin",
       "png_file": "cards/sunday-151.png",
-      "framebuffer_crc32": "b183948e",
-      "framebuffer_sha256": "bdc57c04600dcce26cdedd046f54b9190b2c2c11366760e5cef23d6e0016cb08",
-      "png_sha256": "85b0fbe0e2be27db5d7af35fcb3589ea10e94a086d66b9471bb39fe4178fbb3c"
+      "framebuffer_crc32": "40b59a75",
+      "framebuffer_sha256": "6817b4971a8022c0bf3233130a48c195e64661091927e3c85146554e008516f5",
+      "png_sha256": "4caea1454226a757bee308788dfbc1a5ea2511ea19265f9290977ad1580ff651"
+    },
+    {
+      "case": "battery-recharge-025",
+      "dex_id": 25,
+      "name": "Pikachu",
+      "weekday": "Monday",
+      "battery_status": "10% recharge",
+      "framebuffer_file": "cards/battery-recharge-025.bin",
+      "png_file": "cards/battery-recharge-025.png",
+      "framebuffer_crc32": "105511d0",
+      "framebuffer_sha256": "e466e06782c8aec0be1b162ca1fef9e4022cf55b51c4bf375661fe8e1390c837",
+      "png_sha256": "150a1a332b6163dcd8f2634973cdcb3857518718f8316d5d147bd4d2df505c64"
+    },
+    {
+      "case": "battery-unavailable-025",
+      "dex_id": 25,
+      "name": "Pikachu",
+      "weekday": "Monday",
+      "battery_status": "unavailable",
+      "framebuffer_file": "cards/battery-unavailable-025.bin",
+      "png_file": "cards/battery-unavailable-025.png",
+      "framebuffer_crc32": "2e8d6b3b",
+      "framebuffer_sha256": "fa9d884a6f6ddca5e520c7dd098780f758a7c2bec4092ebea80a00b75d5fef01",
+      "png_sha256": "1ec03dd2e449f8c8f63801ce72df447972c25f21c311187cee4e9f9634b05e42"
     }
   ]
 }

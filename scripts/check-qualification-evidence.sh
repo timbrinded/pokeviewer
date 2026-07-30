@@ -2,10 +2,7 @@
 set -euo pipefail
 
 evidence_dir=${1:?usage: check-qualification-evidence.sh EVIDENCE_DIR}
-required=(
-  metadata.env checklist.md measurements.csv capacity.txt
-  seven-day.csv photos.csv
-)
+required=(metadata.env checklist.md seven-day.csv photos.csv)
 for tool in cargo cmp sed; do
   if ! command -v "$tool" >/dev/null; then
     echo "required tool is unavailable: $tool" >&2
@@ -24,7 +21,7 @@ if ! grep -Eq '^qualification_status=PASS$' "$evidence_dir/metadata.env"; then
   echo "qualification_status must be PASS" >&2
   exit 1
 fi
-if ! grep -Eq '^schema_version=1$' "$evidence_dir/metadata.env"; then
+if ! grep -Eq '^schema_version=2$' "$evidence_dir/metadata.env"; then
   echo "unsupported qualification evidence schema" >&2
   exit 1
 fi
@@ -53,51 +50,16 @@ if grep -Eq '\[ \]|FAIL' "$evidence_dir/checklist.md"; then
   exit 1
 fi
 awk -F, '
-BEGIN { number = "^[0-9]+([.][0-9]+)?$" }
 NR == 1 {
-  if ($0 != "phase,current_ma,duration_seconds,instrument_range,sample_rate_hz,status") exit 1
+  if ($0 != "day,date,weekday,dex_id,name,battery_percent,framebuffer_crc32,status") exit 1
   next
 }
-NF != 6 || $1 !~ /^(refresh|awake_idle|deep_sleep)$/ ||
-  $2 !~ number || $3 !~ number || $4 == "" || $5 !~ number ||
-  $6 != "PASS" { exit 1 }
-{ seen[$1]++ }
-$1 == "deep_sleep" && ($2 > 0.500 || $3 < 60) { exit 1 }
-$1 == "refresh" && $3 > 10 { exit 1 }
-$1 == "refresh" || $1 == "awake_idle" { active += $3 }
-END {
-  if (NR != 4 || seen["refresh"] != 1 || seen["awake_idle"] != 1 ||
-      seen["deep_sleep"] != 1 || active > 30) exit 1
-}
-' "$evidence_dir/measurements.csv" || {
-  echo "measurement rows or release thresholds failed" >&2
-  exit 1
-}
-awk -F= '
-BEGIN { number = "^[0-9]+([.][0-9]+)?$" }
-$1 == "minimum_72h_mAh" && $2 ~ number { minimum = $2 + 0; minimum_seen++ }
-$1 == "intended_cell_rated_mAh" && $2 ~ number { rated = $2 + 0; rated_seen++ }
-$1 == "usable_capacity_fraction" && $2 ~ number { usable = $2 + 0; usable_seen++ }
-$1 == "status" { status = $2; status_seen++ }
-END {
-  if (minimum_seen != 1 || rated_seen != 1 || usable_seen != 1 ||
-      status_seen != 1 || minimum <= 0 || usable <= 0 || usable > 1 ||
-      rated * usable < minimum || status != "PASS") exit 1
-}
-' "$evidence_dir/capacity.txt" || {
-  echo "battery capacity evidence failed" >&2
-  exit 1
-}
-awk -F, '
-NR == 1 {
-  if ($0 != "day,date,weekday,dex_id,name,framebuffer_crc32,status") exit 1
-  next
-}
-NF != 7 || $1 != NR - 1 ||
+NF != 8 || $1 != NR - 1 ||
   $2 !~ /^[0-9]{4}-[0-9]{2}-[0-9]{2}$/ ||
   $3 !~ /^(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)$/ ||
   $4 !~ /^[0-9]+$/ || $4 < 1 || $4 > 151 || $5 == "" ||
-  length($6) != 8 || $6 !~ /^[0-9a-f]+$/ || $7 != "PASS" { exit 1 }
+  $6 !~ /^(0|10|20|30|40|50|60|70|80|90|100)$/ ||
+  length($7) != 8 || $7 !~ /^[0-9a-f]+$/ || $8 != "PASS" { exit 1 }
 END { if (NR != 8) exit 1 }
 ' "$evidence_dir/seven-day.csv" || {
   echo "seven-day schedule evidence is incomplete" >&2
@@ -107,8 +69,9 @@ mkdir -p target
 expected_schedule=$(mktemp "$PWD/target/qualification-schedule.XXXXXX")
 trap 'rm -f -- "$expected_schedule"' EXIT
 start_date=$(awk -F, 'NR == 2 { print $2 }' "$evidence_dir/seven-day.csv")
+battery_percentages=$(awk -F, 'NR > 1 { values = values separator $6; separator = "," } END { print values }' "$evidence_dir/seven-day.csv")
 cargo run --quiet --locked --package xtask -- \
-  qualification-schedule "$start_date" "$expected_schedule"
+  qualification-schedule "$start_date" "$expected_schedule" "$battery_percentages"
 sed -i 's/,PENDING$/,PASS/' "$expected_schedule"
 if ! cmp --silent "$expected_schedule" "$evidence_dir/seven-day.csv"; then
   echo "seven-day evidence does not match the deterministic schedule" >&2

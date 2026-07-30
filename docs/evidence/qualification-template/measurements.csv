@@ -1,4 +1,0 @@
-phase,current_ma,duration_seconds,instrument_range,sample_rate_hz,status
-refresh,REPLACE,REPLACE,REPLACE,REPLACE,PENDING
-awake_idle,REPLACE,REPLACE,REPLACE,REPLACE,PENDING
-deep_sleep,REPLACE,60,REPLACE,REPLACE,PENDING

@@ -16,6 +16,9 @@ pub trait Rtc {
     /// Set the complete local datetime.
     async fn set_datetime(&mut self, datetime: LocalDateTime) -> Result<(), Self::Error>;
 
+    /// Invalidate the calendar and alarm state for storage mode.
+    async fn invalidate(&mut self) -> Result<(), Self::Error>;
+
     /// Configure and enable the fixed daily 07:00:00 alarm.
     async fn configure_daily_alarm(&mut self) -> Result<(), Self::Error>;
 
@@ -93,6 +96,13 @@ impl Rtc for FakeRtc {
             .map_err(|_| FakeRtcError::InvalidDateTime)?;
         self.now = datetime;
         self.oscillator_valid = true;
+        Ok(())
+    }
+
+    async fn invalidate(&mut self) -> Result<(), Self::Error> {
+        self.oscillator_valid = false;
+        self.alarm_pending = false;
+        self.alarm_configured = false;
         Ok(())
     }
 
@@ -253,5 +263,21 @@ mod tests {
         };
 
         assert!(FakeRtc::new(invalid).is_err());
+    }
+
+    #[test]
+    fn invalidate_marks_time_untrusted_and_clears_alarm_state() {
+        let mut rtc = FakeRtc::new(NOW).unwrap();
+        block_on_ready(rtc.configure_daily_alarm()).unwrap();
+        rtc.trigger_alarm();
+
+        block_on_ready(rtc.invalidate()).unwrap();
+
+        assert_eq!(
+            block_on_ready(rtc.read_datetime()),
+            Err(FakeRtcError::OscillatorStopped)
+        );
+        assert!(!rtc.alarm_configured());
+        assert!(!block_on_ready(rtc.alarm_pending()).unwrap());
     }
 }

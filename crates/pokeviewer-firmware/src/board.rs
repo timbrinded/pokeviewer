@@ -19,11 +19,14 @@ use crate::{
     es8311::suspend_audio_codec,
     panel::{PanelDiagnostic, refresh_panel_frame, run_panel_diagnostics},
     render_failure_screen,
-    sleep::{SleepResources, restore_panel_power, restore_power_latch},
+    sleep::{
+        RTC_INTERRUPT_WAKE_BIT, SleepResources, ext1_wake_status, restore_panel_power,
+        restore_power_latch,
+    },
     usb_protocol::UsbProtocolTransport,
 };
 
-const RTC_WAKE_DIAGNOSTIC_PASS_MAGIC: u32 = 0x4558_5430;
+const RTC_WAKE_DIAGNOSTIC_PASS_MAGIC: u32 = 0x4558_5431;
 const RTC_WAKE_DIAGNOSTIC_NO_ALARM_MAGIC: u32 = 0x4E4F_4146;
 
 #[esp_hal::ram(unstable(rtc_fast, persistent))]
@@ -103,6 +106,7 @@ pub fn run_failure_diagnostic(failure: FailureKind) -> ! {
     drop(audio_power);
     SleepResources {
         rtc_interrupt: peripherals.GPIO5,
+        power_button: peripherals.GPIO18,
         panel_power: panel_power_pin,
         power_latch: power_latch_pin,
         audio_power: audio_power_pin,
@@ -114,12 +118,13 @@ pub fn run_failure_diagnostic(failure: FailureKind) -> ! {
 /// Refresh one frame, validate RTC state, and enter active-low RTC deep sleep.
 pub fn run_sleep_diagnostic() -> ! {
     let cause = wakeup_cause();
+    let wake_status = ext1_wake_status();
     match RTC_WAKE_DIAGNOSTIC_RESULT.load(Ordering::Relaxed) {
         RTC_WAKE_DIAGNOSTIC_PASS_MAGIC => {
             let mut delay = Delay::new();
             loop {
                 esp_println::println!(
-                    "sleep diagnostic retained result: passed; wake_cause=Ext0; alarm_was_pending=true"
+                    "sleep diagnostic retained result: passed; wake_cause=Ext1; rtc_status_bit=true; alarm_was_pending=true"
                 );
                 delay.delay_ms(1_000);
             }
@@ -128,7 +133,7 @@ pub fn run_sleep_diagnostic() -> ! {
             let mut delay = Delay::new();
             loop {
                 esp_println::println!(
-                    "sleep diagnostic retained result: failed; wake_cause=Ext0; alarm_was_pending=false"
+                    "sleep diagnostic retained result: failed; wake_cause=Ext1; rtc_status_or_alarm_missing=true"
                 );
                 delay.delay_ms(1_000);
             }
@@ -136,17 +141,17 @@ pub fn run_sleep_diagnostic() -> ! {
         _ => {}
     }
     RTC_WAKE_DIAGNOSTIC_RESULT.store(0, Ordering::Relaxed);
-    let configure_alarm = !matches!(cause, SleepSource::Ext0);
+    let configure_alarm = !matches!(cause, SleepSource::Ext1);
     match run_board_diagnostics(PanelDiagnostic::SingleFrame, configure_alarm) {
         Ok((report, resources)) => {
-            if matches!(cause, SleepSource::Ext0) {
-                if !report.alarm_was_pending {
+            if matches!(cause, SleepSource::Ext1) {
+                if wake_status & RTC_INTERRUPT_WAKE_BIT == 0 || !report.alarm_was_pending {
                     RTC_WAKE_DIAGNOSTIC_RESULT
                         .store(RTC_WAKE_DIAGNOSTIC_NO_ALARM_MAGIC, Ordering::Relaxed);
                     let mut delay = Delay::new();
                     loop {
                         esp_println::println!(
-                            "sleep diagnostic failed: RTC wake had no asserted alarm flag"
+                            "sleep diagnostic failed: EXT1 RTC status or alarm flag was absent"
                         );
                         delay.delay_ms(1_000);
                     }
@@ -155,7 +160,7 @@ pub fn run_sleep_diagnostic() -> ! {
                 let mut delay = Delay::new();
                 loop {
                     esp_println::println!(
-                        "sleep diagnostic passed; wake_cause=Ext0; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending=true; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
+                        "sleep diagnostic passed; wake_cause=Ext1; rtc_status_bit=true; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending=true; panel_rail_off=true; audio_power_low=true; audio_codec_suspended=true",
                         report.rtc_datetime.year,
                         report.rtc_datetime.month,
                         report.rtc_datetime.day,
@@ -167,7 +172,7 @@ pub fn run_sleep_diagnostic() -> ! {
                 }
             }
             esp_println::println!(
-                "sleep diagnostic ready; wake_cause={cause:?}; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending={}; panel_rail_off=true; audio_rail_on=true; audio_codec_suspended=true",
+                "sleep diagnostic ready; wake_cause={cause:?}; RTC={:04}-{:02}-{:02} {:02}:{:02}:{:02}; alarm_was_pending={}; panel_rail_off=true; audio_power_low=true; audio_codec_suspended=true",
                 report.rtc_datetime.year,
                 report.rtc_datetime.month,
                 report.rtc_datetime.day,
@@ -224,6 +229,7 @@ pub fn run_timer_sleep_diagnostic() -> ! {
             drop(audio_power);
             SleepResources {
                 rtc_interrupt: peripherals.GPIO5,
+                power_button: peripherals.GPIO18,
                 panel_power: panel_power_pin,
                 power_latch: power_latch_pin,
                 audio_power: audio_power_pin,
@@ -376,7 +382,7 @@ pub fn run_usb_provisioning() -> ! {
     let mut transport = UsbProtocolTransport::new(peripherals.USB_DEVICE);
     let mut delay = Delay::new();
     loop {
-        if block_on(transport.poll(&mut rtc, 0)).is_err() {
+        if block_on(transport.poll(&mut rtc, 0, false)).is_err() {
             transport.reset_partial_frame();
         }
         delay.delay_ms(1);
@@ -433,6 +439,7 @@ fn run_board_diagnostics(
             report,
             SleepResources {
                 rtc_interrupt: peripherals.GPIO5,
+                power_button: peripherals.GPIO18,
                 panel_power: panel_power_pin,
                 power_latch: power_latch_pin,
                 audio_power: audio_power_pin,

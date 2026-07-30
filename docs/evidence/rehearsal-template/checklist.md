@@ -8,6 +8,10 @@
 - [ ] Bundled CLI version and handshake matched
 - [ ] RTC set and matching read-back observed
 - [ ] Correct daily card, deep sleep, and scheduled refresh observed
+- [ ] Short PWR press did not change the retained card
+- [ ] Three-second PWR hold opened the parent session
+- [ ] Storage mode cleared the RTC, dropped power, and disabled wake
+- [ ] Normal, recharge, and unavailable battery states passed
 - [ ] Invalid-RTC recovery completed from bundled documentation
 - [ ] Bounded panel-failure recovery completed safely
 - [ ] Transcript and photographs sanitized
