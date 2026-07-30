@@ -106,7 +106,7 @@ low-battery test, or USB-power detection.
 ## More Information
 
 - [Product contract](../product-contract.md)
-- [Board and power contract](../hardware/board-v2-pin-power-contract.md)
+- [Board and power contract](../hardware/v2-board-contract.md)
 - [Zephyr default LiPo OCV table](https://docs.zephyrproject.org/latest/doxygen/html/group__devicetree-battery.html)
 - [EEMB LP402535 specification](https://eemb.oss-accelerate.aliyuncs.com/uploads/20230315/7900a5b46fe77f926d269d99ff3a8dfa.pdf)
 - [ESP-IDF self-powered USB requirements](https://docs.espressif.com/projects/esp-idf/en/v5.5/esp32s3/api-reference/peripherals/usb_device.html#self-powered-device)
