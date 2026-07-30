@@ -192,6 +192,19 @@ The USB command interface stops after a successful time update.
 
 Connect the battery before you disconnect the USB cable.
 
+## Wake USB with the battery connected
+
+When the firmware is in deep sleep, `ls /dev/ttyACM*` finds no board. This is
+expected. Connect USB and start:
+
+```console
+"$CLI" info --device "$DEVICE" --wait-for-device
+```
+
+Press and hold `PWR` for at least three seconds, then release it. The command
+waits for the device, verifies the firmware, and opens a two-minute parent USB
+session.
+
 ## Change the time later
 
 You do not have to flash the firmware again. Keep the battery connected.
