@@ -5,10 +5,12 @@
 - [ ] v1.1.0 device qualification passed
 - [ ] Seven-day schedule evidence passed
 - [ ] Retained candidate workflow evidence passed
-- [ ] Exact-artifact clean-host rehearsal passed
+- [ ] Artifact-only isolated-environment rehearsal passed
 - [ ] Candidate archive and internal hashes verified
 - [ ] Exact V2/non-touch target and offset `0x0` confirmed
-- [ ] Battery-disconnected flash procedure passed
+- [ ] Firmware-source and generated-content equivalence confirmed
+- [ ] Exact on-device byte-identity limitation recorded
+- [ ] Physical failure-diagnostic limitation recorded
 - [ ] PWR parent session and RTC read-back passed
 - [ ] Storage mode and next-start setup screen passed
 - [ ] Battery normal, recharge, and unavailable display states passed

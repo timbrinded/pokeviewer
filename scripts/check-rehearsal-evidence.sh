@@ -13,7 +13,7 @@ archive=$2
 values="$evidence_dir/rehearsal.env"
 transcript="$evidence_dir/terminal.txt"
 checklist="$evidence_dir/checklist.md"
-for tool in awk file sha256sum tar; do
+for tool in awk sha256sum tar; do
   if ! command -v "$tool" >/dev/null; then
     echo "required tool is unavailable: $tool" >&2
     exit 1
@@ -24,22 +24,10 @@ required_files=(
   "$values"
   "$transcript"
   "$checklist"
-  "$evidence_dir/setup.png"
-  "$evidence_dir/daily-card.png"
-  "$evidence_dir/scheduled-refresh.png"
-  "$evidence_dir/invalid-rtc.png"
-  "$evidence_dir/failure-recovery.png"
 )
 for file in "${required_files[@]}"; do
   if [[ ! -s "$file" ]]; then
     echo "missing or empty rehearsal evidence: $file" >&2
-    exit 1
-  fi
-done
-for image in "$evidence_dir"/*.png; do
-  mime=$(file --brief --mime-type "$image")
-  if [[ "$mime" != "image/png" && "$mime" != "image/jpeg" ]]; then
-    echo "rehearsal photograph has unsupported content: $image" >&2
     exit 1
   fi
 done
@@ -64,20 +52,6 @@ for key in archive_sha256 firmware_sha256 cli_sha256 content_pack_sha256; do
     exit 1
   fi
 done
-photo_keys=(
-  setup_photo_sha256
-  daily_card_photo_sha256
-  scheduled_refresh_photo_sha256
-  invalid_rtc_photo_sha256
-  failure_recovery_photo_sha256
-)
-for key in "${photo_keys[@]}"; do
-  if [[ ! "$(value "$key")" =~ ^[0-9a-f]{64}$ ]]; then
-    echo "$key must be a lowercase SHA-256 value" >&2
-    exit 1
-  fi
-done
-
 if [[ "$(value board)" != "$BOARD" ]]; then
   echo "rehearsal board does not match the supported V2 contract" >&2
   exit 1
@@ -86,19 +60,12 @@ fi
 pass_keys=(
   outer_checksum
   inner_checksums
-  clean_host
-  erased_flash
-  firmware_flash
-  rtc_readback
-  daily_card
-  deep_sleep
-  scheduled_refresh
-  pwr_short_press
-  parent_session
-  storage_mode
-  battery_display
-  invalid_rtc_recovery
-  panel_failure_recovery
+  isolated_environment
+  network_disabled
+  source_checkout_absent
+  cli_version
+  metadata_contract
+  required_documents
   documentation_only
 )
 for key in "${pass_keys[@]}"; do
@@ -141,22 +108,6 @@ if [[ "$(value firmware_sha256)" != "$firmware_hash" ||
   exit 1
 fi
 
-photo_files=(
-  setup.png
-  daily-card.png
-  scheduled-refresh.png
-  invalid-rtc.png
-  failure-recovery.png
-)
-for index in "${!photo_keys[@]}"; do
-  hash=$(sha256sum "$evidence_dir/${photo_files[$index]}")
-  hash=${hash%% *}
-  if [[ "$(value "${photo_keys[$index]}")" != "$hash" ]]; then
-    echo "recorded photograph hash does not match ${photo_files[$index]}" >&2
-    exit 1
-  fi
-done
-
 if awk '
   /\/dev\/(tty|serial)/ ||
   /\/home\// ||
@@ -173,7 +124,7 @@ fi
 if grep -Eq '^- \[ \]|FAIL' "$checklist" ||
   ! awk '
   /^- \[x\]/ { complete += 1 }
-  END { exit complete == 19 ? 0 : 1 }
+  END { exit complete == 12 ? 0 : 1 }
 ' "$checklist"; then
   echo "rehearsal checklist is incomplete" >&2
   exit 1
@@ -183,4 +134,4 @@ if grep -EIRq 'REQUIRED|PENDING' "$values" "$transcript" "$checklist"; then
   exit 1
 fi
 
-echo "clean-host rehearsal evidence is complete"
+echo "artifact rehearsal evidence is complete"

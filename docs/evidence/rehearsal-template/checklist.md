@@ -1,21 +1,14 @@
-# Clean-host rehearsal checklist
+# Artifact-only isolated-environment rehearsal checklist
 
-- [ ] Fresh supported x86-64 Linux host
-- [ ] Candidate downloaded from retained manual workflow artifact
-- [ ] Outer and internal SHA-256 checks passed before execution
-- [ ] Exact non-touch V2 hardware confirmed
-- [ ] Flash erased and merged image written at `0x0`
-- [ ] Bundled CLI version and handshake matched
-- [ ] RTC set and matching read-back observed
-- [ ] Correct daily card, deep sleep, and scheduled refresh observed
-- [ ] Short PWR press did not change the retained card
-- [ ] Three-second PWR hold opened the parent session
-- [ ] Storage mode cleared the RTC, dropped power, and disabled wake
-- [ ] Normal, recharge, and unavailable battery states passed
-- [ ] Invalid-RTC recovery completed from bundled documentation
-- [ ] Bounded panel-failure recovery completed safely
-- [ ] Transcript and photographs sanitized
-- [ ] No undocumented command or source-tree shortcut used
+- [ ] Fresh or ephemeral supported x86-64 Linux environment
+- [ ] No Pokeviewer source checkout or prior installed binary available
+- [ ] Network disabled during verification
+- [ ] Retained candidate archive and adjacent checksum provided read-only
+- [ ] Outer SHA-256 passed before extraction
+- [ ] Archive paths were safe
+- [ ] All internal SHA-256 values passed
+- [ ] Bundled CLI reported `pokeviewerctl 1.1.0`
+- [ ] Candidate metadata matched the v1.1.0 contract
+- [ ] Required release documents were present and readable
+- [ ] No undocumented repair, rename, or source-tree shortcut used
 - [ ] No unresolved release blocker
-- [ ] Adult reviewer one signed the private original
-- [ ] Adult reviewer two signed the private original

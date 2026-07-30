@@ -16,13 +16,18 @@ Complete RTC power loss requires an adult to reconnect USB and set the local
 clock again. Read `USER-GUIDE.md`, `SAFETY.md`, and `TROUBLESHOOTING.md` before
 use.
 
-This candidate is not physically qualified or approved for publication until
-the v1.1.0 device qualification and exact-artifact clean-host rehearsal are
-complete. The firmware implements the ESP-IDF-aligned RTC and PWR wake path.
-Battery-only scheduled wake and PWR-gated parent setup passed on the target
-board. Storage mode, simultaneous alarm and PWR wake, recovery injection,
-the remaining repeated 07:00 transitions, and the seven-day run remain
-unqualified.
+This candidate is not approved for publication until the remaining v1.1.0
+device qualification is complete. The firmware implements the ESP-IDF-aligned
+RTC and PWR wake path. Battery-only scheduled wake and PWR-gated parent setup
+passed on source-equivalent firmware on the target board. Storage mode,
+simultaneous alarm and PWR wake, the remaining repeated 07:00 transitions, and
+the seven-day run remain unqualified.
+
+The retained archive must pass artifact-only verification in an isolated
+environment. The assembled device keeps its battery connected, so the exact
+candidate bytes are not flashed to, or read back from, the device. This release
+does not claim exact on-device byte identity. Physical RTC, panel, and alarm
+failure diagnostics are also not performed on the assembled device.
 
 Manual current measurement, battery-capacity measurement, and charger
 certification are outside this release scope. Battery runtime is not
