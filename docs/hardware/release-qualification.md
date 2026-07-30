@@ -9,7 +9,7 @@ ESP32-S3-ePaper-1.54-EN V2 board. Any failed threshold blocks release.
 
 ## Equipment and conditions
 
-- Linux host with the repository-pinned Rust, `espup`, and `espflash`;
+- Linux host with the bundled CLI and repository test tools;
 - direct data-capable USB cable;
 - the intended protected 3.7 V single-cell battery; and
 - camera with metadata removal available.
@@ -19,18 +19,26 @@ SHA-256, V2 marking, supply condition, and second-adult reviewer role. Never
 record a child's identity, home detail, MAC, USB serial, credentials, raw
 device path, or unsanitized log.
 
-## Clean-board setup
+## v1.1.0 qualification basis
 
-1. Disconnect the battery and USB. Inspect V2/non-touch markings and the panel
-   connector.
-2. Connect USB only. Confirm the host account has normal serial-group access;
-   do not make the node world-writable.
-3. Check out the exact commit with a clean worktree. Run the full local CI
-   matrix and record artifact hashes.
-4. Flash the release firmware with `cargo xtask firmware-flash`.
-5. Use `pokeviewerctl info --device DEVICE`, `get-rtc`, and `diagnostics`.
-   Sanitize outputs at capture time by replacing the device argument and
-   omitting enumeration output.
+The assembled device keeps its battery connected. Do not reflash it or change
+its wiring for this qualification.
+
+The installed device firmware came from commit
+`2603f9314689a9ad075c344f79cb1fe9f74e2b19`. Record the release-candidate
+commit in the release issue and candidate metadata. The firmware crates,
+ESP32-S3 pad-hold crate, and generated content must have no difference between
+the installed commit and the candidate commit.
+
+The release evidence has two independent parts:
+
+1. Qualify hardware behavior on the installed source-equivalent firmware.
+2. Qualify the retained release archive in an isolated environment.
+
+This procedure does not claim that the exact candidate bytes were flashed to,
+or read back from, the device. Use the bundled `pokeviewerctl` for remaining
+parent operations. Sanitize outputs at capture time by replacing the device
+argument and omitting enumeration output.
 
 ## Observable checks and thresholds
 
@@ -41,7 +49,7 @@ device path, or unsanitized log.
 | USB | info/get/set/diagnostics/storage | startup handshake within six seconds; first parent command within 12 seconds; later responses within two seconds; no wireless initialized |
 | content/render | host matrix plus generated PNGs and representative panel images | all 151 pass; normal, recharge, and unavailable battery states match expected goldens |
 | panel | full refresh and BUSY timing | completes once within 10 s; no clipping/ghosting; rail off afterward |
-| active boot | release firmware over USB | one refresh, then USB disappears on deep-sleep entry within 30 s and does not re-enumerate before the alarm |
+| active boot | source-equivalent firmware over USB | one refresh, then USB disappears on deep-sleep entry within 30 s and does not re-enumerate before the alarm |
 | rollover planning | host boundary tests plus synthetic near-07:00 diagnostic | exactly one boundary transition and a strictly future next alarm |
 | daily wake | build/flash with `cargo xtask sleep-diagnostic-build` and `cargo xtask sleep-diagnostic-flash`; set to 06:59:30 and observe | GPIO5 RTC-domain pull-up enabled with pull-down disabled; prior card before 07:00; one new card at/after 07:00; one RTC `Ext1` wake with GPIO5 status |
 | PWR tap | press and release PWR before three seconds | no panel refresh and no visible change |
@@ -49,20 +57,22 @@ device path, or unsanitized log.
 | simultaneous wake | hold PWR across a synthetic 07:00 alarm | daily refresh completes before parent-session evaluation |
 | storage mode | use the confirmed CLI command in a parent session | response succeeds; `SET TIME` appears; RTC oscillator-stop flag verifies; GPIO17 drops; no ESP wake source remains |
 | battery estimate | host curve/filter tests plus battery-only screen observations | 10 percent steps; low warning enters below 15 percent and clears at or above 20 percent; invalid sample shows `?%` |
-| reset/power loss | reset before/after 07:00; remove/restore power | correct display day and next alarm on every recovery |
-| failure codes | `failure-diagnostic-flash` for RTC/panel/alarm | expected code/retained frame; at most one attempt; USB remains absent in no-wake deep sleep |
+| reset/RTC loss | reset before/after 07:00; storage mode | correct display day and next alarm after RTC setup |
+| failure codes | host failure-policy tests and diagnostic builds | unique terminal policy and screen; every diagnostic image builds |
 
-For panel/alarm fault injection, use a reversible test fixture and current
-limit; never short a rail or connector. If an injection cannot be made safely,
-record `FAIL` and block release rather than waiving it.
+The v1.1.0 release accepts host failure-policy tests and deterministic
+diagnostic builds in place of on-device RTC, panel, and alarm failure
+diagnostics. Physical fault handling remains unverified. Do not disconnect the
+panel, disconnect the battery, or flash diagnostic firmware on the assembled
+qualification device.
 
 ## Repeats, long run, and teardown
 
-Run the pre-07:00 transition three times from a clean reset before the seven-day
-qualification. The long run requires seven consecutive retained cards and
-wake cycles, with no extra refresh. Afterward restore the correct local time,
-disconnect the battery before changing wiring, remove temporary fixtures, and
-confirm the repository and public evidence contain no private identifiers.
+Run the pre-07:00 transition three times from a clean reset before the
+seven-day qualification. The long run requires seven consecutive retained
+cards and wake cycles, with no extra refresh. Afterward restore the correct
+local time. Do not change the device wiring. Confirm that the repository and
+public evidence contain no private identifiers.
 
 Copy [the evidence template][template] into a new ignored working directory,
 replace every placeholder, and run:
@@ -115,10 +125,19 @@ A later PWR hold without an active framed command left the retained card
 unchanged. Private physical images were provided and fulfill these
 readable-display requirements. The images are not published.
 
+The candidate from commit
+`4ae630f419b1165c719108db3069ab880c6f5a64` passed an artifact-only rehearsal
+in an isolated Ubuntu 24.04 environment with no network or source checkout.
+Its outer checksum, internal checksums, CLI version, metadata contract, and
+required release documents passed. This documentation change invalidates that
+candidate. A replacement candidate from merged `main` must repeat the
+artifact rehearsal. Exact on-device byte identity is not part of this
+qualification.
+
 This is not complete v1.1.0 release qualification. Storage mode, simultaneous
-alarm and PWR wake, safe recovery injections, two more clean-reset synthetic
-07:00 transitions, the remaining seven-day run, and the exact-artifact
-clean-host rehearsal remain pending.
+alarm and PWR wake, two more clean-reset synthetic 07:00 transitions, the
+remaining seven-day run, restoration of the correct local time, and the
+replacement candidate rehearsal remain pending.
 
 [issue-23]: https://github.com/timbrinded/pokeviewer/issues/23
 [template]: ../evidence/qualification-template/

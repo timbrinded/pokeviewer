@@ -12,11 +12,6 @@ mkdir -p target
 work_dir=$(mktemp -d "$PWD/target/rehearsal-test.XXXXXX")
 trap 'rm -rf -- "$work_dir"' EXIT
 
-cp docs/evidence/setup-screen/invalid-rtc-setup.png "$work_dir/setup.png"
-cp "$work_dir/setup.png" "$work_dir/daily-card.png"
-cp "$work_dir/setup.png" "$work_dir/scheduled-refresh.png"
-cp "$work_dir/setup.png" "$work_dir/invalid-rtc.png"
-cp "$work_dir/setup.png" "$work_dir/failure-recovery.png"
 sed 's/^- \[ \]/- [x]/' \
   docs/evidence/rehearsal-template/checklist.md >"$work_dir/checklist.md"
 printf '%s\n' \
@@ -35,13 +30,6 @@ hash_from_sums() {
   local filename=$1
   awk -v filename="$filename" '$2 == filename { print $1 }' <<<"$sums"
 }
-file_hash() {
-  local filename=$1
-  local hash
-  hash=$(sha256sum "$work_dir/$filename")
-  printf '%s' "${hash%% *}"
-}
-
 archive_hash=$(sha256sum "$archive")
 archive_hash=${archive_hash%% *}
 cat >"$work_dir/rehearsal.env" <<EOF
@@ -50,27 +38,15 @@ archive_sha256=$archive_hash
 firmware_sha256=$(hash_from_sums pokeviewer-v1.1.0-esp32s3-v2.bin)
 cli_sha256=$(hash_from_sums pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu)
 content_pack_sha256=$(hash_from_sums pokeviewer-v1.pack)
-setup_photo_sha256=$(file_hash setup.png)
-daily_card_photo_sha256=$(file_hash daily-card.png)
-scheduled_refresh_photo_sha256=$(file_hash scheduled-refresh.png)
-invalid_rtc_photo_sha256=$(file_hash invalid-rtc.png)
-failure_recovery_photo_sha256=$(file_hash failure-recovery.png)
 board=waveshare-esp32-s3-epaper-1.54-en-v2-non-touch
 outer_checksum=PASS
 inner_checksums=PASS
-clean_host=PASS
-erased_flash=PASS
-firmware_flash=PASS
-rtc_readback=PASS
-daily_card=PASS
-deep_sleep=PASS
-scheduled_refresh=PASS
-pwr_short_press=PASS
-parent_session=PASS
-storage_mode=PASS
-battery_display=PASS
-invalid_rtc_recovery=PASS
-panel_failure_recovery=PASS
+isolated_environment=PASS
+network_disabled=PASS
+source_checkout_absent=PASS
+cli_version=PASS
+metadata_contract=PASS
+required_documents=PASS
 documentation_only=PASS
 unresolved_blockers=NONE
 EOF
@@ -85,10 +61,12 @@ expect_failure() {
   fi
 }
 
-sed -i 's/deep_sleep=PASS/deep_sleep=FAIL/' "$work_dir/rehearsal.env"
-expect_failure 'failed deep-sleep result'
+sed -i 's/metadata_contract=PASS/metadata_contract=FAIL/' \
+  "$work_dir/rehearsal.env"
+expect_failure 'failed metadata result'
 
-sed -i 's/deep_sleep=FAIL/deep_sleep=PASS/' "$work_dir/rehearsal.env"
+sed -i 's/metadata_contract=FAIL/metadata_contract=PASS/' \
+  "$work_dir/rehearsal.env"
 printf '%s\n' 'device=/dev/ttyACM0' >>"$work_dir/terminal.txt"
 expect_failure 'private serial path'
 
@@ -98,5 +76,7 @@ expect_failure 'incomplete checklist'
 
 sed 's/^- \[ \]/- [x]/' \
   docs/evidence/rehearsal-template/checklist.md >"$work_dir/checklist.md"
-printf 'tampered' >>"$work_dir/setup.png"
-expect_failure 'changed photograph'
+sed -i \
+  's/^cli_sha256=.*/cli_sha256=0000000000000000000000000000000000000000000000000000000000000000/' \
+  "$work_dir/rehearsal.env"
+expect_failure 'incorrect CLI hash'

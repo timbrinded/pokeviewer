@@ -1,2 +1,1 @@
-Sanitized transcript required. Replace every device path with DEVICE.
-
+Sanitized transcript required. Do not include a host path or device identifier.

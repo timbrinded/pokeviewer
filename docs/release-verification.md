@@ -34,9 +34,12 @@ mirror, or failed workflow.
 
 The release must remain a draft and must not be described as qualified while
 the [device qualification](hardware/release-qualification.md) is pending. The
-[clean-host rehearsal](hardware/clean-host-rehearsal.md) must validate the
-final artifact names and commands before publication. Physical images remain
-private. Public evidence states only that reviewed images were provided.
+[isolated-environment rehearsal](hardware/clean-host-rehearsal.md) must
+validate the final artifact, metadata, CLI, and documents before publication.
+For v1.1.0, device behavior is qualified on source-equivalent installed
+firmware. Exact candidate byte identity on the device is not claimed. Physical
+images remain private. Public evidence states only that reviewed images were
+provided.
 
 Pokémon media is excluded from the source MIT licence; read
 [Third-party notices](../THIRD_PARTY_NOTICES.md).
