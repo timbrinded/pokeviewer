@@ -8,5 +8,5 @@
 *.swo
 .DS_Store
 
-# Local hardware and qualification evidence is private until sanitized.
+# Local hardware evidence is private until sanitized.
 /evidence/private/

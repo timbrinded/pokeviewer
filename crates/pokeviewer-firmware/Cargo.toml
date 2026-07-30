@@ -4,6 +4,7 @@ description = "Board-specific no_std firmware for Pokeviewer"
 authors.workspace = true
 edition.workspace = true
 license.workspace = true
+publish = false
 repository.workspace = true
 rust-version.workspace = true
 version.workspace = true
@@ -12,7 +13,7 @@ version.workspace = true
 embedded-hal = { version = "=1.0.0", default-features = false }
 embedded-hal-async = { version = "=1.0.0", default-features = false }
 pcf85063a = { version = "=0.1.1", default-features = false }
-pokeviewer-core = { version = "=1.1.0", path = "../pokeviewer-core" }
+pokeviewer-core = { path = "../pokeviewer-core" }
 time = { version = "=0.3.54", default-features = false }
 
 [target.'cfg(target_arch = "xtensa")'.dependencies]
@@ -24,7 +25,7 @@ esp-backtrace = { version = "=0.19.0", git = "https://github.com/esp-rs/esp-hal"
 esp-bootloader-esp-idf = { version = "=0.5.0", git = "https://github.com/esp-rs/esp-hal", rev = "434755e0447fc1a4ba30fd84da3cf746ec082e00", default-features = false, features = ["esp32s3"] }
 esp-hal = { version = "=1.1.0", git = "https://github.com/esp-rs/esp-hal", rev = "434755e0447fc1a4ba30fd84da3cf746ec082e00", default-features = false, features = ["esp32s3", "exception-handler", "float-save-restore", "rt", "unstable"] }
 esp-println = { version = "=0.17.0", git = "https://github.com/esp-rs/esp-hal", rev = "434755e0447fc1a4ba30fd84da3cf746ec082e00", default-features = false, features = ["esp32s3", "jtag-serial"] }
-pokeviewer-esp32s3-pad-hold = { version = "=1.1.0", path = "../pokeviewer-esp32s3-pad-hold" }
+pokeviewer-esp32s3-pad-hold = { path = "../pokeviewer-esp32s3-pad-hold" }
 portable-atomic = { version = "=1.14.0", default-features = false }
 
 [[bin]]

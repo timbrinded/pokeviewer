@@ -79,7 +79,7 @@ rustup run esp-1.95.0.0 llvm-size -A \
   target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
 ```
 
-Record both `llvm-size` outputs against the exact release-candidate commit;
+Record both `llvm-size` outputs against the exact release commit;
 linked sizes change when the hardware boundary changes and must not be copied
 from an earlier build. The fixed application framebuffer is 5,000 bytes. A
 linker-reported stack region is remaining address-space allocation, not a

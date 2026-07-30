@@ -120,8 +120,8 @@ The v1.1.0 physical handshake, set/read-back, and PWR-gated parent-session
 workflow passed on 2026-07-30. A PWR hold without an active framed CLI request
 left the retained card unchanged. Private physical images were provided and
 fulfill the readable-display requirement. The images are not published.
-Storage-mode qualification remains pending. Public evidence must be sanitized
-under the public evidence policy. CI builds the CLI and USB provisioning
-firmware and checks the release-firmware size budget.
+Public evidence must be sanitized under the public evidence policy. CI builds
+the CLI and USB provisioning firmware and checks the release-firmware size
+budget.
 
 [issue-17]: https://github.com/timbrinded/pokeviewer/issues/17

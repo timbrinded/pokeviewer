@@ -6,7 +6,6 @@ use std::process::{Command, ExitCode};
 
 mod content;
 mod golden;
-mod qualification;
 mod render;
 
 const ESP_TOOLCHAIN: &str = "esp-1.95.0.0";
@@ -85,7 +84,6 @@ fn main() -> ExitCode {
             }
             task_result(render::recovery_screens_command(output_dir.as_deref()))
         }
-        Some("qualification-schedule") => qualification_schedule_command(&mut arguments),
         Some("golden-update") => {
             if arguments.next().is_some() {
                 return fail("golden-update accepts no arguments");
@@ -111,24 +109,6 @@ fn main() -> ExitCode {
             ExitCode::from(2)
         }
     }
-}
-
-fn qualification_schedule_command(arguments: &mut impl Iterator<Item = String>) -> ExitCode {
-    let Some(start) = arguments.next() else {
-        return fail("qualification-schedule requires START_DATE");
-    };
-    let output = arguments.next();
-    let battery_percentages = arguments.next();
-    if arguments.next().is_some() {
-        return fail(
-            "qualification-schedule accepts START_DATE, optional OUTPUT, and optional BATTERY_PERCENT_CSV",
-        );
-    }
-    task_result(qualification::schedule_command(
-        &start,
-        output.as_deref(),
-        battery_percentages.as_deref(),
-    ))
 }
 
 fn run_firmware_diagnostic(command: &str) -> ExitCode {
@@ -264,8 +244,6 @@ COMMANDS:
                       Render the adult invalid-RTC recovery screen
     render-recovery-screens [OUTPUT_DIR]
                       Render every classified adult recovery screen
-    qualification-schedule START_DATE [OUTPUT] [BATTERY_PERCENT_CSV]
-                      Write seven expected daily transitions and frame hashes
     golden-update     Explicitly regenerate reviewed raw and PNG goldens
     golden-check [DIFF_DIR]
                       Compare exact frames and emit failure artifacts

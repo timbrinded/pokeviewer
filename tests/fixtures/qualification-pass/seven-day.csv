@@ -1,8 +1,0 @@
-day,date,weekday,dex_id,name,battery_percent,framebuffer_crc32,status
-1,2026-07-28,Tuesday,85,Dodrio,50,0a9186b1,PASS
-2,2026-07-29,Wednesday,7,Squirtle,50,968ea858,PASS
-3,2026-07-30,Thursday,80,Slowbro,50,4d1c9ff3,PASS
-4,2026-07-31,Friday,2,Ivysaur,50,a43ec1c5,PASS
-5,2026-08-01,Saturday,75,Graveler,50,88479aa5,PASS
-6,2026-08-02,Sunday,148,Dragonair,50,364bf5dd,PASS
-7,2026-08-03,Monday,70,Weepinbell,50,6e4416cc,PASS
