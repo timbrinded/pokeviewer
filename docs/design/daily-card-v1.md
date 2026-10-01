@@ -8,7 +8,8 @@ The selected card is a quiet, full-screen character card with exactly the four
 product-contract essentials. From top to bottom:
 
 1. the display-day weekday, centered at 2× font scale;
-2. the Pokémon Yellow front sprite, centered and rendered at 2× native pixels;
+2. the Pokémon Crystal front sprite, centered and rendered at 2× native pixels,
+   with its four shades drawn as [dot patterns](../development/rendering.md#sprite-shading);
 3. the English Pokémon name, centered at 3× font scale; and
 4. the canonical type or types, centered at 2× font scale.
 
@@ -34,7 +35,7 @@ All coordinates are zero-based and the end value is exclusive:
 
 The bands do not overlap, and all content stays inside the 200 × 200 panel.
 `BAT ?` shares rows with the weekday but sits to its right. The renderer tests
-derive these bounds from the production constants and check all 151 committed
+derive these bounds from the production constants and check all 251 committed
 records, so a name, font, scale, or content change cannot silently truncate a
 label.
 
@@ -44,10 +45,10 @@ The [four representative actual-pixel cards][baseline] cover:
 
 - Pikachu: short name and one long type;
 - Charizard: dual types and a large sprite;
-- Farfetch’d: the widest v1 name and punctuation; and
+- Farfetch’d: the widest name and punctuation; and
 - Nidoran♀: a smaller source sprite and non-ASCII symbol.
 
-The [151-card contact sheet][all-cards] shows every card in Pokédex order with
+The [251-card contact sheet][all-cards] shows every card in Pokédex order with
 eight-pixel gutters, for checking truncation, overlap, and sprite conversion at
 a glance. The [actual-size review page][print-review] prints the
 representative cards at the panel's 1.54-inch size at 100% scale.

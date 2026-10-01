@@ -19,14 +19,31 @@ It validates the complete input before clearing or drawing. Empty, oversized,
 unsupported, duplicate-type, or over-wide input returns a bounded
 `RenderError` and leaves the prior framebuffer unchanged.
 
-The fixed font covers the complete committed v1 name vocabulary, including the
-curly apostrophe and the female and male signs. An exhaustive host test renders
-all 151 committed records.
+The fixed font covers the complete committed name vocabulary, including the
+curly apostrophe, the female and male signs, the hyphen, and digits. An
+exhaustive host test renders all 251 committed records.
 
 The renderer does not derive battery state from voltage. `Normal` shows no
 battery text or icon, `Recharge` shows the lightning icon and `CHARGE!` at the
 bottom, and `Unavailable` shows `BAT ?` in the top-right corner. The card
 contains no battery percentage.
+
+## Sprite shading
+
+Pack sprites hold four shades, from `0` white to `3` black. The renderer draws
+each sprite pixel as a 2 × 2 panel cell and sets 0, 1, 2, or 4 of its pixels
+black for shades 0–3: white, 25 %, 50 %, and black. A black sprite pixel
+whose eight neighbours are also black gets 3 of 4 (75 %), so large black
+areas keep their form while outlines, pupils, and black detail up to two
+pixels thick stay solid. A fixed 2 × 2 ordered-dither threshold, `[[0, 2],
+[3, 1]]`, chooses which pixels, so 25 % is one dot per cell, 50 % is a
+checkerboard, and adjacent cells tile without seams.
+
+Every panel pixel is still black or white, and the panel uses its normal full
+refresh. `SHADE_INK` and `SOLID_INTERIOR_INK` in `render.rs` are the reviewed
+tone table; changing them is a visual change that needs `golden-update`. The
+[tone-mapping evidence](../evidence/crystal-sprites/README.md) compares the
+options.
 
 ## Memory report
 
@@ -34,7 +51,7 @@ contains no battery percentage.
 | --- | ---: | --- |
 | Panel framebuffer | 5,000 bytes RAM | fixed value |
 | Font bitmaps | 231 bytes read-only program data | fixed value |
-| Current sprite | borrowed 392-byte pack slice | none |
+| Current sprite | borrowed 784-byte pack slice | none |
 | `DailyCard` strings and sprite | borrowed views | none |
 | Renderer work buffer | 0 bytes | none |
 | Heap | 0 bytes | none |

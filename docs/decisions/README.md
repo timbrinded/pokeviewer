@@ -17,3 +17,4 @@ outcome; a later decision supersedes them and links in both directions.
 | [0009](0009-use-a-wake-gated-low-voltage-battery-state.md) | partly superseded by ADR-0011 | Use a wake-gated low-voltage battery state |
 | [0010](0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md) | accepted | Use BOOT as an adult restart and GPIO3 as a status light |
 | [0011](0011-recheck-the-battery-every-three-hours.md) | accepted | Re-check the battery every three hours and after a BOOT restart |
+| [0012](0012-show-generations-one-and-two-with-shaded-crystal-sprites.md) | proposed | Show Generations I and II with shaded Crystal sprites |

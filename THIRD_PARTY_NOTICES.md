@@ -9,9 +9,9 @@ affiliated with, endorsed by, or sponsored by Nintendo, Creatures Inc.,
 GAME FREAK inc., or The Pokémon Company International.
 
 The committed content pack derives sprites from the
-[Pokémon Yellow sprite set][sprites] at PokeAPI/sprites revision
+[Pokémon Crystal sprite set][sprites] at PokeAPI/sprites revision
 `8dfa3d97e953caaafaafd4963eff7621811af08e`. Those files are not covered by
-Pokeviewer's MIT license. Converting a sprite to a monochrome firmware format
+Pokeviewer's MIT license. Converting a sprite to a shaded firmware format
 does not remove the underlying third-party rights.
 
 The Pokémon Company's published legal information says its intellectual
@@ -36,4 +36,4 @@ apply to:
 - any other third-party material carrying its own terms.
 
 [pokeapi]: https://pokeapi.co/docs/v2
-[sprites]: https://github.com/PokeAPI/sprites/tree/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-i/yellow
+[sprites]: https://github.com/PokeAPI/sprites/tree/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal

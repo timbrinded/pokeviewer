@@ -50,7 +50,7 @@ archive as a separate asset:
 
 - `pokeviewer-vX.Y.Z-esp32s3-v2.bin`, the merged image for offset `0x0`;
 - `pokeviewerctl-vX.Y.Z-x86_64-unknown-linux-gnu`;
-- `pokeviewer-v1.pack` and `content-manifest.json`;
+- `pokeviewer-v2.pack` and `content-manifest.json`;
 - `BUILD-METADATA.txt`, `MANIFEST.txt`, and `SHA256SUMS`;
 - `README.md` (with links rewritten to the shipped files or the tagged
   source), `RELEASE-NOTES.md`, `SAFETY.md`, and `TROUBLESHOOTING.md`; and
