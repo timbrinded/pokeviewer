@@ -11,10 +11,10 @@ The PBM and PNG for each record are two deterministic conversions of the same
 
 | ID | Card | Frame CRC-32 | PBM SHA-256 | PNG SHA-256 |
 | ---: | --- | --- | --- | --- |
-| 6 | Charizard, Fire/Flying | `944c4e30` | `8e0c914af8a4cfd280c940932f3d485fb12ec69ce05b138eb15b733b26fe9bfe` | `1ccb59254f69cbcf75fe00277c36f3bdf42c979f743315e154b50cd412ae15ae` |
-| 25 | Pikachu, Electric | `fbdcb388` | `691f39ec7e3c9aa2a247e2907ac12e6e8921eadabe0aae8cfcbf4970094a5e59` | `240c86fbfb13649edb7008e21af9b6836e381cec4cdd8d753981cd3df4e48259` |
-| 29 | Nidoran♀, Poison | `148de2c2` | `131523296c8f48855cfc83e144ce45bfbc976df0a495646b0ad586f6c56b182b` | `4ac870ff3b33016d2fac0da6fa1c1d84a5e79c368a5db3c954b0d59cdbc58679` |
-| 83 | Farfetch’d, Normal/Flying | `86be7236` | `690872dc55e7650381577910e4fc53fbdbedd7a4a768ba12badf22d20d412b6a` | `67859db2088411bfc3da6d93b429a41e49ae439ca52dbd0a571fbfb0911c643f` |
+| 6 | Charizard, Fire/Flying | `89b5477c` | `4dd5f814a063b7b5cb0dabb9001d779a592971f3163643e0d9a0942523a526cb` | `a710f690be2f7dc6c4eb64f85a2e3f6e90569a005c3ea9339b7f0f4313190d31` |
+| 25 | Pikachu, Electric | `735807f7` | `63962f4df08fcb429dc6b159746d4f9963224fe08fc39f55f50a8bc420085a26` | `df5cc0f329c9d9765d3d38213943fadfe43e6260a2f3b31e6391e90635c43495` |
+| 29 | Nidoran♀, Poison | `c42b1dbd` | `0458787db8a8370d6d28d9baad475ba33e8ffc924b75dc26665d12dbc008cfe0` | `c0684acc187564215b230ced9e143c3a44f8fe89bbc878cffe7913c3188c390c` |
+| 83 | Farfetch’d, Normal/Flying | `b1e091dd` | `133bdf636120958713c8679cbed5c8799c93919cd4faf3d04d630d4c0cb18022` | `bcaefa2e1e51241ba415ac03c350eaf8988a051bc449a0f4ae0b3bd2195005f3` |
 
 All PNG files are 200 × 200, one-bit grayscale, non-interlaced images. The
 files contain no child, device, host-path, or USB-identifying data.

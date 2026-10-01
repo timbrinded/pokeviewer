@@ -7,6 +7,8 @@ pub use pokeviewer_core::{
 };
 
 mod application;
+#[cfg(any(target_arch = "xtensa", test))]
+mod battery;
 #[cfg(target_arch = "xtensa")]
 mod battery_sensor;
 #[cfg(target_arch = "xtensa")]

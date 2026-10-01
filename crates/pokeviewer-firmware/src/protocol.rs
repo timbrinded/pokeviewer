@@ -1,8 +1,8 @@
 //! Bounded command handling independent of the USB transport.
 
 use pokeviewer_core::{
-    CAPABILITIES, Command, FIRMWARE_VERSION, FrameError, FrameKind, ProtocolFrame, Status,
-    decode_datetime, encode_datetime,
+    BatteryReading, CAPABILITIES, Command, FIRMWARE_VERSION, FrameError, FrameKind, ProtocolFrame,
+    Status, decode_datetime, encode_battery_reading, encode_datetime,
 };
 
 use crate::Rtc;
@@ -39,6 +39,7 @@ pub async fn handle_protocol_request<R>(
     rtc: &mut R,
     request: ProtocolFrame,
     diagnostic_flags: u16,
+    battery: BatteryReading,
     allow_storage: bool,
 ) -> Result<ProtocolOutcome, FrameError>
 where
@@ -111,6 +112,14 @@ where
                 )
             }
         }
+        Command::ReadBattery => {
+            let reading = encode_battery_reading(battery);
+            outcome(
+                request,
+                &[Status::Ok as u8, reading[0], reading[1], reading[2]],
+                ProtocolAction::None,
+            )
+        }
     }
 }
 
@@ -156,7 +165,8 @@ mod tests {
     };
 
     use pokeviewer_core::{
-        Command, FrameKind, LocalDateTime, ProtocolFrame, Status, decode_datetime, encode_datetime,
+        BatteryReading, BatteryState, Command, FrameKind, LocalDateTime, ProtocolFrame, Status,
+        decode_datetime, encode_datetime,
     };
 
     use super::{ProtocolAction, handle_protocol_request};
@@ -187,7 +197,14 @@ mod tests {
         invalid[2] = 13;
         let request = ProtocolFrame::new(1, FrameKind::Request, Command::SetRtc, &invalid).unwrap();
 
-        let outcome = block_on_ready(handle_protocol_request(&mut rtc, request, 0, false)).unwrap();
+        let outcome = block_on_ready(handle_protocol_request(
+            &mut rtc,
+            request,
+            0,
+            BatteryReading::UNAVAILABLE,
+            false,
+        ))
+        .unwrap();
         let response = outcome.response;
         assert_eq!(response.payload(), &[Status::InvalidRequest as u8]);
         assert_eq!(outcome.action, ProtocolAction::None);
@@ -206,7 +223,14 @@ mod tests {
         )
         .unwrap();
 
-        let outcome = block_on_ready(handle_protocol_request(&mut rtc, request, 0, false)).unwrap();
+        let outcome = block_on_ready(handle_protocol_request(
+            &mut rtc,
+            request,
+            0,
+            BatteryReading::UNAVAILABLE,
+            false,
+        ))
+        .unwrap();
         let response = outcome.response;
         assert_eq!(response.request_id, 42);
         assert_eq!(response.kind, FrameKind::Response);
@@ -220,9 +244,15 @@ mod tests {
         let mut rtc = FakeRtc::new(NOW).unwrap();
         let request = ProtocolFrame::new(3, FrameKind::Request, Command::Diagnostics, &[]).unwrap();
 
-        let response = block_on_ready(handle_protocol_request(&mut rtc, request, 0x1234, false))
-            .unwrap()
-            .response;
+        let response = block_on_ready(handle_protocol_request(
+            &mut rtc,
+            request,
+            0x1234,
+            BatteryReading::UNAVAILABLE,
+            false,
+        ))
+        .unwrap()
+        .response;
         assert_eq!(response.payload(), &[Status::Ok as u8, 0x34, 0x12]);
     }
 
@@ -232,12 +262,44 @@ mod tests {
         let request =
             ProtocolFrame::new(4, FrameKind::Request, Command::EnterStorage, &[]).unwrap();
 
-        let denied = block_on_ready(handle_protocol_request(&mut rtc, request, 0, false)).unwrap();
+        let denied = block_on_ready(handle_protocol_request(
+            &mut rtc,
+            request,
+            0,
+            BatteryReading::UNAVAILABLE,
+            false,
+        ))
+        .unwrap();
         assert_eq!(denied.response.payload(), &[Status::InvalidRequest as u8]);
         assert_eq!(denied.action, ProtocolAction::None);
 
-        let allowed = block_on_ready(handle_protocol_request(&mut rtc, request, 0, true)).unwrap();
+        let allowed = block_on_ready(handle_protocol_request(
+            &mut rtc,
+            request,
+            0,
+            BatteryReading::UNAVAILABLE,
+            true,
+        ))
+        .unwrap();
         assert_eq!(allowed.response.payload(), &[Status::Ok as u8]);
         assert_eq!(allowed.action, ProtocolAction::EnterStorage);
+    }
+
+    #[test]
+    fn battery_response_contains_trusted_state_and_little_endian_millivolts() {
+        let mut rtc = FakeRtc::new(NOW).unwrap();
+        let request = ProtocolFrame::new(5, FrameKind::Request, Command::ReadBattery, &[]).unwrap();
+        let battery = BatteryReading::new(BatteryState::Recharge, 3_700).unwrap();
+
+        let response = block_on_ready(handle_protocol_request(
+            &mut rtc, request, 0, battery, false,
+        ))
+        .unwrap()
+        .response;
+
+        assert_eq!(
+            response.payload(),
+            &[Status::Ok as u8, BatteryState::Recharge as u8, 0x74, 0x0e,]
+        );
     }
 }

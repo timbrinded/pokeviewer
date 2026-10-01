@@ -13,7 +13,8 @@ writer inverts those bytes because raw PBM uses `1` for black; the one-bit PNG
 writer uses the panel bytes directly.
 
 `render_daily_card` accepts only a typed `DailyCard`: one `Weekday`, a borrowed
-English name, one or two `PokemonType` values, and a borrowed fixed-size sprite.
+English name, one or two `PokemonType` values, a borrowed fixed-size sprite,
+and one battery state: `Normal`, `Recharge`, or `Unavailable`.
 It validates the complete input before clearing or drawing. Empty, oversized,
 unsupported, duplicate-type, or over-wide input returns a bounded
 `RenderError` and leaves the prior framebuffer unchanged.
@@ -21,6 +22,11 @@ unsupported, duplicate-type, or over-wide input returns a bounded
 The fixed font covers the complete committed v1 name vocabulary, including the
 curly apostrophe and the female and male signs. An exhaustive host test renders
 all 151 committed records.
+
+The renderer does not derive battery state from voltage. `Normal` shows no
+battery text or icon, `Recharge` shows the lightning warning and `CHARGE!`,
+and `Unavailable` shows `BAT ?`. The card contains no battery percentage or
+precise capacity claim.
 
 ## Memory report
 

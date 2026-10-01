@@ -1,7 +1,7 @@
 # Wake, parent-session, and 07:00 state machine
 
-- Status: v1.1.0 implementation complete; device qualification pending
-- Last reviewed: 2026-07-29
+- Status: v1.2.0 implementation complete; battery device confirmation pending
+- Last reviewed: 2026-08-10
 
 Release firmware uses one ESP32-S3 EXT1 `ANY_LOW` wake source:
 
@@ -17,10 +17,11 @@ wake intent from reset history or USB enumeration.
 ```text
 reset or EXT1 wake
   -> restore GPIO5 and GPIO18 from RTC control
-  -> sample the GPIO4 battery divider
   -> hold the shared-bus audio rail low and suspend the ES8311
   -> validate the RTC and wake evidence
   -> derive the current display day and the next strict 07:00
+  -> sample the GPIO4 battery divider only after a validated RTC alarm wake
+  -> commit the resulting battery snapshot
   -> refresh exactly once when reset or a valid RTC alarm requires it
   -> panel sleep and panel rail off
   -> configure the fixed PCF85063 07:00 alarm
@@ -41,6 +42,13 @@ weekday. At exactly 07:00, the current date is selected. `next_rollover`
 calculates the first 07:00 strictly after the current reading. This includes
 month, year, leap-day, and 151-day schedule boundaries.
 
+The retained scheduled battery snapshot has one of three states: `Normal`,
+`Recharge`, or `Unavailable`. A plausible value below 3,750 mV enters
+`Recharge`; a later plausible value at or above 3,850 mV clears it. If a
+scheduled observation is invalid while the retained state is `Recharge`, the
+complete prior snapshot remains. Otherwise, the scheduled observation commits
+`Unavailable` with `0` mV. Reset and invalid-RTC paths do not sample or commit.
+
 ## PWR path
 
 A PWR tap wakes the ESP but does not refresh the panel. Firmware waits for the
@@ -53,12 +61,17 @@ frame does not start the session.
 The parent session first shows `SET TIME`. It can:
 
 - read or set the RTC;
+- read the retained scheduled battery snapshot;
 - read diagnostics; or
 - accept the confirmed storage command.
 
 A successful RTC write is read back before firmware restarts, restores the
 daily card, and returns to normal sleep. A session timeout also restores the
 daily card when the RTC remains valid.
+
+The PWR path does not take or commit a battery observation. The USB battery
+command returns the retained scheduled state and millivolts, so USB power
+cannot replace the value used by the retained card.
 
 If GPIO5 and GPIO18 assert together, the daily refresh completes first.
 Firmware then evaluates the continued PWR hold.
@@ -93,8 +106,9 @@ The retained e-paper card or recovery screen remains visible.
 ## Test boundary
 
 Host tests cover schedule boundaries, wake-source classification, RTC
-read-back, storage authorization, battery filtering and hysteresis, all 151
-cards, and reviewed framebuffer goldens.
+read-back, storage authorization, battery filtering, hysteresis, commit
+gating, invalid-sample retention, all 151 cards, and reviewed three-state
+framebuffer goldens.
 
 The V2 device qualification must prove:
 
@@ -106,8 +120,14 @@ The V2 device qualification must prove:
 - storage-mode RTC invalidation, GPIO17 drop, and no-wake state; and
 - a later PWR start into invalid-RTC setup.
 
-Manual current measurement and discharge testing are outside v1.1.0. See
+Battery confirmation also requires one DMM comparison of the retained USB
+millivolts and one bounded check that contrasts an RTC alarm commit with a PWR
+parent session.
+
+Manual current measurement and discharge testing remain outside scope. See
 [ADR 0004](../decisions/0004-use-esp-idf-aligned-rtc-deep-sleep.md),
 [ADR 0005](../decisions/0005-use-no-wake-deep-sleep-for-terminal-failures.md),
 and
 [ADR 0006](../decisions/0006-use-pwr-gated-parent-setup-and-storage-mode.md).
+This battery contract is recorded in
+[ADR 0009](../decisions/0009-use-a-wake-gated-low-voltage-battery-state.md).

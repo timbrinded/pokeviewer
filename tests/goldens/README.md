@@ -5,9 +5,9 @@ Their adjacent one-bit PNGs are deterministic review projections. The manifest
 ties each case to its Pokédex ID, weekday, English name, file paths, CRC-32, and
 SHA-256 hashes.
 
-The seven cases cover every weekday plus the widest name, punctuation and
-symbol glyphs, single and dual types, small sprites, and 56 × 56 source-sprite
-boundaries.
+Nine cases cover every weekday plus the widest name, punctuation and symbol
+glyphs, single and dual types, small sprites, 56 × 56 source-sprite boundaries,
+and the recharge and unavailable battery states.
 
 Check the committed baselines without network or hardware:
 

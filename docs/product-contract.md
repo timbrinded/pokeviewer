@@ -2,7 +2,7 @@
 
 - Status: accepted
 - Decision issue: [P01 / #2][issue-2]
-- Last reviewed: 2026-07-29
+- Last reviewed: 2026-08-10
 
 This document is the authoritative product boundary. Any change to a locked
 decision requires an accepted decision record before implementation.
@@ -43,9 +43,10 @@ Every normal card contains four primary information groups:
 3. English Pokémon name; and
 4. current canonical type or types.
 
-The card also contains non-interactive battery status. It shows an approximate
-percentage in 10% steps. Below the recharge threshold, it also shows a custom
-lightning icon and `CHARGE!`. An unavailable estimate shows `?%`.
+The card also contains one non-interactive battery state: `Normal`, `Recharge`,
+or `Unavailable`. `Normal` shows no battery text or icon. `Recharge` shows a
+custom lightning icon and `CHARGE!`. `Unavailable` shows `BAT ?`. The card
+does not show a percentage.
 
 The content set is National Pokédex IDs 1 through 151. A fixed, versioned,
 non-repeating permutation selects one entry per display day and repeats after
@@ -71,11 +72,10 @@ V1 has no:
 - guaranteed battery runtime independent of the selected battery's measured
   capacity and condition.
 
-Battery percentage is a generic LiPo voltage estimate. It is not a fuel gauge
-and does not control shutdown, charging, or safety. The board has no dedicated
-USB VBUS-sense input. Firmware cannot distinguish a full battery from USB
-power with no battery. The USB-only development state can therefore show
-`100%`.
+Battery state comes from a bounded voltage sample. It is not a fuel gauge and
+does not control shutdown, charging, or safety. The product makes no precise
+capacity or runtime claim. The board has no dedicated USB VBUS-sense input,
+so firmware cannot use a USB-powered reading to identify cell capacity.
 
 ## Distribution
 

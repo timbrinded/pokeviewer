@@ -1,10 +1,11 @@
 extern crate std;
 
 use super::{
-    Command, FrameAccumulator, FrameError, FrameKind, MAX_FRAME_BYTES, PROTOCOL_VERSION,
-    ProtocolFrame, decode_datetime, encode_datetime,
+    BATTERY_PAYLOAD_BYTES, CAPABILITIES, Command, FIRMWARE_VERSION, FrameAccumulator, FrameError,
+    FrameKind, MAX_FRAME_BYTES, PROTOCOL_VERSION, ProtocolFrame, decode_battery_reading,
+    decode_datetime, encode_battery_reading, encode_datetime,
 };
-use crate::LocalDateTime;
+use crate::{BatteryReading, BatteryState, LocalDateTime};
 
 const NOW: LocalDateTime = LocalDateTime {
     year: 2026,
@@ -23,12 +24,49 @@ fn every_command_round_trips_with_request_id_and_payload() {
         Command::SetRtc,
         Command::Diagnostics,
         Command::EnterStorage,
+        Command::ReadBattery,
     ] {
         let frame =
             ProtocolFrame::new(0x1234, FrameKind::Request, command, &encode_datetime(NOW)).unwrap();
         assert_eq!(
             ProtocolFrame::decode(frame.encode().as_bytes()).unwrap(),
             frame
+        );
+    }
+}
+
+#[test]
+fn protocol_v1_command_ids_and_capability_mask_are_stable_and_extended() {
+    assert_eq!(PROTOCOL_VERSION, 1);
+    assert_eq!(FIRMWARE_VERSION, [1, 2, 0]);
+    assert_eq!(Command::Handshake as u8, 1);
+    assert_eq!(Command::ReadRtc as u8, 2);
+    assert_eq!(Command::SetRtc as u8, 3);
+    assert_eq!(Command::Diagnostics as u8, 4);
+    assert_eq!(Command::EnterStorage as u8, 5);
+    assert_eq!(Command::ReadBattery as u8, 6);
+    assert_eq!(CAPABILITIES, 0x3f);
+}
+
+#[test]
+fn battery_payload_is_three_validated_little_endian_bytes() {
+    let recharge = BatteryReading::new(BatteryState::Recharge, 3_700).unwrap();
+    assert_eq!(BATTERY_PAYLOAD_BYTES, 3);
+    assert_eq!(encode_battery_reading(recharge), [1, 0x74, 0x0e]);
+    assert_eq!(decode_battery_reading(&[1, 0x74, 0x0e]), Ok(recharge));
+    assert_eq!(
+        encode_battery_reading(BatteryReading::unavailable()),
+        [2, 0, 0]
+    );
+    for invalid in [
+        &[0, 0][..],
+        &[3, 0x74, 0x0e][..],
+        &[0, 0, 0][..],
+        &[2, 1, 0][..],
+    ] {
+        assert_eq!(
+            decode_battery_reading(invalid),
+            Err(FrameError::InvalidBatteryReading)
         );
     }
 }

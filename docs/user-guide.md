@@ -16,14 +16,14 @@ Before connecting a cell, read the [safety guide](safety.md).
 
 ## Install a release bundle
 
-Download `pokeviewer-v1.1.0.tar.gz` and its adjacent
-`pokeviewer-v1.1.0.tar.gz.sha256` from the official GitHub release. Verify and
+Download `pokeviewer-v1.2.0.tar.gz` and its adjacent
+`pokeviewer-v1.2.0.tar.gz.sha256` from the official GitHub release. Verify and
 extract the archive:
 
 ```console
-sha256sum --check pokeviewer-v1.1.0.tar.gz.sha256
-tar -xzf pokeviewer-v1.1.0.tar.gz
-cd pokeviewer-v1.1.0
+sha256sum --check pokeviewer-v1.2.0.tar.gz.sha256
+tar -xzf pokeviewer-v1.2.0.tar.gz
+cd pokeviewer-v1.2.0
 sha256sum --check SHA256SUMS
 ```
 
@@ -62,6 +62,7 @@ target/release/pokeviewerctl set-rtc \
 target/release/pokeviewerctl set-rtc \
   --device DEVICE --now
 target/release/pokeviewerctl get-rtc --device DEVICE
+target/release/pokeviewerctl get-battery --device DEVICE
 target/release/pokeviewerctl diagnostics --device DEVICE
 ```
 
@@ -104,16 +105,18 @@ At 07:00 local time the device wakes, displays the weekday, Pokémon Yellow
 sprite, English name, and canonical type or types, then returns to deep sleep.
 The complete e-paper card remains visible without panel power.
 
-The top corner shows an approximate battery value in 10 percent steps. The
-value comes from a generic LiPo open-circuit-voltage curve. It is not a fuel
-gauge. Below the low threshold, a lightning icon and `CHARGE!` appear. The
-warning clears at the higher hysteresis threshold. An implausible ADC sample
-shows `?%`. Firmware does not use this estimate as a safety control.
+The top corner shows one of three battery states. `Normal` shows no battery
+text or icon. `Recharge` shows a lightning icon and `CHARGE!`. `Unavailable`
+shows `BAT ?`. Firmware enters `Recharge` below 3,750 mV and clears it at or
+above 3,850 mV. If an invalid scheduled observation follows `Recharge`, the
+complete prior recharge snapshot remains. Otherwise, it commits `Unavailable`
+with `0` mV.
 
-The board has no dedicated USB-power sense input. A power-only USB charger can
-look like a full battery to the voltage input. USB operation with no battery
-can therefore show `100%`. Use the percentage only as a coarse battery-mode
-estimate.
+Only a validated scheduled RTC alarm wake commits the battery snapshot. The
+`get-battery` command returns that retained state and its bounded millivolt
+value. It does not take a new sample during the PWR session. The board has no
+dedicated USB-power sense input, and the value is not a fuel gauge, precise
+capacity measurement, runtime estimate, or safety control.
 
 Before 07:00 the prior display day intentionally remains. There is no clock,
 touchscreen, child-facing button flow, Wi-Fi, BLE, SD-card dependency, runtime
@@ -125,8 +128,8 @@ e-paper image can still look plausible, but firmware will not trust it or show
 a new daily card. Recharge under adult supervision, connect USB, and set the
 RTC again.
 
-Battery runtime is not guaranteed. The firmware estimate does not replace
-battery protection, charger behavior, or product qualification.
+Battery runtime is not guaranteed. The battery state does not replace battery
+protection, charger behavior, or product qualification.
 
 ## Recovery and maintenance
 

@@ -23,8 +23,28 @@ pub enum WakeInput {
 pub struct WakeDecision {
     /// Refresh the daily card before any parent-session work.
     pub refresh_daily: bool,
+    /// Sample and commit the battery observation for validated daily work.
+    pub sample_battery: bool,
     /// Check whether PWR remains held long enough to open a parent session.
     pub check_parent_session: bool,
+}
+
+impl WakeDecision {
+    /// Return whether validated daily work can sample and commit the battery.
+    #[must_use]
+    pub const fn should_commit_battery(self, rtc_valid: bool, wake_plan_valid: bool) -> bool {
+        self.sample_battery && rtc_valid && wake_plan_valid
+    }
+
+    /// Resume only the deferred parent session after simultaneous daily work.
+    #[must_use]
+    pub const fn parent_session_after_daily() -> Self {
+        Self {
+            refresh_daily: false,
+            sample_battery: false,
+            check_parent_session: true,
+        }
+    }
 }
 
 /// Release firmware did not configure the reported wake evidence.
@@ -41,6 +61,7 @@ pub const fn decide_wake(input: WakeInput) -> Result<WakeDecision, UnexpectedWak
     match input {
         WakeInput::Reset => Ok(WakeDecision {
             refresh_daily: true,
+            sample_battery: false,
             check_parent_session: false,
         }),
         WakeInput::Ext1 {
@@ -49,6 +70,7 @@ pub const fn decide_wake(input: WakeInput) -> Result<WakeDecision, UnexpectedWak
             alarm_pending,
         } if (rtc_pin && alarm_pending) || power_pin => Ok(WakeDecision {
             refresh_daily: rtc_pin && alarm_pending,
+            sample_battery: rtc_pin && alarm_pending,
             check_parent_session: power_pin,
         }),
         WakeInput::Ext1 { .. } | WakeInput::Other => Err(UnexpectedWake),
@@ -60,11 +82,12 @@ mod tests {
     use super::{WakeDecision, WakeInput, decide_wake};
 
     #[test]
-    fn reset_refreshes_without_opening_a_parent_session() {
+    fn reset_and_software_reset_refresh_without_sampling_or_parent_work() {
         assert_eq!(
             decide_wake(WakeInput::Reset),
             Ok(WakeDecision {
                 refresh_daily: true,
+                sample_battery: false,
                 check_parent_session: false,
             })
         );
@@ -80,6 +103,7 @@ mod tests {
             }),
             Ok(WakeDecision {
                 refresh_daily: true,
+                sample_battery: true,
                 check_parent_session: false,
             })
         );
@@ -91,6 +115,7 @@ mod tests {
             }),
             Ok(WakeDecision {
                 refresh_daily: false,
+                sample_battery: false,
                 check_parent_session: true,
             })
         );
@@ -106,9 +131,37 @@ mod tests {
             }),
             Ok(WakeDecision {
                 refresh_daily: true,
+                sample_battery: true,
                 check_parent_session: true,
             })
         );
+    }
+
+    #[test]
+    fn deferred_parent_session_does_not_repeat_daily_battery_work() {
+        assert_eq!(
+            WakeDecision::parent_session_after_daily(),
+            WakeDecision {
+                refresh_daily: false,
+                sample_battery: false,
+                check_parent_session: true,
+            }
+        );
+    }
+
+    #[test]
+    fn alarm_battery_commit_requires_valid_rtc_and_wake_plan() {
+        let decision = decide_wake(WakeInput::Ext1 {
+            rtc_pin: true,
+            power_pin: true,
+            alarm_pending: true,
+        })
+        .unwrap();
+
+        assert!(!decision.should_commit_battery(false, true));
+        assert!(!decision.should_commit_battery(true, false));
+        assert!(!decision.should_commit_battery(false, false));
+        assert!(decision.should_commit_battery(true, true));
     }
 
     #[test]

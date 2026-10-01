@@ -19,14 +19,14 @@ First verify the adjacent archive checksum. Then extract the archive and verify
 its internal file checksums:
 
 ```console
-sha256sum --check pokeviewer-v1.1.0.tar.gz.sha256
-tar -xzf pokeviewer-v1.1.0.tar.gz
-cd pokeviewer-v1.1.0
+sha256sum --check pokeviewer-v1.2.0.tar.gz.sha256
+tar -xzf pokeviewer-v1.2.0.tar.gz
+cd pokeviewer-v1.2.0
 sha256sum --check SHA256SUMS
 ```
 
 The checksum files must come from the GitHub release associated with the
-verified `v1.1.0` tag. The publish workflow builds from a green `main` commit,
+verified `v1.2.0` tag. The publish workflow builds from a green `main` commit,
 verifies the package, compares every draft asset with the local build, and
 checks the public archive and tag after publication. Do not install an artifact
 copied from an issue, chat, third-party mirror, or failed workflow.

@@ -1,7 +1,7 @@
 //! Bounded ESP32-S3 USB Serial/JTAG transport adapter.
 
 use esp_hal::{Blocking, peripherals::USB_DEVICE, usb::usb_serial_jtag::UsbSerialJtag};
-use pokeviewer_core::{FrameAccumulator, FrameError};
+use pokeviewer_core::{BatteryReading, FrameAccumulator, FrameError};
 
 use crate::{ProtocolAction, Rtc, handle_protocol_request};
 
@@ -52,6 +52,7 @@ impl UsbProtocolTransport {
         &mut self,
         rtc: &mut R,
         diagnostic_flags: u16,
+        battery: BatteryReading,
         allow_storage: bool,
     ) -> Result<UsbPoll, UsbProtocolError>
     where
@@ -66,9 +67,10 @@ impl UsbProtocolTransport {
                 continue;
             };
             let request = frame.map_err(UsbProtocolError::InvalidFrame)?;
-            let outcome = handle_protocol_request(rtc, request, diagnostic_flags, allow_storage)
-                .await
-                .map_err(UsbProtocolError::InvalidFrame)?;
+            let outcome =
+                handle_protocol_request(rtc, request, diagnostic_flags, battery, allow_storage)
+                    .await
+                    .map_err(UsbProtocolError::InvalidFrame)?;
             self.usb
                 .write(outcome.response.encode().as_bytes())
                 .map_err(|_| UsbProtocolError::Transport)?;

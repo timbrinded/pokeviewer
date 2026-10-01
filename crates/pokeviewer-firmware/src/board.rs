@@ -16,6 +16,7 @@ use portable_atomic::{AtomicU32, Ordering};
 
 use crate::{
     FailureKind, LocalDateTime, Pcf85063Rtc, Rtc,
+    battery::{diagnostic_flags, load_retained_battery},
     es8311::suspend_audio_codec,
     panel::{PanelDiagnostic, refresh_panel_frame, run_panel_diagnostics},
     render_failure_screen,
@@ -380,9 +381,10 @@ pub fn run_usb_provisioning() -> ! {
     }
     let mut rtc = Pcf85063Rtc::new(i2c);
     let mut transport = UsbProtocolTransport::new(peripherals.USB_DEVICE);
+    let battery = load_retained_battery();
     let mut delay = Delay::new();
     loop {
-        if block_on(transport.poll(&mut rtc, 0, false)).is_err() {
+        if block_on(transport.poll(&mut rtc, diagnostic_flags(battery), battery, false)).is_err() {
             transport.reset_partial_frame();
         }
         delay.delay_ms(1);

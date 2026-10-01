@@ -10,7 +10,7 @@ use esp_hal::{
     system::SleepSource,
     time::Rate,
 };
-use pokeviewer_core::{BatteryStatus, Framebuffer, SetupReason};
+use pokeviewer_core::{BatteryReading, Framebuffer, SetupReason};
 use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
 use portable_atomic::{AtomicU32, Ordering};
 
@@ -18,7 +18,8 @@ use crate::{
     FailureKind, Pcf85063Rtc, Pcf85063RtcError, ProtocolAction, Rtc, Screen, WakeDecision,
     WakeInput,
     application::planned_wake_reached,
-    battery_sensor::{BatteryObservation, sample_battery},
+    battery::{commit_battery_observation, diagnostic_flags, load_retained_battery},
+    battery_sensor::sample_battery_mv,
     decide_wake,
     es8311::suspend_audio_codec,
     panel::refresh_panel_frame,
@@ -66,8 +67,6 @@ pub fn run_pokeviewer() -> ! {
     let mut power_button_pin = peripherals.GPIO18;
     restore_wake_pin(&mut rtc_interrupt_pin);
     restore_wake_pin(&mut power_button_pin);
-    let battery = sample_battery(peripherals.ADC1, peripherals.GPIO4);
-
     macro_rules! sleep_resources {
         () => {
             SleepResources {
@@ -145,10 +144,7 @@ pub fn run_pokeviewer() -> ! {
     let mut rtc = Pcf85063Rtc::new(i2c);
     let alarm_pending = block_on(rtc.alarm_pending()).unwrap_or(false);
     let decision = if parent_after_daily {
-        WakeDecision {
-            refresh_daily: false,
-            check_parent_session: true,
-        }
+        WakeDecision::parent_session_after_daily()
     } else {
         let input = match cause {
             SleepSource::Undefined => WakeInput::Reset,
@@ -164,6 +160,8 @@ pub fn run_pokeviewer() -> ! {
             Err(_) => display_terminal!(FailureKind::UnexpectedWake),
         }
     };
+    let mut battery = load_retained_battery();
+    let mut battery_diagnostic_flags = diagnostic_flags(battery);
 
     if decision.check_parent_session && !decision.refresh_daily {
         if !power_held_for_parent_session(&mut power_button_pin) {
@@ -171,9 +169,12 @@ pub fn run_pokeviewer() -> ! {
             sleep_current_rtc!(rtc);
         }
 
-        let Some((mut transport, first_action)) =
-            wait_for_valid_usb_frame(&mut rtc, peripherals.USB_DEVICE, battery.diagnostic_flags)
-        else {
+        let Some((mut transport, first_action)) = wait_for_valid_usb_frame(
+            &mut rtc,
+            peripherals.USB_DEVICE,
+            battery_diagnostic_flags,
+            battery,
+        ) else {
             wait_for_power_release(&mut power_button_pin);
             sleep_current_rtc!(rtc);
         };
@@ -203,7 +204,7 @@ pub fn run_pokeviewer() -> ! {
         }
         panel_power.set_high();
 
-        match serve_parent_session(&mut rtc, &mut transport, battery.diagnostic_flags) {
+        match serve_parent_session(&mut rtc, &mut transport, battery_diagnostic_flags, battery) {
             ProtocolAction::RtcSet => {
                 Delay::new().delay_ms(100);
                 esp_hal::system::software_reset();
@@ -238,9 +239,14 @@ pub fn run_pokeviewer() -> ! {
 
     let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
     let wake_plan = reading.ok().and_then(|now| plan_wake(now, None).ok());
+    if decision.should_commit_battery(reading.is_ok(), wake_plan.is_some()) {
+        battery =
+            commit_battery_observation(sample_battery_mv(peripherals.ADC1, peripherals.GPIO4));
+        battery_diagnostic_flags = diagnostic_flags(battery);
+    }
     let mut framebuffer = Framebuffer::default();
     let mut frame_failure = None;
-    let rendered = match crate::render_rtc_frame(reading, battery.status, &mut framebuffer) {
+    let rendered = match crate::render_rtc_frame(reading, battery.state(), &mut framebuffer) {
         Ok(rendered) => Some(rendered),
         Err(_) => {
             render_failure_screen(&mut framebuffer, FailureKind::Content)
@@ -282,7 +288,8 @@ pub fn run_pokeviewer() -> ! {
         let action = serve_initial_setup(
             &mut rtc,
             peripherals.USB_DEVICE,
-            FailureKind::InvalidRtc.policy().diagnostic_flag | battery.diagnostic_flags,
+            FailureKind::InvalidRtc.policy().diagnostic_flag | battery_diagnostic_flags,
+            battery,
         );
         if action == ProtocolAction::RtcSet {
             Delay::new().delay_ms(100);
@@ -361,11 +368,12 @@ fn wait_for_valid_usb_frame(
     rtc: &mut BoardRtc,
     usb_device: esp_hal::peripherals::USB_DEVICE<'static>,
     diagnostic_flags: u16,
+    battery: BatteryReading,
 ) -> Option<(UsbProtocolTransport, ProtocolAction)> {
     let mut transport = UsbProtocolTransport::new(usb_device);
     let mut delay = Delay::new();
     for _ in 0..USB_FRAME_GATE_POLLS {
-        match block_on(transport.poll(rtc, diagnostic_flags, false)) {
+        match block_on(transport.poll(rtc, diagnostic_flags, battery, false)) {
             Ok(result) if result.handled > 0 => return Some((transport, result.action)),
             Ok(_) => {}
             Err(_) => transport.reset_partial_frame(),
@@ -379,10 +387,11 @@ fn serve_parent_session(
     rtc: &mut BoardRtc,
     transport: &mut UsbProtocolTransport,
     diagnostic_flags: u16,
+    battery: BatteryReading,
 ) -> ProtocolAction {
     let mut delay = Delay::new();
     for _ in 0..PARENT_SESSION_POLLS {
-        match block_on(transport.poll(rtc, diagnostic_flags, true)) {
+        match block_on(transport.poll(rtc, diagnostic_flags, battery, true)) {
             Ok(result) if result.action != ProtocolAction::None => return result.action,
             Ok(_) => {}
             Err(_) => transport.reset_partial_frame(),
@@ -396,11 +405,12 @@ fn serve_initial_setup(
     rtc: &mut BoardRtc,
     usb_device: esp_hal::peripherals::USB_DEVICE<'static>,
     diagnostic_flags: u16,
+    battery: BatteryReading,
 ) -> ProtocolAction {
     let mut transport = UsbProtocolTransport::new(usb_device);
     let mut delay = Delay::new();
     for _ in 0..PARENT_SESSION_POLLS {
-        match block_on(transport.poll(rtc, diagnostic_flags, false)) {
+        match block_on(transport.poll(rtc, diagnostic_flags, battery, false)) {
             Ok(result) if result.action == ProtocolAction::RtcSet => return result.action,
             Ok(_) => {}
             Err(_) => transport.reset_partial_frame(),
@@ -433,20 +443,14 @@ fn prepare_sleep(rtc: &mut BoardRtc) -> RtcSleepMode {
     }
 }
 
-fn log_daily_ready(
-    crc32: u32,
-    next_wake: pokeviewer_core::LocalDateTime,
-    battery: BatteryObservation,
-) {
-    let (battery_percent, battery_recharge) = match battery.status {
-        BatteryStatus::Estimated { percent, recharge } => (Some(percent), recharge),
-        BatteryStatus::Unavailable => (None, false),
-    };
+fn log_daily_ready(crc32: u32, next_wake: pokeviewer_core::LocalDateTime, battery: BatteryReading) {
     esp_println::println!(
-        "daily card ready; framebuffer_crc32={crc32:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; battery_percent={battery_percent:?}; battery_recharge={battery_recharge}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true; wake_sources=ext1_gpio5_gpio18",
+        "daily card ready; framebuffer_crc32={crc32:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; battery_state={:?}; battery_cell_mv={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true; wake_sources=ext1_gpio5_gpio18",
         next_wake.year,
         next_wake.month,
         next_wake.day,
+        battery.state(),
+        battery.cell_mv(),
     );
 }
 

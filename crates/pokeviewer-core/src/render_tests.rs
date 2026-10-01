@@ -1,10 +1,11 @@
 use super::{
     DailyCard, Framebuffer, NAME_SCALE, NAME_Y, PRIMARY_TYPE_Y, RECHARGE_Y, RenderError,
     SECONDARY_TYPE_Y, SINGLE_TYPE_Y, SPRITE_SCALE, SPRITE_Y, TYPE_SCALE, WEEKDAY_SCALE, WEEKDAY_Y,
-    render_daily_card, render_recovery_screen, render_setup_screen, text_width, type_label,
+    draw_battery_state, draw_recharge_status, render_daily_card, render_recovery_screen,
+    render_setup_screen, text_width, type_label,
 };
 use crate::{
-    BatteryStatus, CONTENT_SPRITE_BYTES, ContentPack, FRAMEBUFFER_BYTES, PokemonType, Weekday,
+    BatteryState, CONTENT_SPRITE_BYTES, ContentPack, FRAMEBUFFER_BYTES, PokemonType, Weekday,
 };
 
 const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
@@ -18,10 +19,7 @@ fn card<'a>(name: &'a str, sprite: &'a [u8; CONTENT_SPRITE_BYTES]) -> DailyCard<
         primary_type: PokemonType::Electric,
         secondary_type: Some(PokemonType::Flying),
         sprite,
-        battery_status: BatteryStatus::Estimated {
-            percent: 50,
-            recharge: false,
-        },
+        battery_state: BatteryState::Normal,
     }
 }
 
@@ -46,11 +44,11 @@ fn long_name_dual_types_and_sprite_extremes_are_deterministic() {
     render_daily_card(&mut black_first, card("Farfetch’d", &BLACK_SPRITE)).unwrap();
     render_daily_card(&mut black_second, card("Farfetch’d", &BLACK_SPRITE)).unwrap();
     assert_eq!(black_first, black_second);
-    assert_eq!(crc32fast::hash(black_first.as_bytes()), 0x55ab_3ac1);
+    assert_eq!(crc32fast::hash(black_first.as_bytes()), 0x2707_31f3);
 
     let mut white = Framebuffer::default();
     render_daily_card(&mut white, card("Nidoran♀", &WHITE_SPRITE)).unwrap();
-    assert_eq!(crc32fast::hash(white.as_bytes()), 0xd2db_1148);
+    assert_eq!(crc32fast::hash(white.as_bytes()), 0xa077_1a7a);
     assert_ne!(black_first, white);
 }
 
@@ -73,16 +71,6 @@ fn invalid_input_is_rejected_without_changing_the_buffer() {
                 ..card("Pikachu", &WHITE_SPRITE)
             },
             RenderError::DuplicateType,
-        ),
-        (
-            DailyCard {
-                battery_status: BatteryStatus::Estimated {
-                    percent: 51,
-                    recharge: false,
-                },
-                ..card("Pikachu", &WHITE_SPRITE)
-            },
-            RenderError::InvalidBatteryStatus,
         ),
     ] {
         let mut framebuffer = initial.clone();
@@ -130,7 +118,7 @@ fn every_committed_name_and_type_combination_renders() {
                 primary_type: record.primary_type,
                 secondary_type: record.secondary_type,
                 sprite: record.sprite,
-                battery_status: BatteryStatus::Unavailable,
+                battery_state: BatteryState::Unavailable,
             },
         )
         .unwrap();
@@ -167,22 +155,12 @@ fn fixed_layout_bands_are_disjoint_and_fit_every_label() {
 }
 
 #[test]
-fn battery_status_variants_are_distinct_and_bounded() {
-    let mut hashes = [0; 4];
-    for (index, battery_status) in [
-        BatteryStatus::Estimated {
-            percent: 100,
-            recharge: false,
-        },
-        BatteryStatus::Estimated {
-            percent: 50,
-            recharge: false,
-        },
-        BatteryStatus::Estimated {
-            percent: 10,
-            recharge: true,
-        },
-        BatteryStatus::Unavailable,
+fn battery_state_variants_are_distinct_and_bounded() {
+    let mut hashes = [0; 3];
+    for (index, battery_state) in [
+        BatteryState::Normal,
+        BatteryState::Recharge,
+        BatteryState::Unavailable,
     ]
     .into_iter()
     .enumerate()
@@ -191,7 +169,7 @@ fn battery_status_variants_are_distinct_and_bounded() {
         render_daily_card(
             &mut framebuffer,
             DailyCard {
-                battery_status,
+                battery_state,
                 ..card("Pikachu", &WHITE_SPRITE)
             },
         )
@@ -201,6 +179,26 @@ fn battery_status_variants_are_distinct_and_bounded() {
     for (index, hash) in hashes.into_iter().enumerate() {
         assert!(!hashes[..index].contains(&hash));
     }
+}
+
+#[test]
+fn battery_state_draws_only_the_required_warning_content() {
+    let blank = Framebuffer::default();
+
+    let mut normal = blank.clone();
+    draw_battery_state(&mut normal, BatteryState::Normal);
+    assert_eq!(normal, blank);
+
+    let mut recharge = blank.clone();
+    draw_battery_state(&mut recharge, BatteryState::Recharge);
+    assert_eq!(recharge, blank);
+    draw_recharge_status(&mut recharge);
+    assert_ne!(recharge, blank);
+
+    let mut unavailable = blank.clone();
+    draw_battery_state(&mut unavailable, BatteryState::Unavailable);
+    assert_ne!(unavailable, blank);
+    assert_eq!(unavailable.crc32(), 0xbbaf_f9be);
 }
 
 #[test]

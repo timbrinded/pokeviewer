@@ -3,7 +3,7 @@
 - Status: accepted for implementation; physical evidence incomplete
 - Hardware issue: [H02 / #3][issue-3]
 - Vendor source revision: [`3f96beedd2e8`][vendor-commit]
-- Last reviewed: 2026-07-28
+- Last reviewed: 2026-08-10
 
 Pokeviewer supports only the non-touch
 `ESP32-S3-ePaper-1.54-EN` V2 board, Waveshare SKU 32299. V1 firmware and pin
@@ -41,7 +41,7 @@ or making the touch and non-touch SKUs behave differently.
 | ---: | --- | --- | --- |
 | 0 | BOOT button | input, active low | adult recovery wake only |
 | 3 | onboard LED | output | off in release firmware |
-| 4 | `BAT_ADC` | ADC1 channel 3; 2:1 divider | bounded diagnostic sample |
+| 4 | `BAT_ADC` | ADC1 channel 3; 2:1 divider | bounded battery-state sample |
 | 5 | `RTC_INT` | input, active low | `Ext0` wake; RTC-domain pull-up enabled |
 | 6 | `EPD3V3_EN` | output, low enables | panel power |
 | 7 | touch reset | touch SKU only | reserved, never driven |
@@ -107,8 +107,15 @@ required RTC address and must not infer board identity from a scan.
   is insufficient after the pin switches to RTC_IO.
 - The PWR/BOOT inputs are reserved adult wake inputs.
 - The e-paper keeps its image after the panel rail and MCU are inactive.
-- Battery voltage is the calibrated GPIO4 reading multiplied by two. It is
-  diagnostic, not a precise state-of-charge measurement.
+- Battery voltage is the calibrated GPIO4 reading multiplied by two. Values
+  from 2,500 mV through 4,500 mV are plausible. The retained value is bounded
+  diagnostic data, not a precise state-of-charge or capacity measurement.
+- A plausible value below 3,750 mV enters `Recharge`. A later plausible value
+  at or above 3,850 mV clears it. An invalid scheduled observation preserves a
+  complete retained `Recharge` snapshot; otherwise it commits `Unavailable`
+  with `0` mV.
+- Only a validated RTC alarm wake commits the retained scheduled battery
+  snapshot. PWR and invalid-RTC paths do not sample or replace it.
 
 The ETA6098 charger and connector do not make an arbitrary lithium cell safe.
 Battery choice, protection, charge current, enclosure, and supervision remain
@@ -128,6 +135,8 @@ adult integration responsibilities.
 | Deep-sleep entry | verified | timer diagnostic slept once and woke by timer without a reset loop |
 | GPIO5 RTC-domain pull-up | verified | alarm-driven EXT0 wake passed at a synthetic 07:00 boundary |
 | Scheduled RTC wake/reboot | verified | retained verdict reported `Ext0` with the PCF alarm flag asserted |
+| Battery millivolt accuracy | pending | one final retained USB value versus DMM comparison required |
+| RTC-versus-PWR battery commit gate | pending | one bounded scheduled-wake and parent-session comparison required |
 | Non-touch I²C population | pending | sanitized full-bus probe required |
 
 Serial access is operational through the host's normal device group; device

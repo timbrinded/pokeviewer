@@ -1,11 +1,14 @@
 ---
-status: accepted
+status: superseded by ADR-0009
 date: 2026-07-29
 decision-makers:
   - Project maintainer
 ---
 
 # Use a generic LiPo OCV battery estimate
+
+This decision is superseded by
+[ADR 0009](0009-use-a-wake-gated-low-voltage-battery-state.md).
 
 ## Context and Problem Statement
 
@@ -105,6 +108,7 @@ low-battery test, or USB-power detection.
 
 ## More Information
 
+- [ADR 0009: Use a wake-gated low-voltage battery state](0009-use-a-wake-gated-low-voltage-battery-state.md)
 - [Product contract](../product-contract.md)
 - [Board and power contract](../hardware/v2-board-contract.md)
 - [Zephyr default LiPo OCV table](https://docs.zephyrproject.org/latest/doxygen/html/group__devicetree-battery.html)

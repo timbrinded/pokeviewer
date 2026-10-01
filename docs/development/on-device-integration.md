@@ -2,19 +2,20 @@
 
 - Status: RTC alarm deep sleep integrated and physically qualified
 - Delivery issue: [I18 / #19][issue-19]
-- Last reviewed: 2026-07-28
+- Last reviewed: 2026-08-10
 
 The release binary now composes the same repository-owned components used by
 host evidence:
 
-1. read the PCF85063A once and classify oscillator, transport, and calendar
-   failures;
-2. either select the passive display day or render the fixed RTC setup screen;
-3. validate the committed Generation I pack in place from flash;
-4. borrow the selected record without allocation;
-5. render into the shared 5,000-byte panel-native framebuffer;
-6. log its CRC-32 and pass those exact bytes to the V2 panel adapter; and
-7. perform one bounded full refresh, put the panel to sleep, and disable its
+1. read the PCF85063A once, classify oscillator, transport, and calendar
+   failures, and validate wake evidence;
+2. sample and commit the battery only after a validated RTC alarm wake;
+3. either select the passive display day or render the fixed RTC setup screen;
+4. validate the committed Generation I pack in place from flash;
+5. borrow the selected record without allocation;
+6. render into the shared 5,000-byte panel-native framebuffer;
+7. log its CRC-32 and pass those exact bytes to the V2 panel adapter; and
+8. perform one bounded full refresh, put the panel to sleep, and disable its
    rail.
 
 The shared I²C bus requires GPIO42 to remain low, so the audio rail stays
@@ -23,6 +24,12 @@ ES8311 software-suspend sequence before using the RTC, retains GPIO42 low with
 its digital per-pin hold, and disables only the panel rail after refresh. The
 rail is powered; only the codec is software-suspended. Audio capture and
 playback are never configured.
+
+The card uses the retained `Normal`, `Recharge`, or `Unavailable` state.
+`Normal` renders no battery text or icon. USB reports that same scheduled
+snapshot. A reset, invalid RTC, or PWR parent session does not sample or
+replace it. An invalid scheduled observation preserves a complete retained
+`Recharge` snapshot; otherwise it commits `Unavailable` with `0` mV.
 
 No Wi-Fi, BLE, SD, runtime API, heap-backed content loading, or child-facing
 input is initialized. In setup mode, the existing bounded USB protocol remains
@@ -63,7 +70,9 @@ alarm flag asserted. After the real local RTC was restored and read back, the
 production binary refreshed once, entered deep sleep, and remained absent from
 USB throughout the bounded 45-second observation.
 
-Sanitized panel photos and battery-side current measurements remain pending.
+Sanitized panel photos, one DMM comparison of retained cell millivolts, and one
+bounded RTC-alarm-versus-PWR battery commit check remain pending. These checks
+do not establish precise capacity or runtime.
 
 ## Static release budget
 
