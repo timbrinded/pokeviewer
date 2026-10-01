@@ -1,11 +1,15 @@
 ---
-status: proposed
+status: accepted
 date: 2026-07-30
 decision-makers:
   - Project maintainer
 ---
 
 # Publish releases from one verified workflow
+
+Accepted on 2026-10-01. `.github/workflows/publish-release.yml` implements
+this decision and is the only publication path. The status had been left at
+`proposed` after the workflow replaced the staged process.
 
 ## Context and Problem Statement
 

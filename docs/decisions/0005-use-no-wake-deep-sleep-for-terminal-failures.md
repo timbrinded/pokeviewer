@@ -10,6 +10,8 @@ decision-makers:
 [ADR 0010](0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md)
 supersedes the no-wake outcome: terminal sleep now arms the BOOT button. The
 one bounded display attempt and the no-automatic-retry rules remain active.
+[ADR 0008](0008-publish-releases-from-one-verified-workflow.md) removed the
+battery-side release qualification named under Confirmation.
 
 ## Context and Problem Statement
 
