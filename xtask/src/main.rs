@@ -5,6 +5,7 @@ use std::env;
 use std::process::{Command, ExitCode};
 
 mod content;
+mod device;
 mod golden;
 mod render;
 
@@ -83,6 +84,13 @@ fn main() -> ExitCode {
                 return fail("render-recovery-screens accepts at most one output directory");
             }
             task_result(render::recovery_screens_command(output_dir.as_deref()))
+        }
+        Some("render-device-views") => {
+            let output_dir = arguments.next();
+            if arguments.next().is_some() {
+                return fail("render-device-views accepts at most one output directory");
+            }
+            task_result(device::device_views_command(output_dir.as_deref()))
         }
         Some("golden-update") => {
             if arguments.next().is_some() {
@@ -244,6 +252,8 @@ COMMANDS:
                       Render the adult invalid-RTC recovery screen
     render-recovery-screens [OUTPUT_DIR]
                       Render every classified adult recovery screen
+    render-device-views [OUTPUT_DIR]
+                      Render README device views around exact panel frames
     golden-update     Explicitly regenerate reviewed raw and PNG goldens
     golden-check [DIFF_DIR]
                       Compare exact frames and emit failure artifacts

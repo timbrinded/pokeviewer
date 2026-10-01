@@ -103,6 +103,17 @@ cargo xtask render-setup-screen docs/evidence/setup-screen/invalid-rtc-setup.png
 cargo xtask render-recovery-screens docs/evidence/recovery-screens
 ```
 
-CI compares only the recovery screens byte for byte; the other images are
-review aids. The [daily-card design](../design/daily-card-v1.md) explains the
+The README device views place exact frames on a drawing of the V2 case:
+
+```console
+cargo xtask render-device-views docs/images/device
+```
+
+The case follows the Waveshare outline drawing: 39.8 × 53.0 × 16.9 mm, a
+27.8 mm screen window, `BOOT` above `PWR` on the right side, and USB-C on the
+bottom. Only the screen pixels are exact. Regenerate the views with any
+reviewed golden change.
+
+CI compares the recovery screens and the device views byte for byte; the
+other images are review aids. The [daily-card design](../design/daily-card-v1.md) explains the
 layout.

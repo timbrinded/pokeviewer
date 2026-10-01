@@ -14,7 +14,7 @@ use pokeviewer_firmware::{FailureKind, render_failure_screen};
 
 type TaskResult = Result<(), String>;
 
-const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v2.pack");
+pub(crate) const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v2.pack");
 const DEFAULT_OUTPUT: &str = "target/render-samples";
 const DEFAULT_CONTACT_SHEET: &str = "target/all-cards-contact-sheet.png";
 const DEFAULT_SETUP_SCREEN: &str = "target/setup-screen.png";
