@@ -221,13 +221,14 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<([u8; SPRITE_BYTES], usiz
         if alpha != 255 {
             continue;
         }
-        // The palette runs from darkest to lightest; shade 3 is black.
-        let rank = palette
+        // The palette runs from darkest to lightest, so its reverse runs from
+        // shade 0 (white) to shade 3 (black).
+        let shade = palette
             .iter()
-            .position(|color| *color == [red, green, blue])
-            .ok_or_else(|| format!("Pokémon ID {id}: sprite palette: colour is not ranked"))?;
-        let shade = u8::try_from(SOURCE_PALETTE_COLORS - 1 - rank)
-            .map_err(|_| format!("Pokémon ID {id}: sprite palette: shade exceeds u8"))?;
+            .rev()
+            .zip(0..)
+            .find_map(|(color, shade)| (*color == [red, green, blue]).then_some(shade))
+            .expect("the palette holds every opaque colour");
         set_sprite_shade(
             &mut output,
             source_index % decoded.width + x_offset,

@@ -1,8 +1,8 @@
 //! Hardware-independent renderer for the 200 × 200 monochrome panel buffer.
 
 use crate::{
-    BatteryState, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, DISPLAY_HEIGHT, DISPLAY_WIDTH,
-    FRAMEBUFFER_BYTES, PokemonType, Weekday, font, sprite_shade,
+    BLACK_SHADE, BatteryState, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, DISPLAY_HEIGHT,
+    DISPLAY_WIDTH, FRAMEBUFFER_BYTES, PokemonType, Weekday, font, sprite_shade,
 };
 
 const NAME_MAX_BYTES: usize = 16;
@@ -20,7 +20,6 @@ const BATTERY_X_MARGIN: usize = 3;
 const BATTERY_Y: usize = 3;
 const RECHARGE_Y: usize = 192;
 const LIGHTNING_GLYPH: [u8; font::HEIGHT] = [0x04, 0x0c, 0x1c, 0x06, 0x0c, 0x08, 0x10];
-const BLACK_SHADE: u8 = 3;
 /// Black panel pixels out of the four in a sprite pixel's 2 × 2 cell, indexed
 /// by the pack's shade from `0` white to `3` black: white, 25 %, 50 %, black.
 const SHADE_INK: [u8; 4] = [0, 1, 2, 4];

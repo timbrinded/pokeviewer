@@ -88,7 +88,7 @@ fn black_features_narrower_than_four_pixels_stay_solid() {
     for (left, size) in [(4, 3), (20, 4)] {
         for y in 10..10 + size {
             for x in left..left + size {
-                set_sprite_shade(&mut sprite, x, y, 3);
+                set_sprite_shade(&mut sprite, x, y, crate::BLACK_SHADE);
             }
         }
     }
@@ -160,7 +160,7 @@ fn clipping_at_every_edge_never_changes_out_of_range_storage() {
 fn every_committed_name_and_type_combination_renders() {
     let pack = ContentPack::parse(PACK).unwrap();
     let mut framebuffer = Framebuffer::default();
-    for dex_id in 1..=251 {
+    for dex_id in 1..=crate::POKEMON_COUNT {
         let record = pack.record(dex_id).unwrap();
         render_daily_card(
             &mut framebuffer,
@@ -196,7 +196,7 @@ fn fixed_layout_bands_are_disjoint_and_fit_every_label() {
     }
 
     let pack = ContentPack::parse(PACK).unwrap();
-    for dex_id in 1..=251 {
+    for dex_id in 1..=crate::POKEMON_COUNT {
         let record = pack.record(dex_id).unwrap();
         assert!(text_width(record.name.chars().count(), NAME_SCALE) <= 200);
         assert!(text_width(type_label(record.primary_type).chars().count(), TYPE_SCALE) <= 200);

@@ -13,10 +13,10 @@ use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 
 pub(crate) const FIRST_ID: u16 = 1;
-pub(crate) const LAST_ID: u16 = 251;
+pub(crate) const LAST_ID: u16 = pokeviewer_core::POKEMON_COUNT as u16;
 pub(crate) const CACHE_SCHEMA_VERSION: u16 = 1;
-pub(crate) const FORMAT_VERSION: u16 = 2;
-pub(crate) const CONTENT_REVISION: u32 = 3;
+pub(crate) const FORMAT_VERSION: u16 = pokeviewer_core::CONTENT_FORMAT_VERSION;
+pub(crate) const CONTENT_REVISION: u32 = pokeviewer_core::CONTENT_REVISION;
 pub(crate) const SCHEDULE_VERSION: u16 = pokeviewer_core::SCHEDULE_VERSION;
 pub(crate) const SPRITES_REVISION: &str = "8dfa3d97e953caaafaafd4963eff7621811af08e";
 pub(crate) const DEFAULT_CACHE: &str = "content/cache-v2";

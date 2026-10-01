@@ -12,7 +12,7 @@ use super::{
 
 const HEADER_LENGTH: usize = 32;
 const RECORD_LENGTH: usize = 6;
-const RECORD_COUNT: usize = LAST_ID as usize;
+const RECORD_COUNT: usize = pokeviewer_core::POKEMON_COUNT as usize;
 const MAX_PACK_BYTES: usize = 262_144;
 
 pub(super) fn convert_cache(
@@ -283,7 +283,7 @@ fn validation_report(records: &[ConvertedRecord], pack_bytes: usize) -> Validati
 
 fn write_contact_sheet(records: &[ConvertedRecord], path: &Path) -> TaskResult {
     const COLUMNS: usize = 16;
-    const ROWS: usize = 16;
+    const ROWS: usize = RECORD_COUNT.div_ceil(COLUMNS);
     const GREYS: [u8; 4] = [255, 170, 85, 0];
     let width = COLUMNS * SPRITE_WIDTH;
     let height = ROWS * SPRITE_HEIGHT;

@@ -2,16 +2,17 @@
 
 use time::{Date, Month, PrimitiveDateTime, Time};
 
+use crate::POKEMON_COUNT;
+
 const EPOCH: Date = match Date::from_ordinal_date(2026, 1) {
     Ok(date) => date,
     Err(_) => panic!("the fixed schedule epoch must be valid"),
 };
 const ROLLOVER_HOUR: u8 = 7;
 
-/// Number of display days in one schedule cycle, one per Pokémon.
-pub(crate) const CYCLE_LENGTH: u8 = 251;
-/// Coprime with the prime cycle length, so the cycle is a permutation. Any
-/// seven consecutive days are at least 31 Pokédex numbers apart.
+/// Coprime with the prime 251-day cycle, one day per Pokémon, so the cycle is
+/// a permutation. Any seven consecutive days are at least 31 Pokédex numbers
+/// apart.
 const CYCLE_MULTIPLIER: u16 = 94;
 
 /// Version of the repository-owned daily schedule.
@@ -164,7 +165,7 @@ pub fn select_daily_pokemon(local: LocalDateTime) -> Result<DailySelection, Inva
     }
 
     let epoch_offset = (display_date - EPOCH).whole_days();
-    let cycle_index = u8::try_from(epoch_offset.rem_euclid(i64::from(CYCLE_LENGTH)))
+    let cycle_index = u8::try_from(epoch_offset.rem_euclid(i64::from(POKEMON_COUNT)))
         .map_err(|_| InvalidDateTime)?;
 
     Ok(DailySelection {
@@ -179,7 +180,7 @@ pub fn select_daily_pokemon(local: LocalDateTime) -> Result<DailySelection, Inva
 /// Indexes at or above the 251-day cycle length wrap into the cycle.
 #[must_use]
 pub fn scheduled_dex_id(cycle_index: u8) -> u8 {
-    let position = CYCLE_MULTIPLIER * u16::from(cycle_index) % u16::from(CYCLE_LENGTH);
+    let position = CYCLE_MULTIPLIER * u16::from(cycle_index) % u16::from(POKEMON_COUNT);
     #[expect(
         clippy::cast_possible_truncation,
         reason = "the remainder is below the 251-day cycle length"

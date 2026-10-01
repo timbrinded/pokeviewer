@@ -1,59 +1,21 @@
 //! Allocation-free content-pack validation and lookup.
 
-use crate::schedule::{CYCLE_LENGTH, SCHEDULE_VERSION, scheduled_dex_id};
+use crate::{
+    CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE,
+    schedule::{SCHEDULE_VERSION, scheduled_dex_id},
+};
+
+/// Number of Pokémon in the pack: National Pokédex IDs 1 through 251.
+pub const POKEMON_COUNT: u8 = 251;
+/// Binary layout version of the content pack.
+pub const CONTENT_FORMAT_VERSION: u16 = 2;
+/// Revision of the converted Pokémon data and sprites.
+pub const CONTENT_REVISION: u32 = 3;
 
 const HEADER_LENGTH: usize = 32;
-const FORMAT_VERSION: u16 = 2;
-const CONTENT_REVISION: u32 = 3;
 const RECORD_LENGTH: usize = 6;
-const RECORD_COUNT: usize = CYCLE_LENGTH as usize;
+const RECORD_COUNT: usize = POKEMON_COUNT as usize;
 const NO_SECONDARY_TYPE: u8 = 0xff;
-
-/// Width and height of one content sprite in source pixels.
-pub const CONTENT_SPRITE_SIZE: usize = 56;
-
-/// Bytes in one 56 × 56 content sprite with two bits per pixel.
-pub const CONTENT_SPRITE_BYTES: usize = CONTENT_SPRITE_SIZE * CONTENT_SPRITE_SIZE / 4;
-
-/// Read the two-bit shade at `(x, y)`, from `0` white to `3` black.
-///
-/// Pixels are row-major, and the most-significant bit pair of each byte is the
-/// leftmost pixel.
-///
-/// # Panics
-///
-/// Panics if `x` or `y` is not below [`CONTENT_SPRITE_SIZE`].
-#[must_use]
-pub fn sprite_shade(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> u8 {
-    let (index, shift) = shade_location(x, y);
-    (sprite[index] >> shift) & 0b11
-}
-
-/// Write the two-bit `shade` at `(x, y)`, replacing the previous value.
-///
-/// # Panics
-///
-/// Panics if `x` or `y` is not below [`CONTENT_SPRITE_SIZE`].
-pub fn set_sprite_shade(sprite: &mut [u8; CONTENT_SPRITE_BYTES], x: usize, y: usize, shade: u8) {
-    let (index, shift) = shade_location(x, y);
-    sprite[index] = (sprite[index] & !(0b11 << shift)) | ((shade & 0b11) << shift);
-}
-
-fn shade_location(x: usize, y: usize) -> (usize, u8) {
-    assert!(
-        x < CONTENT_SPRITE_SIZE && y < CONTENT_SPRITE_SIZE,
-        "sprite pixel is outside the canvas"
-    );
-    let pixel = y * CONTENT_SPRITE_SIZE + x;
-    // Four pixels per byte, leftmost in bits 7–6.
-    let shift = match pixel % 4 {
-        0 => 6,
-        1 => 4,
-        2 => 2,
-        _ => 0,
-    };
-    (pixel / 4, shift)
-}
 
 /// Stable Pokémon type codes stored in the content pack.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -186,7 +148,7 @@ impl<'a> ContentPack<'a> {
         if bytes.get(0..4) != Some(b"PKVW") {
             return Err(PackError::InvalidMagic);
         }
-        if read_u16(bytes, 4)? != FORMAT_VERSION
+        if read_u16(bytes, 4)? != CONTENT_FORMAT_VERSION
             || read_u32(bytes, 8)? != CONTENT_REVISION
             || read_u16(bytes, 12)? != SCHEDULE_VERSION
         {
@@ -246,7 +208,7 @@ impl<'a> ContentPack<'a> {
     ///
     /// Returns [`PackError::OutOfRange`] unless `dex_id` is 1–251.
     pub fn record(&self, dex_id: u8) -> Result<PokemonRecord<'a>, PackError> {
-        if !(1..=CYCLE_LENGTH).contains(&dex_id) {
+        if !(1..=POKEMON_COUNT).contains(&dex_id) {
             return Err(PackError::OutOfRange);
         }
         self.record_at(usize::from(dex_id - 1))
@@ -377,7 +339,7 @@ fn read_u32(bytes: &[u8], offset: usize) -> Result<u32, PackError> {
 mod tests {
     extern crate std;
 
-    use super::{CONTENT_SPRITE_BYTES, ContentPack, PackError, RECORD_COUNT};
+    use super::{CONTENT_SPRITE_BYTES, ContentPack, POKEMON_COUNT, PackError, RECORD_COUNT};
 
     const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
 
@@ -385,7 +347,7 @@ mod tests {
     fn committed_pack_exposes_every_record_without_allocation() {
         let pack = ContentPack::parse(PACK).unwrap();
 
-        for dex_id in 1..=251 {
+        for dex_id in 1..=POKEMON_COUNT {
             let record = pack.record(dex_id).unwrap();
             assert_eq!(record.dex_id, dex_id);
             assert!(!record.name.is_empty());
@@ -394,7 +356,7 @@ mod tests {
         for index in 0..RECORD_COUNT {
             let cycle_index = u8::try_from(index).unwrap();
             let record = pack.scheduled_record(cycle_index).unwrap();
-            assert!((1..=251).contains(&record.dex_id));
+            assert!((1..=POKEMON_COUNT).contains(&record.dex_id));
         }
         assert!(core::mem::size_of_val(&pack) <= 64);
     }

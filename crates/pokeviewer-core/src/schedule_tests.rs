@@ -4,10 +4,10 @@ use std::collections::BTreeSet;
 use time::{Date, Duration};
 
 use super::{
-    CYCLE_LENGTH, DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, Weekday,
-    next_rollover, select_daily_pokemon,
+    DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, Weekday, next_rollover,
+    select_daily_pokemon,
 };
-use crate::ContentPack;
+use crate::{ContentPack, POKEMON_COUNT};
 
 const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
 const EPOCH_ROLLOVER: LocalDateTime = LocalDateTime {
@@ -235,7 +235,7 @@ fn rollover_uses_one_atomic_display_date_across_boundaries() {
 fn every_cycle_is_a_permutation_and_matches_the_committed_pack() {
     let pack = ContentPack::parse(PACK).unwrap();
     let epoch = EPOCH_ROLLOVER.to_primitive().unwrap().date();
-    let cycle_length = i64::from(CYCLE_LENGTH);
+    let cycle_length = i64::from(POKEMON_COUNT);
     for cycle in -20..=20 {
         let start = epoch + Duration::days(cycle * cycle_length);
         let ids: BTreeSet<_> = (0..cycle_length)
@@ -248,7 +248,7 @@ fn every_cycle_is_a_permutation_and_matches_the_committed_pack() {
                 selected.dex_id
             })
             .collect();
-        assert_eq!(ids.len(), usize::from(CYCLE_LENGTH));
+        assert_eq!(ids.len(), usize::from(POKEMON_COUNT));
         assert_eq!(
             selection(at_noon(start)).dex_id,
             selection(at_noon(start + Duration::days(cycle_length))).dex_id

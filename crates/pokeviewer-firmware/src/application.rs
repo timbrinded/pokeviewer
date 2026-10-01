@@ -183,7 +183,7 @@ fn render_selection(
 mod tests {
     use pokeviewer_core::{
         BatteryState, ContentPack, DailySelection, DisplayDate, Framebuffer, LocalDateTime,
-        SetupReason, Weekday, scheduled_dex_id,
+        POKEMON_COUNT, SetupReason, Weekday, scheduled_dex_id,
     };
 
     use super::{
@@ -261,7 +261,7 @@ mod tests {
     #[test]
     fn every_packed_entry_renders_through_the_integrated_path() {
         let pack = ContentPack::parse(PACK).unwrap();
-        for cycle_index in 0..=250 {
+        for cycle_index in 0..POKEMON_COUNT {
             let dex_id = scheduled_dex_id(cycle_index);
             let mut framebuffer = Framebuffer::default();
             render_selection(
