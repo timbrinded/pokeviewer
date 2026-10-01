@@ -187,6 +187,14 @@ fn list_devices() -> Result<String, String> {
 }
 
 fn open_device(device: &str, wait_for_device: bool) -> Result<SerialPort, String> {
+    open_device_with_grace(device, wait_for_device, PERMISSION_SETTLE_TIMEOUT)
+}
+
+fn open_device_with_grace(
+    device: &str,
+    wait_for_device: bool,
+    permission_grace: Duration,
+) -> Result<SerialPort, String> {
     let deadline = Instant::now() + DEVICE_WAIT_TIMEOUT;
     let mut first_denied = None;
     loop {
@@ -198,7 +206,7 @@ fn open_device(device: &str, wait_for_device: bool) -> Result<SerialPort, String
                 if wait_for_device
                     && error.kind() == io::ErrorKind::PermissionDenied
                     && first_denied.get_or_insert_with(Instant::now).elapsed()
-                        < PERMISSION_SETTLE_TIMEOUT =>
+                        < permission_grace =>
             {
                 thread::sleep(DEVICE_WAIT_INTERVAL);
             }
@@ -210,6 +218,8 @@ fn open_device(device: &str, wait_for_device: bool) -> Result<SerialPort, String
                     && error.kind() == io::ErrorKind::NotFound
                     && Instant::now() < deadline =>
             {
+                // A later device node gets its own permission grace period.
+                first_denied = None;
                 thread::sleep(DEVICE_WAIT_INTERVAL);
             }
             Err(error)
@@ -500,9 +510,9 @@ mod tests {
 
     use super::{
         Options, PERMISSION_SETTLE_TIMEOUT, RESPONSE_TIMEOUT, exchange_command,
-        format_command_response, open_device, parse_datetime, parse_handshake, parse_options,
-        read_matching_response, read_response, run, start_session, validate_command_capability,
-        validate_options,
+        format_command_response, open_device_with_grace, parse_datetime, parse_handshake,
+        parse_options, read_matching_response, read_response, run, start_session,
+        validate_command_capability, validate_options,
     };
 
     const NOW: &str = "2026-07-27T19:05:09";
@@ -755,7 +765,7 @@ mod tests {
                 "battery_state=recharge cell_mv=3720",
             ),
             (
-                BatteryReading::unavailable(),
+                BatteryReading::UNAVAILABLE,
                 "battery_state=unavailable cell_mv=unavailable",
             ),
         ] {
@@ -814,17 +824,23 @@ mod tests {
             std::env::temp_dir().join(format!("pokeviewerctl-denied-{}", std::process::id()));
         std::fs::write(&path, []).unwrap();
         std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o000)).unwrap();
+        if std::fs::File::open(&path).is_ok() {
+            // Privileged users bypass file modes, so this host cannot exercise EACCES.
+            std::fs::remove_file(&path).unwrap();
+            return;
+        }
         let device = path.to_str().unwrap();
+        let grace = Duration::from_millis(300);
 
         let started = std::time::Instant::now();
-        let waited = open_device(device, true).unwrap_err();
+        let waited = open_device_with_grace(device, true, grace).unwrap_err();
         let elapsed = started.elapsed();
-        let immediate = open_device(device, false).unwrap_err();
+        let immediate = open_device_with_grace(device, false, grace).unwrap_err();
         std::fs::remove_file(&path).unwrap();
 
         assert_eq!(waited, "permission denied for selected serial device");
         assert_eq!(immediate, waited);
-        assert!(elapsed >= PERMISSION_SETTLE_TIMEOUT);
-        assert!(elapsed < PERMISSION_SETTLE_TIMEOUT * 3);
+        assert!(elapsed >= grace);
+        assert!(elapsed < PERMISSION_SETTLE_TIMEOUT);
     }
 }

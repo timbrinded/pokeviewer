@@ -105,6 +105,18 @@ impl SleepResources {
         })
     }
 
+    /// Enter deep sleep until only the RTC alarm becomes active-low.
+    ///
+    /// The alarm-wake diagnostic uses this so a button press cannot be mistaken
+    /// for an alarm wake.
+    pub(crate) fn sleep_for_alarm(self) -> ! {
+        self.sleep_ext1(SleepWakeSources {
+            rtc_alarm: true,
+            power_button: false,
+            boot_button: false,
+        })
+    }
+
     /// Enter deep sleep until PWR or BOOT becomes active-low.
     pub(crate) fn sleep_for_setup(self) -> ! {
         self.sleep_ext1(SleepWakeSources {

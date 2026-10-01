@@ -6,10 +6,10 @@ use esp_hal::{
     delay::Delay,
     gpio::{Input, InputConfig, InputPin, Level, Output, OutputConfig, Pull},
     i2c::master::{Config as I2cConfig, I2c},
-    peripherals::GPIO3,
+    peripherals::{GPIO3, GPIO5},
     rtc_cntl::wakeup_cause,
     system::SleepSource,
-    time::Rate,
+    time::{Duration, Instant, Rate},
 };
 use pokeviewer_core::{BatteryReading, Framebuffer, SetupReason};
 use pokeviewer_esp32s3_pad_hold::release_audio_power_pad;
@@ -37,10 +37,13 @@ type BoardI2c = esp_hal::i2c::master::I2c<'static, esp_hal::Async>;
 type BoardRtc = Pcf85063Rtc<BoardI2c>;
 
 const PARENT_AFTER_DAILY_MAGIC: u32 = 0x5057_5201;
+const TERMINAL_SLEEP_MAGIC: u32 = 0x5445_524d;
 const BUTTON_POLL_MS: u32 = 50;
-const POWER_HOLD_POLLS: usize = 60;
-const RESTART_HOLD_POLLS: usize = 20;
+// Hold thresholds count from wake, which is when the press began.
+const POWER_HOLD_MS: u64 = 3_000;
+const RESTART_HOLD_MS: u64 = 1_000;
 const BUTTON_RELEASE_POLLS: usize = 200;
+const RTC_INTERRUPT_RELEASE_POLLS: usize = 10;
 const RESTART_LIGHT_MS: u32 = 300;
 const USB_FRAME_GATE_POLLS: usize = 15_000;
 const PARENT_SESSION_POLLS: usize = 120_000;
@@ -48,12 +51,17 @@ const PARENT_SESSION_POLLS: usize = 120_000;
 #[esp_hal::ram(unstable(rtc_fast, persistent))]
 static PARENT_AFTER_DAILY: AtomicU32 = AtomicU32::new(0);
 
+// Set only while a terminal failure sleeps, so a short BOOT press can return to it.
+#[esp_hal::ram(unstable(rtc_fast, persistent))]
+static TERMINAL_SLEEP: AtomicU32 = AtomicU32::new(0);
+
 /// Render one frame, then deep-sleep until the RTC alarm, PWR, or BOOT wakes the board.
 pub fn run_pokeviewer() -> ! {
     let cause = wakeup_cause();
     let wake_status = ext1_wake_status();
     let parent_after_daily =
         PARENT_AFTER_DAILY.swap(0, Ordering::Relaxed) == PARENT_AFTER_DAILY_MAGIC;
+    let after_terminal = TERMINAL_SLEEP.swap(0, Ordering::Relaxed) == TERMINAL_SLEEP_MAGIC;
     let peripherals = esp_hal::init(esp_hal::Config::default());
 
     let mut power_latch_pin = peripherals.GPIO17;
@@ -123,7 +131,7 @@ pub fn run_pokeviewer() -> ! {
 
     macro_rules! sleep_current_rtc {
         ($rtc:ident) => {{
-            let sleep_mode = prepare_sleep(&mut $rtc);
+            let sleep_mode = prepare_sleep(&mut $rtc, &mut rtc_interrupt_pin);
             drop($rtc);
             drop(panel_power);
             drop(power_latch);
@@ -179,7 +187,14 @@ pub fn run_pokeviewer() -> ! {
     let mut battery_diagnostic_flags = diagnostic_flags(battery);
 
     if decision.check_restart {
-        if !button_held(boot_button_pin.reborrow(), RESTART_HOLD_POLLS) {
+        if !button_held(boot_button_pin.reborrow(), RESTART_HOLD_MS) {
+            if after_terminal {
+                drop(rtc);
+                drop(panel_power);
+                drop(power_latch);
+                drop(audio_power);
+                sleep_until_restart(sleep_resources!());
+            }
             sleep_current_rtc!(rtc);
         }
         // Acknowledge the restart before the slower panel refresh begins.
@@ -190,7 +205,7 @@ pub fn run_pokeviewer() -> ! {
     }
 
     if decision.check_parent_session && !decision.refresh_daily {
-        if !button_held(power_button_pin.reborrow(), POWER_HOLD_POLLS) {
+        if !button_held(power_button_pin.reborrow(), POWER_HOLD_MS) {
             sleep_current_rtc!(rtc);
         }
 
@@ -336,7 +351,9 @@ pub fn run_pokeviewer() -> ! {
         sleep_resources!().sleep_for_setup();
     };
     let wake_plan = wake_plan.expect("daily frame has a validated wake plan");
-    if block_on(rtc.configure_daily_alarm()).is_err() {
+    if block_on(rtc.configure_daily_alarm()).is_err()
+        || !rtc_interrupt_released(rtc_interrupt_pin.reborrow())
+    {
         terminal!(FailureKind::Alarm);
     }
     let after_alarm_configuration = match block_on(rtc.read_datetime()) {
@@ -367,20 +384,34 @@ pub fn run_pokeviewer() -> ! {
     sleep_resources!().sleep();
 }
 
-/// Report whether an active-low button stays pressed for `polls` intervals.
-fn button_held<'a>(pin: impl InputPin + 'a, polls: usize) -> bool {
+/// Report whether an active-low button stays pressed until `held_ms` after wake.
+fn button_held<'a>(pin: impl InputPin + 'a, held_ms: u64) -> bool {
     let input = Input::new(pin, InputConfig::default().with_pull(Pull::Up));
-    if input.is_high() {
-        return false;
-    }
     let mut delay = Delay::new();
-    for _ in 0..polls {
-        delay.delay_ms(BUTTON_POLL_MS);
+    loop {
         if input.is_high() {
             return false;
         }
+        if Instant::now().duration_since_epoch() >= Duration::from_millis(held_ms) {
+            return true;
+        }
+        delay.delay_ms(BUTTON_POLL_MS);
     }
-    true
+}
+
+/// Report whether the PCF85063 interrupt line rises after the alarm flag clears.
+///
+/// A line that stays low would wake EXT1 immediately, so it is an alarm failure.
+fn rtc_interrupt_released<'a>(pin: impl InputPin + 'a) -> bool {
+    let input = Input::new(pin, InputConfig::default().with_pull(Pull::Up));
+    let mut delay = Delay::new();
+    for _ in 0..RTC_INTERRUPT_RELEASE_POLLS {
+        if input.is_high() {
+            return true;
+        }
+        delay.delay_ms(10);
+    }
+    input.is_high()
 }
 
 /// Wait a bounded time for an active-low button to be released.
@@ -464,14 +495,17 @@ enum RtcSleepMode {
     AlarmFailure,
 }
 
-fn prepare_sleep(rtc: &mut BoardRtc) -> RtcSleepMode {
+fn prepare_sleep(rtc: &mut BoardRtc, rtc_interrupt: &mut GPIO5<'static>) -> RtcSleepMode {
     let valid = block_on(rtc.read_datetime()).is_ok();
     let alarm_pending = block_on(rtc.alarm_pending()).unwrap_or(false);
     if valid && alarm_pending {
         Delay::new().delay_ms(100);
         esp_hal::system::software_reset();
     }
-    if valid && block_on(rtc.configure_daily_alarm()).is_err() {
+    if valid
+        && (block_on(rtc.configure_daily_alarm()).is_err()
+            || !rtc_interrupt_released(rtc_interrupt.reborrow()))
+    {
         return RtcSleepMode::AlarmFailure;
     }
     if valid {
@@ -500,6 +534,11 @@ fn sleep_after_failure(failure: FailureKind, resources: SleepResources) -> ! {
         policy.diagnostic_flag,
         policy.max_attempts,
     );
+    sleep_until_restart(resources);
+}
+
+fn sleep_until_restart(resources: SleepResources) -> ! {
+    TERMINAL_SLEEP.store(TERMINAL_SLEEP_MAGIC, Ordering::Relaxed);
     resources.sleep_until_restart();
 }
 

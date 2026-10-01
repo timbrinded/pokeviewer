@@ -83,7 +83,7 @@ pub(super) struct GoldenCase {
     pub(super) dex_id: u8,
     pub(super) name: String,
     pub(super) weekday: String,
-    pub(super) battery_status: String,
+    pub(super) battery_state: String,
     pub(super) framebuffer_file: String,
     pub(super) png_file: String,
     pub(super) framebuffer_crc32: String,

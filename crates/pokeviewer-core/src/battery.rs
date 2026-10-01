@@ -16,6 +16,8 @@ pub const BATTERY_SNAPSHOT_VERSION: u8 = 1;
 pub const BATTERY_SNAPSHOT_BYTES: usize = 4;
 // Twelve retained tag bits derived from the ASCII `BT` marker (0x4254).
 const BATTERY_SNAPSHOT_MAGIC: u16 = 0x0254;
+// The version occupies the low two tag bits.
+const _: () = assert!(BATTERY_SNAPSHOT_VERSION < 4);
 const BATTERY_SNAPSHOT_TAG: u16 =
     (BATTERY_SNAPSHOT_MAGIC << 2) | u16::from_be_bytes([0, BATTERY_SNAPSHOT_VERSION]);
 
@@ -63,12 +65,6 @@ impl BatteryReading {
         state: BatteryState::Unavailable,
         cell_mv: 0,
     };
-
-    /// Return the canonical unavailable reading.
-    #[must_use]
-    pub const fn unavailable() -> Self {
-        Self::UNAVAILABLE
-    }
 
     /// Construct a reading that satisfies the battery contract.
     ///

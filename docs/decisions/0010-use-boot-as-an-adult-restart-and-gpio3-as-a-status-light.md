@@ -51,7 +51,8 @@ Release firmware arms GPIO0 in daily, setup, and terminal-failure sleep. A
 `BOOT` wake that stays held for one second flashes the green LED once and runs
 the normal reset path: it reads the RTC and refreshes the card, `SET TIME`, or
 recovery screen. It does not sample the battery. A shorter press returns to
-sleep without changing the display. An alarm refresh or `PWR` parent session
+the same sleep without changing the display, so a tap after a terminal failure
+keeps only GPIO0 armed. Hold times count from wake. An alarm refresh or `PWR` parent session
 in the same wake takes precedence.
 
 Terminal failures arm only GPIO0. A restart runs the failed path once more and

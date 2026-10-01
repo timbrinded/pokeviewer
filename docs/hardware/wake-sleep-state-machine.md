@@ -38,7 +38,9 @@ reset or EXT1 wake
 The PCF alarm flag is cleared and configured before sleep. Firmware waits up
 to ten seconds for every requested wake line to rise. EXT1 `ANY_LOW` would wake
 immediately from a line that is still low, so `select_sleep_wake_sources`
-decides which lines to arm after the wait. Firmware never waits indefinitely. GPIO6 and GPIO17 use RTC per-pin holds. GPIO42 uses only its documented
+decides which lines to arm after the wait. Firmware never waits indefinitely.
+A PCF85063 interrupt line that stays low after the alarm flag clears is an
+`ALARM` failure, because the daily alarm could never wake the device. GPIO6 and GPIO17 use RTC per-pin holds. GPIO42 uses only its documented
 digital per-pin hold bit, which matches ESP-IDF `gpio_hold_en`.
 
 Before 07:00, the selection remains the prior calendar date, including its
@@ -84,8 +86,9 @@ the device sleeps or restarts.
 
 ## BOOT restart path
 
-A BOOT wake must stay held for one second. A shorter press returns to sleep
-without a refresh. A recognized hold flashes the green LED once, waits for
+A BOOT wake must stay held for one second, counted from wake. A shorter press
+returns to the same sleep without a refresh; after a terminal failure, that is
+the BOOT-only terminal sleep. A recognized hold flashes the green LED once, waits for
 release, and runs the reset path: it reads the RTC and refreshes the card,
 `SET TIME`, or recovery screen. It does not sample the battery. An alarm
 refresh or PWR parent session in the same wake takes precedence.

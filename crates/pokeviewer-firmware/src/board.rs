@@ -183,7 +183,7 @@ pub fn run_sleep_diagnostic() -> ! {
                 report.rtc_datetime.second,
                 report.alarm_was_pending,
             );
-            resources.sleep();
+            resources.sleep_for_alarm();
         }
         Err(error) => {
             let mut delay = Delay::new();

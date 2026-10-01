@@ -62,7 +62,7 @@ pub(crate) fn update_command() -> TaskResult {
             dex_id: spec.dex_id,
             name: record.name.to_owned(),
             weekday: weekday_label(spec.weekday).to_owned(),
-            battery_status: battery_label(spec.battery_state).to_owned(),
+            battery_state: battery_label(spec.battery_state).to_owned(),
             framebuffer_file: raw_relative,
             png_file: png_relative,
             framebuffer_crc32: format!("{:08x}", crc32fast::hash(framebuffer.as_bytes())),
@@ -73,7 +73,7 @@ pub(crate) fn update_command() -> TaskResult {
     write_json(
         &root.join("manifest.json"),
         &GoldenManifest {
-            schema_version: 2,
+            schema_version: 3,
             renderer_version: 3,
             cases,
         },
@@ -87,7 +87,7 @@ pub(crate) fn check_command(diff_dir: Option<&str>) -> TaskResult {
     let diff_dir = safe_relative_output(diff_dir.unwrap_or(DEFAULT_DIFF_DIR))?;
     clear_directory(&diff_dir)?;
     let manifest = read_manifest(&root.join("manifest.json"))?;
-    if manifest.schema_version != 2
+    if manifest.schema_version != 3
         || manifest.renderer_version != 3
         || manifest.cases.len() != CASES.len()
     {
@@ -180,7 +180,7 @@ fn validate_case_metadata(
         || committed.dex_id != spec.dex_id
         || committed.name != expected_name
         || committed.weekday != weekday_label(spec.weekday)
-        || committed.battery_status != battery_label(spec.battery_state)
+        || committed.battery_state != battery_label(spec.battery_state)
         || committed.framebuffer_file != expected_raw
         || committed.png_file != expected_png
     {

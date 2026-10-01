@@ -55,7 +55,7 @@ fn battery_payload_is_three_validated_little_endian_bytes() {
     assert_eq!(encode_battery_reading(recharge), [1, 0x74, 0x0e]);
     assert_eq!(decode_battery_reading(&[1, 0x74, 0x0e]), Ok(recharge));
     assert_eq!(
-        encode_battery_reading(BatteryReading::unavailable()),
+        encode_battery_reading(BatteryReading::UNAVAILABLE),
         [2, 0, 0]
     );
     for invalid in [
