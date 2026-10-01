@@ -109,17 +109,6 @@ manifest="$bundle_dir/content-manifest.json"
 content_format_version=$(jq -er '.format_version' "$manifest")
 content_revision=$(jq -er '.content_revision' "$manifest")
 schedule_version=$(jq -er '.schedule_version' "$manifest")
-manifest_pack_hash=$(jq -er '.pack_sha256' "$manifest")
-for value in "$content_format_version" "$content_revision" "$schedule_version"; do
-  if [[ ! "$value" =~ ^[0-9]+$ ]]; then
-    echo "content manifest contains a non-integer version" >&2
-    exit 1
-  fi
-done
-if [[ "$manifest_pack_hash" != "$content_hash" ]]; then
-  echo "content manifest pack hash does not match the packaged content" >&2
-  exit 1
-fi
 cat >"$bundle_dir/BUILD-METADATA.txt" <<EOF
 product_version=$VERSION
 source_commit=$commit

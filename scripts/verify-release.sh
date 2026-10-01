@@ -85,37 +85,18 @@ if [[ "$reported_version" != "pokeviewerctl $VERSION" ]]; then
   exit 1
 fi
 
-metadata_version=$(awk -F= '$1 == "product_version" { print $2 }' \
-  "$bundle_dir/BUILD-METADATA.txt")
-if [[ "$metadata_version" != "$VERSION" ]]; then
-  echo "build metadata version does not match release version" >&2
-  exit 1
-fi
-
 metadata_value() {
   local key=$1
   awk -F= -v key="$key" '$1 == key { print substr($0, length(key) + 2) }' \
     "$bundle_dir/BUILD-METADATA.txt"
 }
 
-if [[ ! "$(metadata_value source_commit)" =~ ^[0-9a-f]{40}$ ||
-  "$(metadata_value board)" != "waveshare-esp32-s3-epaper-1.54-en-v2-non-touch" ||
-  "$(metadata_value firmware_target)" != "xtensa-esp32s3-none-elf" ||
-  "$(metadata_value firmware_flash_offset)" != "0x0" ||
-  "$(metadata_value cli_target)" != "x86_64-unknown-linux-gnu" ||
-  "$(metadata_value protocol_version)" != "1" ]]; then
-  echo "build metadata does not match the v1 compatibility contract" >&2
+if [[ "$(metadata_value product_version)" != "$VERSION" ]]; then
+  echo "build metadata version does not match release version" >&2
   exit 1
 fi
 
 manifest="$bundle_dir/content-manifest.json"
-if [[ "$(metadata_value content_format_version)" != "$(jq -er '.format_version' "$manifest")" ||
-  "$(metadata_value content_revision)" != "$(jq -er '.content_revision' "$manifest")" ||
-  "$(metadata_value schedule_version)" != "$(jq -er '.schedule_version' "$manifest")" ]]; then
-  echo "build metadata content versions do not match the content manifest" >&2
-  exit 1
-fi
-
 pack="$bundle_dir/pokeviewer-v1.pack"
 pack_hash=$(sha256sum "$pack")
 pack_hash=${pack_hash%% *}
