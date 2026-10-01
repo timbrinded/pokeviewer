@@ -8,9 +8,6 @@ the canonical type or types. The device does not use Wi-Fi or BLE.
 
 ![Seven Pokeviewer devices, one for each weekday from Monday to Sunday](docs/images/device/week.svg)
 
-The screens in these pictures come from the firmware's own renderer, pixel
-for pixel. The case drawing follows the Waveshare outline drawing.
-
 ## Quick start
 
 These instructions install Pokeviewer v2.0.0 from the official
