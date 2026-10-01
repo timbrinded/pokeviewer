@@ -90,11 +90,14 @@ espflash save-image \
 cp "$CLI" "$bundle_dir/$cli_bin"
 cp content/generated/pokeviewer-v1.pack "$bundle_dir/"
 cp content/generated/pokeviewer-v1.json "$bundle_dir/content-manifest.json"
-# The archive ships SAFETY.md and TROUBLESHOOTING.md beside the README; every
-# other repository link points at the tagged source on GitHub.
+# The archive ships SAFETY.md and TROUBLESHOOTING.md beside the README; images
+# load from the tagged raw files, and every other repository link points at
+# the tagged source on GitHub.
 readonly source_url="https://github.com/timbrinded/pokeviewer/blob/v$VERSION"
+readonly raw_url="https://raw.githubusercontent.com/timbrinded/pokeviewer/v$VERSION"
 sed -e 's#](docs/safety\.md)#](SAFETY.md)#g' \
   -e 's#](docs/troubleshooting\.md)#](TROUBLESHOOTING.md)#g' \
+  -e "s#](\\(docs/images/[^)]*\\))#](${raw_url}/\\1)#g" \
   -e "s#](\\(docs/[^)]*\\|CONTRIBUTING\\.md\\))#](${source_url}/\\1)#g" \
   README.md >"$bundle_dir/README.md"
 cp release/RELEASE-NOTES.md "$bundle_dir/"

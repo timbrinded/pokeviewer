@@ -6,6 +6,11 @@ It supports only the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 board.
 The device shows the weekday, a Pokémon Yellow sprite, the English name, and
 the canonical type or types. The device does not use Wi-Fi or BLE.
 
+![Seven Pokeviewer devices, one for each weekday from Monday to Sunday](docs/images/device/week.svg)
+
+The screens in these pictures come from the firmware's own renderer, pixel
+for pixel. The case drawing follows the Waveshare outline drawing.
+
 ## Quick start
 
 These instructions install Pokeviewer v2.0.0 from the official
@@ -24,6 +29,11 @@ Get these items:
 
 Read the [safety guide](docs/safety.md) (`SAFETY.md` in the release archive)
 before you connect the battery.
+
+Find the parts that setup uses. `BOOT` is above `PWR` on the right side, the
+light is next to the microSD slot, and the USB-C port is on the bottom.
+
+![The front, right side, and bottom of the device, with the microSD slot, light, BOOT, PWR, and USB-C port labelled](docs/images/device/anatomy.svg)
 
 Install the pinned flash utility:
 
@@ -163,6 +173,9 @@ Wait for the command to report a successful write.
 5. Connect the USB cable normally.
 6. Wait for the screen to show `SET TIME`. The green light turns on.
 
+   ![The SET TIME screen](docs/images/device/screen-set-time.svg)
+   ![The light, on and green](docs/images/device/light-green.svg)
+
 This power cycle stops download mode and starts the installed firmware.
 The device waits two minutes for the time. If the green light turns off
 first, hold `BOOT` for one second to start another two-minute wait.
@@ -297,6 +310,8 @@ The device has two buttons, `PWR` and `BOOT`, and one light that can show
 green or orange. A child does not need to use them. A short press of either
 button does not change the screen.
 
+![The right side of the device, with the light, BOOT, and PWR labelled](docs/images/device/anatomy.svg)
+
 ### `PWR` button
 
 | What you do | What happens |
@@ -322,24 +337,24 @@ day's card. It does not change the clock.
 
 ### Lights
 
-| Light | Meaning |
-| --- | --- |
-| Green flashes once | The device accepted a `BOOT` restart. |
-| Green stays on | The device is listening for, or connected to, a computer. |
-| Green off | Normal. The device is asleep or working without a computer. |
-| Orange on | The battery is charging from USB. The charger controls this light. |
-| Orange off | The battery is not charging, or it is full. |
+| Looks like | Light | Meaning |
+| --- | --- | --- |
+| ![Green light flashing once](docs/images/device/light-green-flash.svg) | Green flashes once | The device accepted a `BOOT` restart. |
+| ![Green light on](docs/images/device/light-green.svg) | Green stays on | The device is listening for, or connected to, a computer. |
+| ![Light off](docs/images/device/light-off.svg) | Green off | Normal. The device is asleep or working without a computer. |
+| ![Orange light on](docs/images/device/light-orange.svg) | Orange on | The battery is charging from USB. The charger controls this light. |
+| ![Light off](docs/images/device/light-off.svg) | Orange off | The battery is not charging, or it is full. |
 
 ### Screen messages
 
-| Screen | Meaning | What to do |
-| --- | --- | --- |
-| Weekday, Pokémon, name, and type | Normal daily card. | Nothing. It changes at 07:00. |
-| `BAT ?` in the top-right corner | The last battery reading was not valid. | Charge the battery. The next reading, within three hours, replaces it. |
-| Lightning icon and `CHARGE!` at the bottom | The battery is low. | Charge until the orange light goes out, then unplug. `CHARGE!` clears within three hours, or hold `BOOT` for one second to clear it now. |
-| `SET TIME` | The clock is not set, or a computer session is open. | [Change the time](#change-the-time-later). |
-| `POKEVIEWER ERROR` with `RESET` | A bounded failure stopped the device. | Hold `BOOT` for one second. If it returns, read [troubleshooting](docs/troubleshooting.md). |
-| `POKEVIEWER ERROR` with `REFLASH` | The firmware content is damaged. | [Flash the firmware](#4-flash-the-firmware) again. |
+| Looks like | Screen | Meaning | What to do |
+| --- | --- | --- | --- |
+| ![Daily card for Pikachu on Monday](docs/images/device/screen-daily.svg) | Weekday, Pokémon, name, and type | Normal daily card. | Nothing. It changes at 07:00. |
+| ![Daily card with BAT ? in the top-right corner](docs/images/device/screen-unavailable.svg) | `BAT ?` in the top-right corner | The last battery reading was not valid. | Charge the battery. The next reading, within three hours, replaces it. |
+| ![Daily card with a lightning icon and CHARGE! at the bottom](docs/images/device/screen-recharge.svg) | Lightning icon and `CHARGE!` at the bottom | The battery is low. | Charge until the orange light goes out, then unplug. `CHARGE!` clears within three hours, or hold `BOOT` for one second to clear it now. |
+| ![The SET TIME screen](docs/images/device/screen-set-time.svg) | `SET TIME` | The clock is not set, or a computer session is open. | [Change the time](#change-the-time-later). |
+| ![POKEVIEWER ERROR screen with code WAKE and RESET](docs/images/device/screen-error-reset.svg) | `POKEVIEWER ERROR` with `RESET` | A bounded failure stopped the device. The middle line shows a code such as `WAKE` or `ALARM`. | Hold `BOOT` for one second. If it returns, read [troubleshooting](docs/troubleshooting.md). |
+| ![POKEVIEWER ERROR screen with code PACK and REFLASH](docs/images/device/screen-error-reflash.svg) | `POKEVIEWER ERROR` with `REFLASH` | The firmware content is damaged. | [Flash the firmware](#4-flash-the-firmware) again. |
 
 After a new clock setting or battery connection, the card can show `BAT ?`
 until the next battery reading, at most three hours later. A reading taken
