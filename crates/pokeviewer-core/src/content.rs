@@ -15,6 +15,46 @@ pub const CONTENT_SPRITE_SIZE: usize = 56;
 /// Bytes in one 56 × 56 content sprite with two bits per pixel.
 pub const CONTENT_SPRITE_BYTES: usize = CONTENT_SPRITE_SIZE * CONTENT_SPRITE_SIZE / 4;
 
+/// Read the two-bit shade at `(x, y)`, from `0` white to `3` black.
+///
+/// Pixels are row-major, and the most-significant bit pair of each byte is the
+/// leftmost pixel.
+///
+/// # Panics
+///
+/// Panics if `x` or `y` is not below [`CONTENT_SPRITE_SIZE`].
+#[must_use]
+pub fn sprite_shade(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> u8 {
+    let (index, shift) = shade_location(x, y);
+    (sprite[index] >> shift) & 0b11
+}
+
+/// Write the two-bit `shade` at `(x, y)`, replacing the previous value.
+///
+/// # Panics
+///
+/// Panics if `x` or `y` is not below [`CONTENT_SPRITE_SIZE`].
+pub fn set_sprite_shade(sprite: &mut [u8; CONTENT_SPRITE_BYTES], x: usize, y: usize, shade: u8) {
+    let (index, shift) = shade_location(x, y);
+    sprite[index] = (sprite[index] & !(0b11 << shift)) | ((shade & 0b11) << shift);
+}
+
+fn shade_location(x: usize, y: usize) -> (usize, u8) {
+    assert!(
+        x < CONTENT_SPRITE_SIZE && y < CONTENT_SPRITE_SIZE,
+        "sprite pixel is outside the canvas"
+    );
+    let pixel = y * CONTENT_SPRITE_SIZE + x;
+    // Four pixels per byte, leftmost in bits 7–6.
+    let shift = match pixel % 4 {
+        0 => 6,
+        1 => 4,
+        2 => 2,
+        _ => 0,
+    };
+    (pixel / 4, shift)
+}
+
 /// Stable Pokémon type codes stored in the content pack.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]

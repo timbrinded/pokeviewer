@@ -33,17 +33,22 @@ contains no battery percentage.
 Pack sprites hold four shades, from `0` white to `3` black. The renderer draws
 each sprite pixel as a 2 × 2 panel cell and sets 0, 1, 2, or 4 of its pixels
 black for shades 0–3: white, 25 %, 50 %, and black. A black sprite pixel
-whose eight neighbours are also black gets 3 of 4 (75 %), so large black
-areas keep their form while outlines, pupils, and black detail up to two
-pixels thick stay solid. A fixed 2 × 2 ordered-dither threshold, `[[0, 2],
+that is one of the four centre pixels of an all-black 4 × 4 square gets 3 of
+4 (75 %), so large black areas keep their form while outlines, eyes, spots,
+and black detail up to three pixels wide stay solid. A fixed 2 × 2 ordered-dither threshold, `[[0, 2],
 [3, 1]]`, chooses which pixels, so 25 % is one dot per cell, 50 % is a
 checkerboard, and adjacent cells tile without seams.
 
 Every panel pixel is still black or white, and the panel uses its normal full
 refresh. `SHADE_INK` and `SOLID_INTERIOR_INK` in `render.rs` are the reviewed
-tone table; changing them is a visual change that needs `golden-update`. The
-[tone-mapping evidence](../evidence/crystal-sprites/README.md) compares the
-options.
+tone table; changing them is a visual change that needs `golden-update`.
+
+The Crystal palettes are why the shading exists. With two shades mapped to
+black and two to white, 39 of the 251 sprites are more than 80 % ink inside
+their outline: Vileplume's body and face, Gengar, Umbreon, and Murkrow become
+solid black, and Snorlax loses its belly. With this table, no sprite is above
+about 80 %, and light bodies such as Pikachu read as a 25 % stipple instead
+of disappearing into the white background.
 
 ## Memory report
 

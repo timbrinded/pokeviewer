@@ -180,9 +180,12 @@ pub fn select_daily_pokemon(local: LocalDateTime) -> Result<DailySelection, Inva
 #[must_use]
 pub fn scheduled_dex_id(cycle_index: u8) -> u8 {
     let position = CYCLE_MULTIPLIER * u16::from(cycle_index) % u16::from(CYCLE_LENGTH);
-    // The remainder is below 251, so the conversion and the 1-based ID never
-    // overflow.
-    u8::try_from(position).map_or(u8::MAX, |position| position + 1)
+    #[expect(
+        clippy::cast_possible_truncation,
+        reason = "the remainder is below the 251-day cycle length"
+    )]
+    let position = position as u8;
+    position + 1
 }
 
 /// Calculate the first 07:00:00 local transition strictly after `local`.

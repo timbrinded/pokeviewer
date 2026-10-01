@@ -1,14 +1,15 @@
 use std::io::Cursor;
 
 use png::{BitDepth, ColorType, Transformations};
+use pokeviewer_core::{CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, set_sprite_shade};
 use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
 
 use super::TaskResult;
 
-pub(super) const SPRITE_WIDTH: usize = 56;
-pub(super) const SPRITE_HEIGHT: usize = 56;
-pub(super) const SPRITE_BYTES: usize = SPRITE_WIDTH * SPRITE_HEIGHT / 4;
+pub(super) const SPRITE_WIDTH: usize = CONTENT_SPRITE_SIZE;
+pub(super) const SPRITE_HEIGHT: usize = CONTENT_SPRITE_SIZE;
+pub(super) const SPRITE_BYTES: usize = CONTENT_SPRITE_BYTES;
 pub(super) const NO_SECONDARY_TYPE: u8 = 0xff;
 const MAX_NAME_BYTES: usize = 16;
 const SOURCE_PALETTE_COLORS: usize = 4;
@@ -73,7 +74,7 @@ pub(super) struct ConvertedRecord {
     pub(super) secondary_type: u8,
     pub(super) source_width: usize,
     pub(super) source_height: usize,
-    pub(super) sprite: Vec<u8>,
+    pub(super) sprite: [u8; SPRITE_BYTES],
 }
 
 #[derive(Debug)]
@@ -210,10 +211,10 @@ fn validate_name(id: u16, name: &str) -> TaskResult {
     Ok(())
 }
 
-fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> {
+fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<([u8; SPRITE_BYTES], usize, usize)> {
     let decoded = decode_sprite(id, bytes)?;
     let palette = source_palette(id, &decoded.pixels)?;
-    let mut output = vec![0; SPRITE_BYTES];
+    let mut output = [0; SPRITE_BYTES];
     let x_offset = (SPRITE_WIDTH - decoded.width) / 2;
     let y_offset = (SPRITE_HEIGHT - decoded.height) / 2;
     for (source_index, [red, green, blue, alpha]) in decoded.pixels.into_iter().enumerate() {
@@ -227,10 +228,12 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> 
             .ok_or_else(|| format!("Pokémon ID {id}: sprite palette: colour is not ranked"))?;
         let shade = u8::try_from(SOURCE_PALETTE_COLORS - 1 - rank)
             .map_err(|_| format!("Pokémon ID {id}: sprite palette: shade exceeds u8"))?;
-        let source_x = source_index % decoded.width;
-        let source_y = source_index / decoded.width;
-        let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
-        output[output_index / 4] |= shade << (6 - 2 * (output_index % 4));
+        set_sprite_shade(
+            &mut output,
+            source_index % decoded.width + x_offset,
+            source_index / decoded.width + y_offset,
+            shade,
+        );
     }
     Ok((output, decoded.width, decoded.height))
 }

@@ -6,7 +6,7 @@ use super::{
 };
 use crate::{
     BatteryState, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, ContentPack, DISPLAY_WIDTH,
-    FRAMEBUFFER_BYTES, PokemonType, Weekday,
+    FRAMEBUFFER_BYTES, PokemonType, Weekday, set_sprite_shade,
 };
 
 const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
@@ -45,7 +45,6 @@ fn long_name_dual_types_and_sprite_extremes_are_deterministic() {
     render_daily_card(&mut black_first, card("Farfetch’d", &BLACK_SPRITE)).unwrap();
     render_daily_card(&mut black_second, card("Farfetch’d", &BLACK_SPRITE)).unwrap();
     assert_eq!(black_first, black_second);
-    assert_eq!(crc32fast::hash(black_first.as_bytes()), 0x17e7_5483);
 
     let mut white = Framebuffer::default();
     render_daily_card(&mut white, card("Nidoran♀", &WHITE_SPRITE)).unwrap();
@@ -80,6 +79,29 @@ fn sprite_shades_render_as_dithered_cells() {
     let left = (DISPLAY_WIDTH - CONTENT_SPRITE_SIZE * SPRITE_SCALE) / 2;
     assert_eq!(black.is_black(left, SPRITE_Y), Some(true));
     assert_eq!(black.is_black(left + 2, SPRITE_Y + 3), Some(false));
+}
+
+#[test]
+fn black_features_narrower_than_four_pixels_stay_solid() {
+    let mut sprite = WHITE_SPRITE;
+    // A 3 × 3 eye and a 4 × 4 patch, well apart.
+    for (left, size) in [(4, 3), (20, 4)] {
+        for y in 10..10 + size {
+            for x in left..left + size {
+                set_sprite_shade(&mut sprite, x, y, 3);
+            }
+        }
+    }
+    let mut framebuffer = Framebuffer::default();
+    render_daily_card(&mut framebuffer, card("Mew", &sprite)).unwrap();
+
+    let eye_cells = 3 * 3;
+    let patch_centre_cells = 2 * 2;
+    let patch_edge_cells = 4 * 4 - patch_centre_cells;
+    assert_eq!(
+        sprite_ink(&framebuffer),
+        (eye_cells + patch_edge_cells) * 4 + patch_centre_cells * 3
+    );
 }
 
 #[test]

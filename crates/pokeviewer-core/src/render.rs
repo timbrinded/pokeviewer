@@ -2,7 +2,7 @@
 
 use crate::{
     BatteryState, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, DISPLAY_HEIGHT, DISPLAY_WIDTH,
-    FRAMEBUFFER_BYTES, PokemonType, Weekday, font,
+    FRAMEBUFFER_BYTES, PokemonType, Weekday, font, sprite_shade,
 };
 
 const NAME_MAX_BYTES: usize = 16;
@@ -24,10 +24,11 @@ const BLACK_SHADE: u8 = 3;
 /// Black panel pixels out of the four in a sprite pixel's 2 × 2 cell, indexed
 /// by the pack's shade from `0` white to `3` black: white, 25 %, 50 %, black.
 const SHADE_INK: [u8; 4] = [0, 1, 2, 4];
-/// Ink for a black sprite pixel whose eight neighbours are also black. Large
-/// black areas drop to 75 % so the body keeps its form, while outlines and
-/// thin black detail stay solid.
+/// Ink for a black sprite pixel at the centre of an all-black 4 × 4 square.
+/// Large black areas drop to 75 % so the body keeps its form, while outlines,
+/// eyes, and black detail up to three pixels wide stay solid.
 const SOLID_INTERIOR_INK: u8 = 3;
+const SOLID_BLOCK: usize = 4;
 /// Ordered-dither thresholds for one 2 × 2 cell. A panel pixel is black when
 /// the cell's ink exceeds its threshold, so 25 % is one dot, 50 % is a
 /// checkerboard, and adjacent cells tile without seams.
@@ -55,7 +56,7 @@ pub struct DailyCard<'a> {
 pub enum RenderError {
     /// The English display name is empty.
     EmptyName,
-    /// The UTF-8 name exceeds the content-pack v1 limit.
+    /// The UTF-8 name exceeds the content-pack limit of 16 bytes.
     NameTooLong,
     /// The name contains a character absent from the fixed font.
     UnsupportedGlyph,
@@ -129,8 +130,8 @@ impl Framebuffer {
 ///
 /// # Errors
 ///
-/// Returns [`RenderError`] when the name or type combination violates the v1
-/// contract or cannot fit the fixed layout.
+/// Returns [`RenderError`] when the name or type combination violates the
+/// content-pack contract or cannot fit the fixed layout.
 pub fn render_daily_card(
     framebuffer: &mut Framebuffer,
     card: DailyCard<'_>,
@@ -313,20 +314,22 @@ fn sprite_ink(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> u8 {
     }
 }
 
+/// Whether `(x, y)` is one of the four centre pixels of an all-black square
+/// of [`SOLID_BLOCK`] pixels. Black features narrower than that, such as
+/// outlines, pupils, and spots, never qualify.
 fn is_solid_interior(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> bool {
-    let last = CONTENT_SPRITE_SIZE - 1;
-    if x == 0 || y == 0 || x == last || y == last {
-        return false;
-    }
-    (y - 1..=y + 1).all(|neighbour_y| {
-        (x - 1..=x + 1)
-            .all(|neighbour_x| sprite_shade(sprite, neighbour_x, neighbour_y) == BLACK_SHADE)
-    })
+    [(1, 1), (1, 2), (2, 1), (2, 2)]
+        .into_iter()
+        .any(|(offset_x, offset_y)| {
+            x >= offset_x && y >= offset_y && is_black_square(sprite, x - offset_x, y - offset_y)
+        })
 }
 
-fn sprite_shade(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> u8 {
-    let index = y * CONTENT_SPRITE_SIZE + x;
-    (sprite[index / 4] >> (6 - 2 * (index % 4))) & 0b11
+fn is_black_square(sprite: &[u8; CONTENT_SPRITE_BYTES], left: usize, top: usize) -> bool {
+    left + SOLID_BLOCK <= CONTENT_SPRITE_SIZE
+        && top + SOLID_BLOCK <= CONTENT_SPRITE_SIZE
+        && (top..top + SOLID_BLOCK)
+            .all(|y| (left..left + SOLID_BLOCK).all(|x| sprite_shade(sprite, x, y) == BLACK_SHADE))
 }
 
 fn fill_scaled_pixel(framebuffer: &mut Framebuffer, x: usize, y: usize, scale: usize) {

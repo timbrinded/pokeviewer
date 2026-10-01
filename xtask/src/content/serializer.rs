@@ -205,12 +205,6 @@ fn build_pack(records: &[ConvertedRecord]) -> TaskResult<Vec<u8>> {
         record_bytes.extend([record.primary_type, record.secondary_type, name_length]);
         record_bytes.extend_from_slice(&name_offset.to_le_bytes());
         names.extend_from_slice(record.name.as_bytes());
-        if record.sprite.len() != SPRITE_BYTES {
-            return Err(format!(
-                "Pokémon ID {}: converted sprite must be {SPRITE_BYTES} bytes",
-                record.id
-            ));
-        }
         sprites.extend_from_slice(&record.sprite);
     }
 
@@ -297,12 +291,11 @@ fn write_contact_sheet(records: &[ConvertedRecord], path: &Path) -> TaskResult {
     for (record_index, record) in records.iter().enumerate() {
         let cell_x = (record_index % COLUMNS) * SPRITE_WIDTH;
         let cell_y = (record_index / COLUMNS) * SPRITE_HEIGHT;
-        for sprite_index in 0..SPRITE_WIDTH * SPRITE_HEIGHT {
-            let byte = record.sprite[sprite_index / 4];
-            let shade = (byte >> (6 - 2 * (sprite_index % 4))) & 0b11;
-            let x = cell_x + sprite_index % SPRITE_WIDTH;
-            let y = cell_y + sprite_index / SPRITE_WIDTH;
-            pixels[y * width + x] = GREYS[usize::from(shade)];
+        for y in 0..SPRITE_HEIGHT {
+            for x in 0..SPRITE_WIDTH {
+                let shade = pokeviewer_core::sprite_shade(&record.sprite, x, y);
+                pixels[(cell_y + y) * width + cell_x + x] = GREYS[usize::from(shade)];
+            }
         }
     }
 
@@ -356,7 +349,7 @@ mod tests {
                 secondary_type: NO_SECONDARY_TYPE,
                 source_width: SPRITE_WIDTH,
                 source_height: SPRITE_HEIGHT,
-                sprite: vec![0; SPRITE_BYTES],
+                sprite: [0; SPRITE_BYTES],
             })
             .collect()
     }

@@ -18,6 +18,7 @@ pub use battery::{
 };
 pub use content::{
     CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, ContentPack, PackError, PokemonRecord, PokemonType,
+    set_sprite_shade, sprite_shade,
 };
 pub use protocol::{
     BATTERY_PAYLOAD_BYTES, CAP_DIAGNOSTICS, CAP_ENTER_STORAGE, CAP_HANDSHAKE, CAP_READ_BATTERY,
