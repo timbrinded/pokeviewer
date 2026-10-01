@@ -70,8 +70,10 @@ alarm flag asserted. After the real local RTC was restored and read back, the
 production binary refreshed once, entered deep sleep, and remained absent from
 USB throughout the bounded 45-second observation.
 
-Sanitized panel photos, one DMM comparison of retained cell millivolts, and one
-bounded RTC-alarm-versus-PWR battery commit check remain pending. These checks
+The RTC-alarm-versus-PWR battery commit check passed on 2026-10-01: 3,902 mV
+stayed through PWR and BOOT wakes, and a synthetic 07:00 alarm wake committed
+4,080 mV. Sanitized panel photos and one DMM comparison of retained cell
+millivolts remain pending. These checks
 do not establish precise capacity or runtime.
 
 ## Static release budget

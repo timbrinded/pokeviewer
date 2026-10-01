@@ -19,6 +19,8 @@ confidence-threshold = 0.8
 [bans]
 multiple-versions = "allow"
 wildcards = "deny"
+# Internal path dependencies are unpublished workspace crates, not registry wildcards.
+allow-wildcard-paths = true
 
 [sources]
 unknown-registry = "deny"
