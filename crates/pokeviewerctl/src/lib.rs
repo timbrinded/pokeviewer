@@ -528,7 +528,7 @@ mod tests {
         );
         assert_eq!(
             run(["--version".to_owned()]).unwrap(),
-            "pokeviewerctl 1.2.0"
+            "pokeviewerctl 2.0.0"
         );
     }
 

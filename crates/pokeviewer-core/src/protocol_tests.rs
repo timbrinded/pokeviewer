@@ -38,7 +38,7 @@ fn every_command_round_trips_with_request_id_and_payload() {
 #[test]
 fn protocol_v1_command_ids_and_capability_mask_are_stable_and_extended() {
     assert_eq!(PROTOCOL_VERSION, 1);
-    assert_eq!(FIRMWARE_VERSION, [1, 2, 0]);
+    assert_eq!(FIRMWARE_VERSION, [2, 0, 0]);
     assert_eq!(Command::Handshake as u8, 1);
     assert_eq!(Command::ReadRtc as u8, 2);
     assert_eq!(Command::SetRtc as u8, 3);
