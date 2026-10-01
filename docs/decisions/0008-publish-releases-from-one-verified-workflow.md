@@ -70,5 +70,4 @@ qualification validator. A local release package must pass
 ## More Information
 
 - [Publishing guide](../development/publishing.md)
-- [Release verification](../release-verification.md)
 - [Optional hardware validation](../hardware/validation.md)

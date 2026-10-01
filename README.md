@@ -10,10 +10,8 @@ the canonical type or types. The device does not use Wi-Fi or BLE.
 
 These instructions install Pokeviewer v1.2.0 from the official
 [Pokeviewer releases](https://github.com/timbrinded/pokeviewer/releases) page.
-They require an x86-64 Linux computer.
-
-The ESP32-S3 ROM contains the factory download bootloader. This procedure
-writes Pokeviewer firmware to flash memory.
+They require an x86-64 Linux computer. The release archive contains a copy of
+this guide as `README.md`.
 
 ### 1. Prepare the equipment
 
@@ -24,7 +22,8 @@ Get these items:
 - a compatible protected battery; and
 - an x86-64 Linux computer with `curl`, `tar`, `sha256sum`, and Cargo.
 
-Read the [safety guide](docs/safety.md) before you connect the battery.
+Read the [safety guide](docs/safety.md) (`SAFETY.md` in the release archive)
+before you connect the battery.
 
 Install the pinned flash utility:
 
@@ -56,7 +55,8 @@ cd pokeviewer-v1.2.0
 sha256sum --check SHA256SUMS
 ```
 
-Stop if a checksum command reports a failure.
+Stop if a checksum command reports a failure. Install only files from the
+official release page, not copies from an issue, chat, or mirror.
 
 ### 3. Start download mode
 
@@ -79,8 +79,13 @@ Set `DEVICE` to the path that the command shows:
 export DEVICE=/dev/ttyACM0
 ```
 
-**Troubleshooting: battery connected.** If `ls` finds no board, the installed
-firmware is in deep sleep. Prepare the bundled CLI and wait for the device:
+**Troubleshooting: battery connected.** If `ls` finds no board, the battery is
+probably still connected and the installed firmware is in deep sleep. `BOOT`
+cannot start download mode while the battery powers the board. Disconnect the
+battery and repeat this step.
+
+To reach the installed firmware instead, for example to read it with `info`,
+prepare the bundled CLI and wait for the device:
 
 ```console
 chmod u+x ./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu
@@ -257,7 +262,8 @@ power-off. A later `PWR` press starts the device.
 
 At 07:00 local time, the device wakes and shows the card for the new day.
 The device then enters deep sleep. The e-paper panel keeps the card visible
-without panel power.
+without panel power. Before 07:00, the previous day's card stays, including
+its weekday. This is intended.
 
 The firmware contains all 151 Generation I entries.
 The device does not require an account, an SD card, or internet access.
@@ -265,13 +271,11 @@ The supported board does not have a touchscreen.
 
 The card shows one battery state. `Normal` shows no battery text or icon.
 `Recharge` shows the lightning icon and `CHARGE!` at the bottom.
-`Unavailable` shows `BAT ?` in the top-right corner. If an invalid scheduled observation follows `Recharge`, the complete
-prior recharge snapshot remains. Otherwise, it commits `Unavailable` with
-`0` mV. The display does not show battery percentage or make a precise
-capacity claim.
+`Unavailable` shows `BAT ?` in the top-right corner. The device measures the
+battery only at the scheduled 07:00 wake. The display does not show a battery
+percentage or estimate runtime.
 
-The USB CLI reports the retained scheduled sample without changing the
-display:
+The USB CLI reports the last 07:00 reading without changing the display:
 
 ```console
 "$CLI" get-battery --device "$DEVICE" --wait-for-device
@@ -280,9 +284,11 @@ display:
 Start the command, then press and hold `PWR` until the green light turns on.
 Release `PWR` when `SET TIME` appears.
 
-It reports the state and bounded cell millivolts. Millivolts are diagnostic
-data, not a state-of-charge measurement. The board has no dedicated USB-power
-sense input, so a USB-powered reading does not identify the cell's capacity.
+It reports the state and the cell voltage in millivolts. The voltage is a
+diagnostic value, not a measure of remaining charge.
+
+Battery runtime is not guaranteed. The battery state does not replace the
+battery's protection circuit, the charger, or adult supervision.
 
 ## Controls and lights
 
@@ -354,15 +360,20 @@ An adult must assemble, inspect, charge, and supervise the device.
 
 ## Documentation
 
-- [Setup and operation](docs/user-guide.md)
+For parents:
+
 - [Safety](docs/safety.md)
 - [Troubleshooting and recovery](docs/troubleshooting.md)
-- [Release verification](docs/release-verification.md)
-- [Product contract](docs/product-contract.md)
-- [Architecture decisions](docs/decisions/README.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-## Local development
+For maintainers and reviewers:
 
-For local development information, read
-[CONTRIBUTING.md](CONTRIBUTING.md).
+- [Contributing](CONTRIBUTING.md)
+- [Product contract](docs/product-contract.md)
+- [Firmware runtime](docs/hardware/wake-sleep-state-machine.md)
+- [V2 board contract](docs/hardware/v2-board-contract.md)
+- [USB protocol](docs/usb-protocol-v1.md)
+- [Content pack format](docs/content-pack-v1.md)
+- [Toolchain and source builds](docs/development/toolchain.md)
+- [CI](docs/development/ci.md) and [publishing a release](docs/development/publishing.md)
+- [Architecture decisions](docs/decisions/README.md)

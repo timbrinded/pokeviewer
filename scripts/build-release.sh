@@ -30,10 +30,16 @@ if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 IFS= read -r release_notes_heading <release/RELEASE-NOTES.md
-IFS= read -r flashing_heading <release/FLASHING.md
-if [[ "$release_notes_heading" != "# Pokeviewer v$VERSION" ||
-  "$flashing_heading" != "# Flash Pokeviewer v$VERSION" ]]; then
-  echo "release document headings do not match v$VERSION" >&2
+if [[ "$release_notes_heading" != "# Pokeviewer v$VERSION" ]]; then
+  echo "release notes heading does not match v$VERSION" >&2
+  exit 1
+fi
+# The README install commands name the release files, so a stale version
+# would send users to the previous release.
+stale_names=$(grep -oE 'pokeviewer(ctl)?-v[0-9]+\.[0-9]+\.[0-9]+' README.md |
+  grep -vFx -e "pokeviewer-v$VERSION" -e "pokeviewerctl-v$VERSION" || true)
+if [[ -n "$stale_names" ]] || ! grep -qF "pokeviewer-v$VERSION.tar.gz" README.md; then
+  echo "README.md install commands do not all use v$VERSION" >&2
   exit 1
 fi
 
@@ -85,12 +91,9 @@ espflash save-image \
 cp "$CLI" "$bundle_dir/$cli_bin"
 cp content/generated/pokeviewer-v1.pack "$bundle_dir/"
 cp content/generated/pokeviewer-v1.json "$bundle_dir/content-manifest.json"
-cp release/FLASHING.md "$bundle_dir/"
-cp release/RELEASE-NOTES.md "$bundle_dir/"
-cp docs/user-guide.md "$bundle_dir/USER-GUIDE.md"
+cp README.md release/RELEASE-NOTES.md "$bundle_dir/"
 cp docs/safety.md "$bundle_dir/SAFETY.md"
 cp docs/troubleshooting.md "$bundle_dir/TROUBLESHOOTING.md"
-cp docs/release-verification.md "$bundle_dir/RELEASE-VERIFICATION.md"
 cp LICENSE THIRD_PARTY_NOTICES.md "$bundle_dir/"
 chmod 0644 "$bundle_dir"/*
 chmod 0755 "$bundle_dir/$cli_bin"
@@ -133,12 +136,10 @@ payloads=(
   "pokeviewer-v1.pack"
   "content-manifest.json"
   "BUILD-METADATA.txt"
-  "FLASHING.md"
+  "README.md"
   "RELEASE-NOTES.md"
-  "USER-GUIDE.md"
   "SAFETY.md"
   "TROUBLESHOOTING.md"
-  "RELEASE-VERIFICATION.md"
   "LICENSE"
   "THIRD_PARTY_NOTICES.md"
 )

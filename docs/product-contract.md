@@ -2,10 +2,9 @@
 
 - Status: accepted
 - Decision issue: [P01 / #2][issue-2]
-- Last reviewed: 2026-08-10
 
-This document is the authoritative product boundary. Any change to a locked
-decision requires an accepted decision record before implementation.
+This document is the authoritative product boundary. Changing it requires an
+accepted [decision record](decisions/README.md) first.
 
 ## Supported device
 
@@ -15,8 +14,8 @@ decision requires an accepted decision record before implementation.
 - Battery-powered operation through the board's supported 3.7 V lithium
   battery input.
 
-The exact V2 pin and power contract is maintained separately because vendor V1
-and V2 examples are not interchangeable.
+The [V2 board contract](hardware/v2-board-contract.md) records pins and power
+behavior. Vendor V1 and V2 examples are not interchangeable.
 
 ## Runtime contract
 
@@ -81,24 +80,25 @@ so firmware cannot use a USB-powered reading to identify cell capacity.
 
 ## Distribution
 
-Each final GitHub release contains:
+Each GitHub release contains:
 
 - one merged, ready-to-flash image for the supported V2 board;
 - one Linux x86-64 `pokeviewerctl` binary;
 - SHA-256 checksums and build/content version metadata;
-- setup, operation, safety, recovery, and verification documentation; and
+- setup, operation, safety, and recovery documentation; and
 - applicable licenses and third-party notices.
+
+The [publishing guide](development/publishing.md) lists the exact files.
 
 Original Pokeviewer code is MIT-licensed. Pokémon media is not. The
 [third-party notice](../THIRD_PARTY_NOTICES.md) records the non-affiliation and
 redistribution risk without claiming permission.
 
-## Public evidence boundary
+## Privacy
 
-Screenshots, photographs, logs, CI artifacts, and release evidence must follow
-the [privacy and evidence rules](privacy-and-evidence.md). In particular, they
-must not expose a child's identity, home information, credentials, private host
-paths, device MAC address, or USB serial identifier.
+Nothing published from this repository may identify the child or household or
+expose a device identifier. The [privacy rules](privacy-and-evidence.md) list
+what to leave out.
 
 ## Sources
 
