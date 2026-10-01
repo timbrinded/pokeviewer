@@ -72,11 +72,11 @@ fn fetch_all(temporary: &Path) -> TaskResult {
         let pokemon_url = format!("https://pokeapi.co/api/v2/pokemon/{id}/");
         let species_url = format!("https://pokeapi.co/api/v2/pokemon-species/{id}/");
         let sprite_url = format!(
-            "https://raw.githubusercontent.com/PokeAPI/sprites/{SPRITES_REVISION}/sprites/pokemon/versions/generation-i/yellow/{id}.png"
+            "https://raw.githubusercontent.com/PokeAPI/sprites/{SPRITES_REVISION}/sprites/pokemon/versions/generation-ii/crystal/{id}.png"
         );
         let pokemon = fetch(&pokemon_url, id, "Pokémon API response")?;
         let species = fetch(&species_url, id, "species API response")?;
-        let sprite = fetch(&sprite_url, id, "Yellow front sprite")?;
+        let sprite = fetch(&sprite_url, id, "Crystal front sprite")?;
         source::validate_source_bytes(id, &pokemon, &species, &sprite)?;
 
         let pokemon_path = format!("pokemon/{id:03}.json");

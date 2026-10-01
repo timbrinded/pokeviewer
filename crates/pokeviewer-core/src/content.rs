@@ -1,19 +1,21 @@
 //! Allocation-free content-pack validation and lookup.
 
+use crate::schedule::{CYCLE_LENGTH, SCHEDULE_VERSION, scheduled_dex_id};
+
 const HEADER_LENGTH: usize = 32;
-const FORMAT_VERSION: u16 = 1;
-const CONTENT_REVISION: u32 = 2;
-const SCHEDULE_VERSION: u16 = 1;
+const FORMAT_VERSION: u16 = 2;
+const CONTENT_REVISION: u32 = 3;
 const RECORD_LENGTH: usize = 6;
-const RECORD_COUNT: usize = 151;
-const SPRITE_WIDTH: usize = 56;
-const SPRITE_HEIGHT: usize = 56;
+const RECORD_COUNT: usize = CYCLE_LENGTH as usize;
 const NO_SECONDARY_TYPE: u8 = 0xff;
 
-/// Bytes in one 56 × 56 one-bit content sprite.
-pub const CONTENT_SPRITE_BYTES: usize = SPRITE_WIDTH * SPRITE_HEIGHT / 8;
+/// Width and height of one content sprite in source pixels.
+pub const CONTENT_SPRITE_SIZE: usize = 56;
 
-/// Stable Pokémon type codes stored in content-pack v1.
+/// Bytes in one 56 × 56 content sprite with two bits per pixel.
+pub const CONTENT_SPRITE_BYTES: usize = CONTENT_SPRITE_SIZE * CONTENT_SPRITE_SIZE / 4;
+
+/// Stable Pokémon type codes stored in the content pack.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(u8)]
 pub enum PokemonType {
@@ -92,11 +94,12 @@ pub struct PokemonRecord<'a> {
     pub primary_type: PokemonType,
     /// Current canonical secondary type, when present.
     pub secondary_type: Option<PokemonType>,
-    /// Borrowed 56 × 56, row-major, one-bit sprite.
+    /// Borrowed 56 × 56, row-major sprite of two-bit shades, from `0` white
+    /// to `3` black.
     pub sprite: &'a [u8; CONTENT_SPRITE_BYTES],
 }
 
-/// A validated v1 pack backed directly by its flash bytes.
+/// A validated v2 pack backed directly by its flash bytes.
 #[derive(Clone, Copy, Debug)]
 pub struct ContentPack<'a> {
     records: &'a [u8],
@@ -114,7 +117,7 @@ pub enum PackError {
     InvalidMagic,
     /// Format, content, or schedule version is unsupported.
     UnsupportedVersion,
-    /// A fixed header field does not match content-pack v1.
+    /// A fixed header field does not match content-pack v2.
     InvalidHeader,
     /// Payload checksum does not match.
     InvalidChecksum,
@@ -124,14 +127,14 @@ pub enum PackError {
     InvalidType,
     /// A name offset, length, encoding, or character is invalid.
     InvalidName,
-    /// Schedule v1 is missing, duplicated, or changed.
+    /// Schedule v2 is missing, duplicated, or changed.
     InvalidSchedule,
-    /// Requested Pokédex ID or cycle index is outside v1.
+    /// Requested Pokédex ID or cycle index is outside the pack.
     OutOfRange,
 }
 
 impl<'a> ContentPack<'a> {
-    /// Validate and borrow a complete content-pack v1 image.
+    /// Validate and borrow a complete content-pack v2 image.
     ///
     /// # Errors
     ///
@@ -152,8 +155,8 @@ impl<'a> ContentPack<'a> {
         if usize::from(read_u16(bytes, 6)?) != HEADER_LENGTH
             || usize::from(read_u16(bytes, 14)?) != RECORD_COUNT
             || usize::from(read_u16(bytes, 16)?) != RECORD_COUNT
-            || bytes[18] != 56
-            || bytes[19] != 56
+            || usize::from(bytes[18]) != CONTENT_SPRITE_SIZE
+            || usize::from(bytes[19]) != CONTENT_SPRITE_SIZE
             || usize::from(bytes[20]) != RECORD_LENGTH
             || bytes[21] != 0
         {
@@ -201,19 +204,19 @@ impl<'a> ContentPack<'a> {
     ///
     /// # Errors
     ///
-    /// Returns [`PackError::OutOfRange`] unless `dex_id` is 1–151.
+    /// Returns [`PackError::OutOfRange`] unless `dex_id` is 1–251.
     pub fn record(&self, dex_id: u8) -> Result<PokemonRecord<'a>, PackError> {
-        if !(1..=151).contains(&dex_id) {
+        if !(1..=CYCLE_LENGTH).contains(&dex_id) {
             return Err(PackError::OutOfRange);
         }
         self.record_at(usize::from(dex_id - 1))
     }
 
-    /// Resolve schedule v1 and borrow its record.
+    /// Resolve schedule v2 and borrow its record.
     ///
     /// # Errors
     ///
-    /// Returns [`PackError::OutOfRange`] unless `cycle_index` is 0–150.
+    /// Returns [`PackError::OutOfRange`] unless `cycle_index` is 0–250.
     pub fn scheduled_record(&self, cycle_index: u8) -> Result<PokemonRecord<'a>, PackError> {
         let dex_id = *self
             .schedule
@@ -244,9 +247,8 @@ impl<'a> ContentPack<'a> {
 
     fn validate_schedule(&self) -> Result<(), PackError> {
         for (index, actual) in self.schedule.iter().copied().enumerate() {
-            let expected = u8::try_from((73 * index) % RECORD_COUNT + 1)
-                .map_err(|_| PackError::InvalidSchedule)?;
-            if actual != expected {
+            let index = u8::try_from(index).map_err(|_| PackError::InvalidSchedule)?;
+            if actual != scheduled_dex_id(index) {
                 return Err(PackError::InvalidSchedule);
             }
         }
@@ -337,13 +339,13 @@ mod tests {
 
     use super::{CONTENT_SPRITE_BYTES, ContentPack, PackError, RECORD_COUNT};
 
-    const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
+    const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
 
     #[test]
     fn committed_pack_exposes_every_record_without_allocation() {
         let pack = ContentPack::parse(PACK).unwrap();
 
-        for dex_id in 1..=151 {
+        for dex_id in 1..=251 {
             let record = pack.record(dex_id).unwrap();
             assert_eq!(record.dex_id, dex_id);
             assert!(!record.name.is_empty());
@@ -352,7 +354,7 @@ mod tests {
         for index in 0..RECORD_COUNT {
             let cycle_index = u8::try_from(index).unwrap();
             let record = pack.scheduled_record(cycle_index).unwrap();
-            assert!((1..=151).contains(&record.dex_id));
+            assert!((1..=251).contains(&record.dex_id));
         }
         assert!(core::mem::size_of_val(&pack) <= 64);
     }
@@ -371,7 +373,7 @@ mod tests {
     #[test]
     fn superseded_content_revision_is_rejected() {
         let mut superseded = std::vec::Vec::from(PACK);
-        superseded[8..12].copy_from_slice(&1_u32.to_le_bytes());
+        superseded[8..12].copy_from_slice(&2_u32.to_le_bytes());
 
         assert_eq!(
             ContentPack::parse(&superseded).unwrap_err(),

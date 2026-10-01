@@ -1,0 +1,4525 @@
+{
+  "schema_version": 1,
+  "sprites_revision": "8dfa3d97e953caaafaafd4963eff7621811af08e",
+  "retrieved_unix_seconds": 1790878556,
+  "entries": [
+    {
+      "id": 1,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/1/",
+        "path": "pokemon/001.json",
+        "sha256": "3ca1bf39b481b750d1eed194b990e9eb96c98ed77831ed0459589e22124458cb"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/1/",
+        "path": "species/001.json",
+        "sha256": "0841398912abb467d9292255f0ab1dc69ad13a59f30c0a1589525ec43a33909f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/1.png",
+        "path": "sprites/001.png",
+        "sha256": "f15d5a654fdf3e1236fb1a0a3182efc8694b766f86a66122599b9cbff943c439"
+      }
+    },
+    {
+      "id": 2,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/2/",
+        "path": "pokemon/002.json",
+        "sha256": "b69b7ba192c5a7dd218632bf1546118750d2ead0f74ab022d0614554689b5412"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/2/",
+        "path": "species/002.json",
+        "sha256": "a22616922b257d439f93e86d2f8b78b3c41404405e9c20f82b8b2cada4afa3f0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/2.png",
+        "path": "sprites/002.png",
+        "sha256": "9f0c93232586770effe25ed0cf238224eae1cd22efc101c11dc5da630b7c4aca"
+      }
+    },
+    {
+      "id": 3,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/3/",
+        "path": "pokemon/003.json",
+        "sha256": "40211c7e0afd5cf6482e71fab6b196ed869882926f7736268528237670cf3fe8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/3/",
+        "path": "species/003.json",
+        "sha256": "1ec7684f0dae5889a4cdb014c1dce2866be60479079004bbc14afff26d7b09e5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/3.png",
+        "path": "sprites/003.png",
+        "sha256": "25d03f52b61b525693d59ca2d079f13c75f50833fa8228358d63e43e5d9198db"
+      }
+    },
+    {
+      "id": 4,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/4/",
+        "path": "pokemon/004.json",
+        "sha256": "e3dd69ab06bd480c0a3eb06346b7d980d40ddcdc6ba3034c8d4fd28744cb70e7"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/4/",
+        "path": "species/004.json",
+        "sha256": "a2313515bb25a69e00158dfc53ec265e27d8c4450589ad4645f58906740262de"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/4.png",
+        "path": "sprites/004.png",
+        "sha256": "1a123c811f3a6ca62e7200d2510062996826d9320caa0f0b4371e835799aab81"
+      }
+    },
+    {
+      "id": 5,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/5/",
+        "path": "pokemon/005.json",
+        "sha256": "022310e37c2b4d33533d6f6047bdffaece01e69b4eb5fbb52d81b4176b17f4b9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/5/",
+        "path": "species/005.json",
+        "sha256": "4b85319a7dc2723d641cf9376011c08429e4773bc489a5d8ebed945475a6db74"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/5.png",
+        "path": "sprites/005.png",
+        "sha256": "ac9dc42933b65c0088f56ba0056ae8db44492bf7e1208c0aa64ffd3a191fcd00"
+      }
+    },
+    {
+      "id": 6,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/6/",
+        "path": "pokemon/006.json",
+        "sha256": "4d8c563bfb48a1d569d64ed45ce8ac1f8ef2e798ee555da57431225c448b7b88"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/6/",
+        "path": "species/006.json",
+        "sha256": "623e24b457cb50ed73df753dc54ba5b8f24ba314220ade8166a878edc44c3b3a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/6.png",
+        "path": "sprites/006.png",
+        "sha256": "34e9c25978df1f1e76f40331edc86cb0e3e6e7a0873dcde69b75f659ec94f45b"
+      }
+    },
+    {
+      "id": 7,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/7/",
+        "path": "pokemon/007.json",
+        "sha256": "2312ba1fe604ff5aa8d0c28d4ab9ac0ab793905f05539b6b5c66ebbac150aebe"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/7/",
+        "path": "species/007.json",
+        "sha256": "e6e025716c0b323d1048aab287db084b4f5773ead4dd07e6c2e14ddca7d68985"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/7.png",
+        "path": "sprites/007.png",
+        "sha256": "8ae85e3147578e13d6878856b8927fc4af8ae1a12217c1f8a81766f94c36be46"
+      }
+    },
+    {
+      "id": 8,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/8/",
+        "path": "pokemon/008.json",
+        "sha256": "f607e6ce0454f91ec7aa43d6e19b37f24cba8c11cdb7a9507048a979e32ace28"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/8/",
+        "path": "species/008.json",
+        "sha256": "b9a8c8b7fd5fddfb6a6320272e7cb1b19b01ad8ac31bec99d0c25c955b2959d5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/8.png",
+        "path": "sprites/008.png",
+        "sha256": "1a29851c487f257959e984fbbc018dd1d3be6d12b26141689022c55799a6ee86"
+      }
+    },
+    {
+      "id": 9,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/9/",
+        "path": "pokemon/009.json",
+        "sha256": "15d4b0062b7ce1f2317e5214a9f5a19fdc1ff0f154e4032bdd6b79cb2ee3ac9c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/9/",
+        "path": "species/009.json",
+        "sha256": "c38fe3038228bfe5f80c39be0e8677202e5fafd19cc20bb6e02a7af6ef3befbc"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/9.png",
+        "path": "sprites/009.png",
+        "sha256": "595ef9ac09d2c70f71105aeb7f3a5f9489012f86be6f87adda2c60ffc9877238"
+      }
+    },
+    {
+      "id": 10,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/10/",
+        "path": "pokemon/010.json",
+        "sha256": "3ffa7e340bd8c0b2491023df4a4b6c26b439828d61f4e39ee62b016969a9ad2f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/10/",
+        "path": "species/010.json",
+        "sha256": "65d71b38b0b00f8e0028f5c36ebd0f1ac89b630582f81179d11a267d0e670441"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/10.png",
+        "path": "sprites/010.png",
+        "sha256": "d70eaf359e37f615eed75f56a6667355e53d2819cf1db0b960f937b5c1a894d0"
+      }
+    },
+    {
+      "id": 11,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/11/",
+        "path": "pokemon/011.json",
+        "sha256": "5459df348b72005d20add58d12f3578e874d44fdf14f76d99634152af208f87d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/11/",
+        "path": "species/011.json",
+        "sha256": "209efae829a0359747856759002135fcbc155920ba5078a5b946ec9c8967f1c7"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/11.png",
+        "path": "sprites/011.png",
+        "sha256": "5d6541e3c0b365ae6a60929022d2cf10e4f5591913045ffc7cbd6ed3f095156d"
+      }
+    },
+    {
+      "id": 12,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/12/",
+        "path": "pokemon/012.json",
+        "sha256": "f4ccac3dea9346ad5ffaec152bcacabaab4fa6a24db3dd10aec3f6f6d104d8c1"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/12/",
+        "path": "species/012.json",
+        "sha256": "da4dd0cc30a87635c2aaef978c5ac70832f7fff96e91ad0ff67976e50fdd72b9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/12.png",
+        "path": "sprites/012.png",
+        "sha256": "23d0dad64dcf6346bce0e2f3f25523445a94f121bf766988eeee9e553d0a9bc0"
+      }
+    },
+    {
+      "id": 13,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/13/",
+        "path": "pokemon/013.json",
+        "sha256": "8752f58aace25ee7f1f3e3c8624d9598cff9ea200416799f073f2d25b9fcc7df"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/13/",
+        "path": "species/013.json",
+        "sha256": "3bd98fa0fdd5f271319c1f4d278750f512202ef028b4276dc28d09ed1442633b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/13.png",
+        "path": "sprites/013.png",
+        "sha256": "09a4e970746c6550ffe501479127086ddfd8cc1d3f2cb53db811225dd3fda1ba"
+      }
+    },
+    {
+      "id": 14,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/14/",
+        "path": "pokemon/014.json",
+        "sha256": "39914a86aead8f38fed07a70c5b9ec89a695362a7404ba0a7e8b67eeef347c07"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/14/",
+        "path": "species/014.json",
+        "sha256": "1f23d9e168ba550fe1b615b1c248e9d30fab8f6fb4f4cb608ae71d2249effe41"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/14.png",
+        "path": "sprites/014.png",
+        "sha256": "a0e1eb33966c6bf3373220d94340f92577c59bf488481608044fd2f245c07cef"
+      }
+    },
+    {
+      "id": 15,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/15/",
+        "path": "pokemon/015.json",
+        "sha256": "991c2d496ceb9ba66f972c8531d59b99d21dddf3943ca26e387bbf7fcdb31ead"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/15/",
+        "path": "species/015.json",
+        "sha256": "cc7b4619df07be59ccfe172f79d9022fb78bd40750bd57b803b5d9d1733df89f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/15.png",
+        "path": "sprites/015.png",
+        "sha256": "54a8dba5923883728e3532c766b3f07df10be3c24da7847bed0b7022287d6a6a"
+      }
+    },
+    {
+      "id": 16,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/16/",
+        "path": "pokemon/016.json",
+        "sha256": "f7551d9cbf63ae28069140ddd090aeffe25998e1e8d3f125fdcebcd1007dec1d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/16/",
+        "path": "species/016.json",
+        "sha256": "1bac4a09ce9159004bbb9f2e3dd3b8c921f7e2d79b04b4c2b6ebafe45ab163f0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/16.png",
+        "path": "sprites/016.png",
+        "sha256": "df3c42805c88235a18034557ec8654187c3b559ff8c50037bd8f0412ec254640"
+      }
+    },
+    {
+      "id": 17,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/17/",
+        "path": "pokemon/017.json",
+        "sha256": "97984ad09d8b9416a53486ac5c57405bf67d218e5d1605343fbd76d2f1cd92e3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/17/",
+        "path": "species/017.json",
+        "sha256": "5497329185fa1a64455f7cd89ca934359569eeb1b02396328916c67cf54f0457"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/17.png",
+        "path": "sprites/017.png",
+        "sha256": "3a9c4fef73e26033baca3f985a01e363ccd22b21f70cf3665d54996057708dd3"
+      }
+    },
+    {
+      "id": 18,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/18/",
+        "path": "pokemon/018.json",
+        "sha256": "c0ae492c769946ddf9cf87316080049741c73f03b0e3cbc184197441d55fdfe0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/18/",
+        "path": "species/018.json",
+        "sha256": "1de15664fe3ec3b5b5eaef7e8af5372153d91e317f45efd71bf6d30a37e93907"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/18.png",
+        "path": "sprites/018.png",
+        "sha256": "7df0ac6acd8ccc9f32be8de7f486604b0966ae10575d72fefb2527f404f975c1"
+      }
+    },
+    {
+      "id": 19,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/19/",
+        "path": "pokemon/019.json",
+        "sha256": "70de364cf76579ce0c0e5b0bc3441c6ead55ed8b736dc941608bec1f2f6bb694"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/19/",
+        "path": "species/019.json",
+        "sha256": "a90b63ba156df69d1e76a626fbbd127b66fb7786f169f1291df65cfe27028151"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/19.png",
+        "path": "sprites/019.png",
+        "sha256": "0ab5e0d27e862abea6f3ecd471e1401acb1cd7bff64badb48b4e9bed49bd362f"
+      }
+    },
+    {
+      "id": 20,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/20/",
+        "path": "pokemon/020.json",
+        "sha256": "bb0aea7bfb4721c8b25e40d99c55805b9b38e93049e51e498d73eb6deb901332"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/20/",
+        "path": "species/020.json",
+        "sha256": "f9ad7b0e3e9df770762467dfe43cd892b89ca3195b1878eee933e82c95961f2b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/20.png",
+        "path": "sprites/020.png",
+        "sha256": "3e5e8b4053bd94f8b966115a6f243dfe525b51cdb7d7edf420593276c97bebac"
+      }
+    },
+    {
+      "id": 21,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/21/",
+        "path": "pokemon/021.json",
+        "sha256": "a37f547774e2a1a35a63f8c63cd217be72b8309f266b965bacb1a812894491d8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/21/",
+        "path": "species/021.json",
+        "sha256": "fe034a99b2722e2ddb6aee8ca34277f8b3fa38f08c86589627db4efb5000b6ff"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/21.png",
+        "path": "sprites/021.png",
+        "sha256": "ccb78384f0af5e14c434a103de388aa8b7a42cf3b3c9ea15d852f45a81868987"
+      }
+    },
+    {
+      "id": 22,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/22/",
+        "path": "pokemon/022.json",
+        "sha256": "335c343a54904981af7620c2aae1af9a15017a7969ca23deb14bb61cde8fbd2c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/22/",
+        "path": "species/022.json",
+        "sha256": "4ef6bbd468217ec487de364ee5513facc80cf7fa83c5b9c8bec000b9c13a8fe1"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/22.png",
+        "path": "sprites/022.png",
+        "sha256": "481c73c362cfb5ebfb7cecb83f578a954e775c0c70ef8925f4bc31a9912003b7"
+      }
+    },
+    {
+      "id": 23,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/23/",
+        "path": "pokemon/023.json",
+        "sha256": "9330d7114a838987f32322bb1561a3f7fa7f3cef3fac6c2c22155516361403c2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/23/",
+        "path": "species/023.json",
+        "sha256": "749c04919870bf92a9c686ec3ec34a3bf374f98ed0a66900b7c474d98c56a605"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/23.png",
+        "path": "sprites/023.png",
+        "sha256": "a5ecfe851e1b70c252724fdcfbf2d7b70c30c28b8d7dc12fc5b1ef4308e17f21"
+      }
+    },
+    {
+      "id": 24,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/24/",
+        "path": "pokemon/024.json",
+        "sha256": "c04065a86e844f14de5ba64868392d19f9768601377afadf2acfd412d6eb7ee1"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/24/",
+        "path": "species/024.json",
+        "sha256": "ac5c56102c5257a355dd7520194c4e0b81ce355a5f7b26e6ea99c8a5a7ace287"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/24.png",
+        "path": "sprites/024.png",
+        "sha256": "da3ac5aea7dd6724c06731b75fbb82c9cf63896bbd72b982a953ffba02d8038f"
+      }
+    },
+    {
+      "id": 25,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/25/",
+        "path": "pokemon/025.json",
+        "sha256": "65ff5787e30b2f6ac469d4edb8e359b54eb60c04c3db616f71ecda626b537fb5"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/25/",
+        "path": "species/025.json",
+        "sha256": "a2ed8553154a8436bebdfa8e96df529e9e046b21badbba333ebf0eb860cc3358"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/25.png",
+        "path": "sprites/025.png",
+        "sha256": "f6789ae72b74edaaecbea5dfcb9eb184881b99cc6dbe229f06026e01ad662316"
+      }
+    },
+    {
+      "id": 26,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/26/",
+        "path": "pokemon/026.json",
+        "sha256": "51994835d1fb276938ae06207e6ee4c2dabea06502bee506c1608dd5e3a56b8a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/26/",
+        "path": "species/026.json",
+        "sha256": "eb3b2ed9c2c93ec4679fdb5c0aa6d5cd48453d0bafd634d3d2c28efdb141188a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/26.png",
+        "path": "sprites/026.png",
+        "sha256": "09be618102e076fc1bb86f949e7ea41e6d66422638c51d0bb633d33b2b9e71fd"
+      }
+    },
+    {
+      "id": 27,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/27/",
+        "path": "pokemon/027.json",
+        "sha256": "9b8bf857c1080bfb1fbdd32f06f4d56ef01c153a708fc5218af6302026aa8b20"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/27/",
+        "path": "species/027.json",
+        "sha256": "090e0a913e36f32b1b111ed6f7527df7969be532c4c8615541087357f408b58a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/27.png",
+        "path": "sprites/027.png",
+        "sha256": "77a33fb130646dbae0a6a00bb1396c744e0391ae3b1628e6e5ff32c4517b00f2"
+      }
+    },
+    {
+      "id": 28,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/28/",
+        "path": "pokemon/028.json",
+        "sha256": "31a429e4e1338fc0ce0dcf1c2605fd37efaddf657533ab88f8a86c67d6e84d0f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/28/",
+        "path": "species/028.json",
+        "sha256": "054625376da913ca5e4715c6ba2e0b4087a42d7ecb82b1f6471db7ee929830c0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/28.png",
+        "path": "sprites/028.png",
+        "sha256": "5ae4eea5d9016affe535a542b5fd61e27761d08fc9f74182115f4e525730bb71"
+      }
+    },
+    {
+      "id": 29,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/29/",
+        "path": "pokemon/029.json",
+        "sha256": "0ad68cffd738880388982abd808c08a1baff5a9bc7913023fa8b48925bd0375d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/29/",
+        "path": "species/029.json",
+        "sha256": "f2f5437ff002d697d45458b375b447d7d99618b31b9984eb61e0b6287ab724fc"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/29.png",
+        "path": "sprites/029.png",
+        "sha256": "b7ee595bb30b391edf13065ff5cafa674bedb4720326f53f37017efe5b0da17d"
+      }
+    },
+    {
+      "id": 30,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/30/",
+        "path": "pokemon/030.json",
+        "sha256": "068f062a5ca647ee710621f97c12afd560c7456f6508fb6b449c8d8b9762c236"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/30/",
+        "path": "species/030.json",
+        "sha256": "5c94f166e4a0db98d01ad94243099a9b745327bb0ca7b14f75d221d0b572c70a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/30.png",
+        "path": "sprites/030.png",
+        "sha256": "bf91c8f83503fa4f0af08b5792e3a36114d931b089f905acdef324a26344e707"
+      }
+    },
+    {
+      "id": 31,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/31/",
+        "path": "pokemon/031.json",
+        "sha256": "dd6c1c1c61915938d53ac9706508cb2b6fc00632422b79d863281ec37f2b62f9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/31/",
+        "path": "species/031.json",
+        "sha256": "d97f8ac2ba9c41ef9b2fdb7c6f7a11bbbb53b7f8e976e6fc38abdd2b93bb5640"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/31.png",
+        "path": "sprites/031.png",
+        "sha256": "0f84002689bf2c8e85be067b5896b0139911634f62e164f38abdac97688988de"
+      }
+    },
+    {
+      "id": 32,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/32/",
+        "path": "pokemon/032.json",
+        "sha256": "22aa4454e868634e288b84ee84a44c2db3cc709513fcf1d8616a81847f8e0490"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/32/",
+        "path": "species/032.json",
+        "sha256": "0bf0f77b2d48dfc5101aeeb7455b61a60816e795980ab306dca5ea663526e242"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/32.png",
+        "path": "sprites/032.png",
+        "sha256": "a3b7633ccb4381aa00e3363a56a3c17457e4f9bf7c503188bb1591f01b4bc6c8"
+      }
+    },
+    {
+      "id": 33,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/33/",
+        "path": "pokemon/033.json",
+        "sha256": "4e9bf72645e415e3da6a06a8f4aed2ee408d76e42ee0d62bed6d839d11782951"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/33/",
+        "path": "species/033.json",
+        "sha256": "06e849dee52de7c6eb484715ddb8cf5a706e7af11e62576e1ae1a13309a3e448"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/33.png",
+        "path": "sprites/033.png",
+        "sha256": "517a8d83570af653b63b98d8a22023138a69e12dc97823c859519216fb9c504b"
+      }
+    },
+    {
+      "id": 34,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/34/",
+        "path": "pokemon/034.json",
+        "sha256": "3c10cc7f438629f7cae82b187b31fd4ff0934d3497ad95019f80c1f07760917c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/34/",
+        "path": "species/034.json",
+        "sha256": "caa92029466bdb75a2f9ca95d6df349e389b3c66379c41eb6a06bc1dc7a4cc2e"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/34.png",
+        "path": "sprites/034.png",
+        "sha256": "636f53967be97888dfe476455a36707d209bac50a6f26cd4f4bb7b81db964e59"
+      }
+    },
+    {
+      "id": 35,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/35/",
+        "path": "pokemon/035.json",
+        "sha256": "84965bff68735557d528ab94e8499a3bc794dc86a19ab1e964c96a906fd0c7a0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/35/",
+        "path": "species/035.json",
+        "sha256": "290d21e42e4027e298d5e82e6075ff9350bf5271fd16e6a8e48f8456c16b142c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/35.png",
+        "path": "sprites/035.png",
+        "sha256": "8aa623de86c064eea179ab6cf4ba004466b876638b7b4d1db28541f743ac5a2b"
+      }
+    },
+    {
+      "id": 36,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/36/",
+        "path": "pokemon/036.json",
+        "sha256": "42e8c8e4b4b727ecafd45e9607461a4ca5c623854bdec3fd505d60be9b25a176"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/36/",
+        "path": "species/036.json",
+        "sha256": "33e4ce222b8e9d1cc8e5bbcc23810debdec99da6af1667ba47eed62b732b79b5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/36.png",
+        "path": "sprites/036.png",
+        "sha256": "c81254a53d91c90e4778b085716000f6e44d6792350b4077b776e5d577755f29"
+      }
+    },
+    {
+      "id": 37,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/37/",
+        "path": "pokemon/037.json",
+        "sha256": "8996aaf1307f64999098424fa1f2eb065092171edffc9e2743563c7500089272"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/37/",
+        "path": "species/037.json",
+        "sha256": "29001e9ecff5dda8cd6ad0aa390652dc5d46d8202c004b11129004caf29a55b7"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/37.png",
+        "path": "sprites/037.png",
+        "sha256": "65b9025cfcf4fc759626e605a5e52adb2060c69a9c66c0a81834abd6f35dc8a0"
+      }
+    },
+    {
+      "id": 38,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/38/",
+        "path": "pokemon/038.json",
+        "sha256": "64bc9aab9d9c20f013a505eff2cb913ece034ffcd74510045ac1c557c00fd739"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/38/",
+        "path": "species/038.json",
+        "sha256": "74d59a70c6ebf46f803c4bc3acdb5c6e95bd4a793db5d7bfee1b4b0d713087bb"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/38.png",
+        "path": "sprites/038.png",
+        "sha256": "3809f66452ea2a528e773fa08559aca19434ea5d49bc8b916b86397f6164144f"
+      }
+    },
+    {
+      "id": 39,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/39/",
+        "path": "pokemon/039.json",
+        "sha256": "3de0ca011c1b43cf94c4c8e4cd50f5b85ad8ada73aa471bae6454e396704b62d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/39/",
+        "path": "species/039.json",
+        "sha256": "9582f212400448df48a9ace8bc125fc202e5291a072436114c6794cad21dfa03"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/39.png",
+        "path": "sprites/039.png",
+        "sha256": "b9297898d6e5b98f666a8fa560aabbbc1b448b6436eb7a78da9fbb4670e95166"
+      }
+    },
+    {
+      "id": 40,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/40/",
+        "path": "pokemon/040.json",
+        "sha256": "f88a6522ef371ab04d088307ffd2bc3cd42a3fe77e7f75f95a2872bb5ccc4ab5"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/40/",
+        "path": "species/040.json",
+        "sha256": "93c986f6f51181737ad131769a031a4f1b58b564481e411db272c8645fa2ba7d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/40.png",
+        "path": "sprites/040.png",
+        "sha256": "62f8bcb396b80343a891db452344bfb3ef859c89794ab259c33ca7f05020b0fd"
+      }
+    },
+    {
+      "id": 41,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/41/",
+        "path": "pokemon/041.json",
+        "sha256": "9c1d3f3a8df0b96cec9ba10507c831e154325a8ab79eb87151ab766aabc446b5"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/41/",
+        "path": "species/041.json",
+        "sha256": "b283c9491855b5d52b431035d9b59045f7d402b9d295bfdab08cda04d9c6c65c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/41.png",
+        "path": "sprites/041.png",
+        "sha256": "99546cab90280a3e747f4b4b7ea371911398d3801973635db64740a23315e094"
+      }
+    },
+    {
+      "id": 42,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/42/",
+        "path": "pokemon/042.json",
+        "sha256": "0ef85882edb4b8f6f03e9be37cb3c3414deb9a29d40bcd7c07533717ff93c1be"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/42/",
+        "path": "species/042.json",
+        "sha256": "d200505617463b27166504e8b346fc2e33eeaa7631ab931a95fd1e712bb3c468"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/42.png",
+        "path": "sprites/042.png",
+        "sha256": "2ac72005ac1e5a160c97427cba4414207b8ae3a56adb5147808c8d19cc755d9a"
+      }
+    },
+    {
+      "id": 43,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/43/",
+        "path": "pokemon/043.json",
+        "sha256": "dff78fbe15a0cc20f82e671e8dc4c4d02117fe4c867f9d81e5533b6c0d3a5f0c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/43/",
+        "path": "species/043.json",
+        "sha256": "b4cb176b6a1e582778321f2a1f1d2972a02a8c7eb87c920304e2da36d4cfd65b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/43.png",
+        "path": "sprites/043.png",
+        "sha256": "4356dce6821a728787be1c7a029329f811f0618b5d00ba4a8f4d664ef34909ce"
+      }
+    },
+    {
+      "id": 44,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/44/",
+        "path": "pokemon/044.json",
+        "sha256": "6ff26e5323f06e73d79524d1b0571e972563cb4aea900fc5ea14206216561f80"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/44/",
+        "path": "species/044.json",
+        "sha256": "c12d89f85a6203a212eb5a2b20e94d2e5acf333d2f0dc768c4bcc3ed07576320"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/44.png",
+        "path": "sprites/044.png",
+        "sha256": "2d90e71bbcbe7213143d5584d7858f7f168c7b8d5c78a2e74216c137613f18ab"
+      }
+    },
+    {
+      "id": 45,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/45/",
+        "path": "pokemon/045.json",
+        "sha256": "e65a9f2d2d55e47cf2e6b88c0e288b0d578da430399ff4bbc7666b6e0db9f499"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/45/",
+        "path": "species/045.json",
+        "sha256": "548b491e37e50733d3b3f49e0bb1d515534ac6de5a1aa84953c5882ed3ee1ee6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/45.png",
+        "path": "sprites/045.png",
+        "sha256": "10a12efae1c6a2004ef7ce9509538232177c7777639be954a83d3d3d1e469899"
+      }
+    },
+    {
+      "id": 46,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/46/",
+        "path": "pokemon/046.json",
+        "sha256": "07812817adc70899c1c3e0ffacc67a8efad7c5a47d5414ae6b5cb034db36085e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/46/",
+        "path": "species/046.json",
+        "sha256": "7a3edb9f1a9aed26f5b94672893c33b9106255188a43f46564498ffe7fc4ec54"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/46.png",
+        "path": "sprites/046.png",
+        "sha256": "86f5b20fd0b2c198468df3f9c6e3b02f48b64448e5b574e35b0818587e3a6c3b"
+      }
+    },
+    {
+      "id": 47,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/47/",
+        "path": "pokemon/047.json",
+        "sha256": "16885ed36b0fdcb29c5d9918cd8da774bb2adcb1f59a833505aa75d6699c44d5"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/47/",
+        "path": "species/047.json",
+        "sha256": "b5e62bc1252a143047a3a5c77fec62568879146b2ac3ee2c910c36221faeb253"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/47.png",
+        "path": "sprites/047.png",
+        "sha256": "9bee0b584ca7ae7e053ffdc871390cb571c3d9fc47436ec684f78e730b3d6612"
+      }
+    },
+    {
+      "id": 48,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/48/",
+        "path": "pokemon/048.json",
+        "sha256": "30f75c2991460b9dfb2546346d7d04fa23529a6430247c0954b15bf182d3907f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/48/",
+        "path": "species/048.json",
+        "sha256": "c52160f0c0cbcc4ec1983642c8e4e60b9b577f6c26e1e9490cabed0691d91995"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/48.png",
+        "path": "sprites/048.png",
+        "sha256": "d44f7106827cb1f1489f53624a138d9cfbc1b3003150a4461d3458e2135b85cd"
+      }
+    },
+    {
+      "id": 49,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/49/",
+        "path": "pokemon/049.json",
+        "sha256": "718dd5608f0fb4c743949a8bfbf2c7f585b2a55919d3184ebabd684a4ead5776"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/49/",
+        "path": "species/049.json",
+        "sha256": "5624f175a11a2c170fa27a9f485393aeac45a6b451ff680fd59d810f617a5ab0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/49.png",
+        "path": "sprites/049.png",
+        "sha256": "0ace676452df8301ced2f94cf1e48ba848af123ad6d6f3f9a43aaf8aaf15d76e"
+      }
+    },
+    {
+      "id": 50,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/50/",
+        "path": "pokemon/050.json",
+        "sha256": "07a0084daf39fa80415a4947f4287aced6305e6723b57fbc6b3f250c435ce736"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/50/",
+        "path": "species/050.json",
+        "sha256": "905251452255637153f401f0411078282d09d76db0443878f7ec6c3e6bf5e270"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/50.png",
+        "path": "sprites/050.png",
+        "sha256": "a30079d0d4c8f623d015e42edcaf92702154cb9a5ce932cff4e34cef46cb684c"
+      }
+    },
+    {
+      "id": 51,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/51/",
+        "path": "pokemon/051.json",
+        "sha256": "5d9c1c4199d91cb250e35d7364a78aa1c95f5a427de1db20e6d13b3c3475bd1b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/51/",
+        "path": "species/051.json",
+        "sha256": "fe4dba4a8cbb471e2932e1e65b45643a6afc41e1789805c5bf11f46045cbcac9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/51.png",
+        "path": "sprites/051.png",
+        "sha256": "8dc5cbedc3782cc9d70639bfe99b0a8f776913578834847038fb32e6175f9f33"
+      }
+    },
+    {
+      "id": 52,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/52/",
+        "path": "pokemon/052.json",
+        "sha256": "c34a576a37362b39d764f436c4e3ef3470fed2c1fca39e08a816b6845cb0e5b4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/52/",
+        "path": "species/052.json",
+        "sha256": "cc88ecbb6198ac265fc8bd748ffb1f5e29fcececcaa4f7019a27c24f6a0ee4ee"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/52.png",
+        "path": "sprites/052.png",
+        "sha256": "90f1a9fb7e5c8402ac4dc189ee695cbbd92b9fc30fe0309f5a4bf5282f46cc03"
+      }
+    },
+    {
+      "id": 53,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/53/",
+        "path": "pokemon/053.json",
+        "sha256": "2bd1df704d3321807ded073563863d14a676244c5339b903e643972df5e5b884"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/53/",
+        "path": "species/053.json",
+        "sha256": "3a847229aa5799076e48759bc8b8f9242fb7f2f86b75fff2c3357525cb3ca422"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/53.png",
+        "path": "sprites/053.png",
+        "sha256": "4b4f3e6ae541e350c6a55b67221758e639efe038d5c7830d71c3eccc9d4b03e9"
+      }
+    },
+    {
+      "id": 54,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/54/",
+        "path": "pokemon/054.json",
+        "sha256": "7b4aea14d7ba9b4ac91b8e2a8b3a577f00b3fc624db1d60067dc24291aaad2a0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/54/",
+        "path": "species/054.json",
+        "sha256": "5dc162847deafd2e9556db960e8b887c25bd535eba6d1f37179fb1329bcb2928"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/54.png",
+        "path": "sprites/054.png",
+        "sha256": "d0c3b58d9a275c2eeb07776c1482a34199ae84c406de7ee843877f264a06334a"
+      }
+    },
+    {
+      "id": 55,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/55/",
+        "path": "pokemon/055.json",
+        "sha256": "d8c256d2d363bfe641eb729c38f9e33e6d6e1acb3d47073dc64431e934a459ef"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/55/",
+        "path": "species/055.json",
+        "sha256": "25d08feda3c5e0eda30ef11d7d2802b202cb75c3b7e754ef94702f0cecae64e6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/55.png",
+        "path": "sprites/055.png",
+        "sha256": "20c170b82c95e7345bd74a23621db7db3d2935db3e8b72bdc1036593ef94bfa9"
+      }
+    },
+    {
+      "id": 56,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/56/",
+        "path": "pokemon/056.json",
+        "sha256": "03a2bfe37678f592a8c39e44574d758acf75b771b059f9f3aafe4d8c5dedac49"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/56/",
+        "path": "species/056.json",
+        "sha256": "73b2f400eb19543fd13ef6d6223685edf97b73aae80c3226924b331c0434549f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/56.png",
+        "path": "sprites/056.png",
+        "sha256": "e981a0e6644ddb94066c779b86d841b5242de2e56db5fc2f03f516a23558a922"
+      }
+    },
+    {
+      "id": 57,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/57/",
+        "path": "pokemon/057.json",
+        "sha256": "53198a276465aaa88d16d3414fb7b0a623adf8d43cf9b9f280def54aaa87ef24"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/57/",
+        "path": "species/057.json",
+        "sha256": "02bc73a50348325452cffc75c89f0af3d2d6ee2352deaa7206a701a490a507eb"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/57.png",
+        "path": "sprites/057.png",
+        "sha256": "ccaca5c1a544227343b2217007e7074e86d6db81647bb6fd09de31a95b93c573"
+      }
+    },
+    {
+      "id": 58,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/58/",
+        "path": "pokemon/058.json",
+        "sha256": "56f4a0b183dfb868cca57f7bb9c15915d88269aa475e42c500e48d667b945ded"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/58/",
+        "path": "species/058.json",
+        "sha256": "e4e1790fd7b02f4caf35dad28f4fb5d8d3d8735fa47a140c13779943dac895a9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/58.png",
+        "path": "sprites/058.png",
+        "sha256": "53216a38fbdbe330aea442ed66274baf6c93970be4b6cc59cbeeb4ef318d56c8"
+      }
+    },
+    {
+      "id": 59,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/59/",
+        "path": "pokemon/059.json",
+        "sha256": "3b697f641872757bbe588d0cc6f3c8e9537e93c428cadfcf588b25832543b2a3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/59/",
+        "path": "species/059.json",
+        "sha256": "533e9725a3b25341ed72a09a638bec9728f2c533ac942caf653459d20c66a446"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/59.png",
+        "path": "sprites/059.png",
+        "sha256": "c6f0cdcb1154082d332ae2246ee2ed4926a3b479c9facaae90e94901ca049a76"
+      }
+    },
+    {
+      "id": 60,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/60/",
+        "path": "pokemon/060.json",
+        "sha256": "919fb81f38111e6e37af9c09726e3c637bdbce2b58334298a3a881bc21366193"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/60/",
+        "path": "species/060.json",
+        "sha256": "4694a3626f0583537b05e31aed2720163ad28d751e17da1d913f638e1aa84c37"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/60.png",
+        "path": "sprites/060.png",
+        "sha256": "e9ac723e4e2af278a31671d81f0e1145d98ee643c29afda826000bccdf9cda69"
+      }
+    },
+    {
+      "id": 61,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/61/",
+        "path": "pokemon/061.json",
+        "sha256": "d667efeb7ff3a336ea1e8a302dda3640ec01a6620b0abe9f11b0e1fdbf099adc"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/61/",
+        "path": "species/061.json",
+        "sha256": "24b82a9a2e83f8c28b5d20b68dd711ca559601e95d398c27dc4dce78561c8720"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/61.png",
+        "path": "sprites/061.png",
+        "sha256": "ec2a142ebec43d4e426b7ccd2669e0dffaa1310ff9f72a92ac9dc570720c43bc"
+      }
+    },
+    {
+      "id": 62,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/62/",
+        "path": "pokemon/062.json",
+        "sha256": "84ef2bb8096548bab7292c54eaac3ab7835e219894784b68a4b9b3178564c546"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/62/",
+        "path": "species/062.json",
+        "sha256": "64f8028074d537032100638b6533a0bb758d2fdb96bbaa60d05e958b292fe456"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/62.png",
+        "path": "sprites/062.png",
+        "sha256": "e5c22f7d62647be7c1a2f7af73efccf76963ccb7b20990da1a6b3b9718a5686a"
+      }
+    },
+    {
+      "id": 63,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/63/",
+        "path": "pokemon/063.json",
+        "sha256": "f82f136d0db787635ae07e85717e8cc68c96fb9172a3adb9aa30a5c6cb2daf37"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/63/",
+        "path": "species/063.json",
+        "sha256": "09653e2b216d798407b60599bd8a5cd31195e630a45adc9165b2c054c9343cb2"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/63.png",
+        "path": "sprites/063.png",
+        "sha256": "dbff422866d0b84c38a81fbf01e3f4d55ad4e4fc4d9dff05ff6bc5fd6dca0154"
+      }
+    },
+    {
+      "id": 64,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/64/",
+        "path": "pokemon/064.json",
+        "sha256": "f0b2d71479721806dd11b085d188dff8377b035b9a1c2d2bb1b9011f8770e7a6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/64/",
+        "path": "species/064.json",
+        "sha256": "5bfb3af6102bd338966afe2c6c6ec7750f40db0ad284850a28971f70b9661fe4"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/64.png",
+        "path": "sprites/064.png",
+        "sha256": "6cc45aba464bf329a3df043e9ee365545bae16e90f463fd91032cc9d4caddee1"
+      }
+    },
+    {
+      "id": 65,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/65/",
+        "path": "pokemon/065.json",
+        "sha256": "d8057e920602d4f2b84973f3a4e0ad3a0cf2208c2917056c016af42d2d25acc9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/65/",
+        "path": "species/065.json",
+        "sha256": "b8f9e9f31e84cb75328de1c7d2b65f14a3460a9d7bb60ddb5d04cbbf60b51f4c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/65.png",
+        "path": "sprites/065.png",
+        "sha256": "380eac8947f693ae058585f68721e2e84537fe13cd3eacb3001ff78b673c9d63"
+      }
+    },
+    {
+      "id": 66,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/66/",
+        "path": "pokemon/066.json",
+        "sha256": "038938652c02d88f535ef5ec8e8b108604404ef7857d65282fb38dd21eb0ead5"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/66/",
+        "path": "species/066.json",
+        "sha256": "0888cc1aacb7c7b64444b8f7f00c207147fc6e11b92a1ff3c31046952615271f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/66.png",
+        "path": "sprites/066.png",
+        "sha256": "8a940b5f46e4be965ac077168c918d3476b23aac38485ae4e46db080b19b25e4"
+      }
+    },
+    {
+      "id": 67,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/67/",
+        "path": "pokemon/067.json",
+        "sha256": "4ba305ab7208e369705e991fa239208ef9035338b54aab6470dfab2bf01f799f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/67/",
+        "path": "species/067.json",
+        "sha256": "b1c9e14588f2da61f5d699d47e8dbd494dda6db1d76f9cef08028f286c62ef33"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/67.png",
+        "path": "sprites/067.png",
+        "sha256": "212b0154dc5a4710095330f185e913a5635b67a853cad0c2646f2d8cebc1ae4d"
+      }
+    },
+    {
+      "id": 68,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/68/",
+        "path": "pokemon/068.json",
+        "sha256": "a10604c67b2069ec0604eb02b493d2f95f399fb6c8fb785201d2421782810907"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/68/",
+        "path": "species/068.json",
+        "sha256": "8abaab5b1015c544d29397bee7fefb43cee892534c53ddb0e284f5a53237a1a5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/68.png",
+        "path": "sprites/068.png",
+        "sha256": "e921553488338d2da26cd8fc239f7cb6fc2d9ce77dcaac463064ca1039922ad8"
+      }
+    },
+    {
+      "id": 69,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/69/",
+        "path": "pokemon/069.json",
+        "sha256": "c5690675e21b7cbd8ce093375fea48ebc60635da00ced0fda31d5e58ad848f1d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/69/",
+        "path": "species/069.json",
+        "sha256": "bfc5414ae5ad5e0c6ec60e8783cfecb21e091e099a1d0124ef97764f621108be"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/69.png",
+        "path": "sprites/069.png",
+        "sha256": "dfa4b9bbb0421181324141e2a34afc107280352d90534b7ef94dc7d6c8fa6cef"
+      }
+    },
+    {
+      "id": 70,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/70/",
+        "path": "pokemon/070.json",
+        "sha256": "cfe88fdc2b76c6720ef55a649af5da783b89dd4faa0bc694d2c8a17902b63028"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/70/",
+        "path": "species/070.json",
+        "sha256": "b0c5a9ac3ca2e29a45c38e12b8ca596f37f7033168e124ab71ed2a1291812327"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/70.png",
+        "path": "sprites/070.png",
+        "sha256": "d9386d482293275fef52c341a35bf4bea5ee0b2db5304707a925893ed928b100"
+      }
+    },
+    {
+      "id": 71,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/71/",
+        "path": "pokemon/071.json",
+        "sha256": "d6ded2e5c428f006652b1c10d58097d73e5ef14c97d75c911614ae1cf89221f4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/71/",
+        "path": "species/071.json",
+        "sha256": "a5f62b581117a7f176b552faee974e6fe7a577886954fe9840f917d10a392c00"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/71.png",
+        "path": "sprites/071.png",
+        "sha256": "3cff57c0aafa4731d71e84e18c7892daad07886a068e380c607fd68bf000df54"
+      }
+    },
+    {
+      "id": 72,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/72/",
+        "path": "pokemon/072.json",
+        "sha256": "7661316bd6b30766c5fb904cab3bbcfda5644d965fe155fb0e67ffce0f727c64"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/72/",
+        "path": "species/072.json",
+        "sha256": "655d0581c20c80439506ef18807aeae2bce77b0908736b4c535b124f089092e7"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/72.png",
+        "path": "sprites/072.png",
+        "sha256": "34518b64b7af862f4a5ff8bcd78376ee3aff86eb66da57dfc79d7869cb1c4b61"
+      }
+    },
+    {
+      "id": 73,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/73/",
+        "path": "pokemon/073.json",
+        "sha256": "61fa218063492f00740e2f240a7bae19f6d6f1cee7c9a6452d9b2f5d1160c73b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/73/",
+        "path": "species/073.json",
+        "sha256": "811c07d6b050735c82f4bdbfdaf4e23e5cc4f616ceb3a205aa78f216e70ac489"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/73.png",
+        "path": "sprites/073.png",
+        "sha256": "567a5dfa60be2bb43459c7f286d3a3ed9395ce724e3f1da26d6832dc409a689e"
+      }
+    },
+    {
+      "id": 74,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/74/",
+        "path": "pokemon/074.json",
+        "sha256": "45aa8d8bef2f5ea1c0cf0a96c7ccb8f185bfb58526fbaa86e8e7ed7b3168f7dc"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/74/",
+        "path": "species/074.json",
+        "sha256": "a209cddf452ee10d442adac0dffd00cf199da7a6d47ce84620f555e79b2e6049"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/74.png",
+        "path": "sprites/074.png",
+        "sha256": "1ad5d735c3223c48a6e68fa29be081fa784457d02b32579d193c83e22155a43b"
+      }
+    },
+    {
+      "id": 75,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/75/",
+        "path": "pokemon/075.json",
+        "sha256": "d7f5b3e928a1921d5884c9675597613674d43fa0f3a65a1e07741788f715fde9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/75/",
+        "path": "species/075.json",
+        "sha256": "0ee46c2b9635f57337c1054eae96689e9a2f38a17de540e5f36246087a07145b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/75.png",
+        "path": "sprites/075.png",
+        "sha256": "3e052842d2e03aa6198751d52e8f14e539466b2ad7491a845abb69c290449ad3"
+      }
+    },
+    {
+      "id": 76,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/76/",
+        "path": "pokemon/076.json",
+        "sha256": "df1bd0a70760ec833b509797a82e990574d1015ee1fa81776c00e1832b1b0ff2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/76/",
+        "path": "species/076.json",
+        "sha256": "2bf550d4ff661abfddd2db6ca777fb244bbbcb48e6db4d0270632559d401f3b1"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/76.png",
+        "path": "sprites/076.png",
+        "sha256": "837bcfd448f320eae71803728b36454e9c404f648f36fd23f36bd7120c927363"
+      }
+    },
+    {
+      "id": 77,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/77/",
+        "path": "pokemon/077.json",
+        "sha256": "bcc206bdf820f58685cce8825c1bd5dd12f85542b940633389a25e9f1bffd676"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/77/",
+        "path": "species/077.json",
+        "sha256": "2a406262d9602ea7f233c959a625121d506b47b44f5002e3b2a704591ab8d791"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/77.png",
+        "path": "sprites/077.png",
+        "sha256": "0b419c736063164b500992da16a078e30952554db215ebc14789d10037b5be2b"
+      }
+    },
+    {
+      "id": 78,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/78/",
+        "path": "pokemon/078.json",
+        "sha256": "bc9fef34f5dbe003840e32110f7e0d1a669bb22da468ae3c9af1fc3f26f50ea6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/78/",
+        "path": "species/078.json",
+        "sha256": "975be3ff95a802e5510aa93a25662666f3abcfbdf9d999dbfe60e0f9d12dcca9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/78.png",
+        "path": "sprites/078.png",
+        "sha256": "4e6f883c1cad1954b841d93b4746d3e0380cdf404755a3a145ba976fea8ac4b9"
+      }
+    },
+    {
+      "id": 79,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/79/",
+        "path": "pokemon/079.json",
+        "sha256": "3322f115a5995e8e82dceb0f00b2b81120658dc9b86efd34154550a8927df206"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/79/",
+        "path": "species/079.json",
+        "sha256": "1ac4584b825de3e9ba35c359291be4e148c00ddd186fc638a0aca900935ebb93"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/79.png",
+        "path": "sprites/079.png",
+        "sha256": "487456f017ac5bde3a258ad93826bf708cdb6c21c33036e011ba2d878600c6f2"
+      }
+    },
+    {
+      "id": 80,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/80/",
+        "path": "pokemon/080.json",
+        "sha256": "8e96c975d29e1b2e41780763292d95e0c3a0a0c03a845c68a98586bb47f2edfe"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/80/",
+        "path": "species/080.json",
+        "sha256": "f05a7db5066430fe4558c90004a85146565189d9b65f2755b4ec571d94ccb45f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/80.png",
+        "path": "sprites/080.png",
+        "sha256": "14d2cc502577bfe751ed267b08cbec310fb2f177f5802309f7e28885ff19b573"
+      }
+    },
+    {
+      "id": 81,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/81/",
+        "path": "pokemon/081.json",
+        "sha256": "45a47b0e3a4a9089775ea4f3d19ebc931a33bea1cb5b8a812fc1de81d551b71d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/81/",
+        "path": "species/081.json",
+        "sha256": "0e3c7e1fc56debb184744a217b883b6e7532bd614444fbe463acaa4831015ef7"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/81.png",
+        "path": "sprites/081.png",
+        "sha256": "839c664309a98035ef9240b9ac5483ffb0935099d187e83ccf95237cab91f253"
+      }
+    },
+    {
+      "id": 82,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/82/",
+        "path": "pokemon/082.json",
+        "sha256": "3fb613686547a5507e03d931dc4ec200663d831f3baa81d7dd172d810cbd903c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/82/",
+        "path": "species/082.json",
+        "sha256": "05b0643d52f347e0e24fde889a9436707731564e491ce9758ad1f2d9ebd6b8fd"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/82.png",
+        "path": "sprites/082.png",
+        "sha256": "51a2220c017cb709e8c709b061c6fb4241144a9df73b82d77a08c0906bc5a4fa"
+      }
+    },
+    {
+      "id": 83,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/83/",
+        "path": "pokemon/083.json",
+        "sha256": "98bef0331a561a552948c967a76c620058e767de1dcb55797ebb9f2546ef0be4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/83/",
+        "path": "species/083.json",
+        "sha256": "fd4367a85e7c334df86e66936072af59999e9fc52d68c36c418e79fb626f6e54"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/83.png",
+        "path": "sprites/083.png",
+        "sha256": "f8f6404ff62402b1ae41f85c4e437d44659acbdef95cca9a39a7a659fb42f355"
+      }
+    },
+    {
+      "id": 84,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/84/",
+        "path": "pokemon/084.json",
+        "sha256": "208aba9cd5f039b63ed4f2df0afc2ac3aec493508c2c5569575b956cbee85929"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/84/",
+        "path": "species/084.json",
+        "sha256": "8b607ae445e3806f67e1a284ab862ef32087a495197776bc3d95f999c1f174e6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/84.png",
+        "path": "sprites/084.png",
+        "sha256": "1b5f58e5e68cd00129bc9cd4f284740e08dfc0b3de3f1421a0ce1c3227a1d64b"
+      }
+    },
+    {
+      "id": 85,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/85/",
+        "path": "pokemon/085.json",
+        "sha256": "1e223fdab8e519fee0a76bfb12a065fd9b9c525ecc0aedf72667c6014cb488ab"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/85/",
+        "path": "species/085.json",
+        "sha256": "1dcc17a0058f7ddcd9fddcdbac38ecba71a9e2376c063f1e3778af62f540b105"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/85.png",
+        "path": "sprites/085.png",
+        "sha256": "00afc7d01cabe97fcc7132513af7be6a814e33a367c18f2d70a2a359aa414bcf"
+      }
+    },
+    {
+      "id": 86,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/86/",
+        "path": "pokemon/086.json",
+        "sha256": "83530184db425bf16a87f7973e7267ffb5f4dda1486b0f60668eedd5e82309c6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/86/",
+        "path": "species/086.json",
+        "sha256": "613a8e183f899eb38da56226497d34a9f9bebea5017f5651749bae99310ef8c9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/86.png",
+        "path": "sprites/086.png",
+        "sha256": "0664bbb3a418348bcc1c40a98d5040f07dfe6ebc21285f59bd289e26ac00f558"
+      }
+    },
+    {
+      "id": 87,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/87/",
+        "path": "pokemon/087.json",
+        "sha256": "30e1e68bbc4ba6efdf520f973a1611cdfdc538afda3c2d665f39bdaae360c27b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/87/",
+        "path": "species/087.json",
+        "sha256": "852369a42051147d6d79a377317f8eb96df7497bc915087dfc6a5d7c00bdc22d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/87.png",
+        "path": "sprites/087.png",
+        "sha256": "89e75213152a23ca0ba3ed52c7339b5ab66795838c02f584cf4fb7250cd8345b"
+      }
+    },
+    {
+      "id": 88,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/88/",
+        "path": "pokemon/088.json",
+        "sha256": "4ad421b9637aceef8df44bfb6e379694d8b9f4baeef724092e1e494e4456b172"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/88/",
+        "path": "species/088.json",
+        "sha256": "0f2c58a8622cc565123feae700e1b4469d5772a96e3841d6d0599abcdfcf2396"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/88.png",
+        "path": "sprites/088.png",
+        "sha256": "3f61fd9906e99a148dbfdfea5fa2f782f460d69a20c693a61418d01971113c19"
+      }
+    },
+    {
+      "id": 89,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/89/",
+        "path": "pokemon/089.json",
+        "sha256": "2eef312d7e6b492eae5dd21b2b4ad7932838e291e98074c7f2f27a7dfb85dbc3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/89/",
+        "path": "species/089.json",
+        "sha256": "0aea3f40e31bbb8838a05b383a90615b0f7dbdce07f694c9425123f6f155fddc"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/89.png",
+        "path": "sprites/089.png",
+        "sha256": "b17cd6961d48eaabca734ffc71f58bbebdcd2d3dfdac6590aedee63c29e1762b"
+      }
+    },
+    {
+      "id": 90,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/90/",
+        "path": "pokemon/090.json",
+        "sha256": "4095cbe7d38db1d73217b7982eff5b542f166a9f00678d04e40bb243a3c804de"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/90/",
+        "path": "species/090.json",
+        "sha256": "6833109f93a3fcc729c47a6b252152c865a5ab62a1e345b86403a947f933ac4f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/90.png",
+        "path": "sprites/090.png",
+        "sha256": "e5738eefea4c9cb1617ee6310422123b80b40547e030657592b92e359f2a5257"
+      }
+    },
+    {
+      "id": 91,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/91/",
+        "path": "pokemon/091.json",
+        "sha256": "54f5ad065921f53d3bcfa2897047ffa1f4458726c25fc5db203afd847f3fbe57"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/91/",
+        "path": "species/091.json",
+        "sha256": "d22f2d930690e656fca2944dffaf968475e198c53230761755c03c83e0dc54ab"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/91.png",
+        "path": "sprites/091.png",
+        "sha256": "31943c67a0c790728be98d1af87537674948398ebc8d01bbc18feade5f4ec83e"
+      }
+    },
+    {
+      "id": 92,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/92/",
+        "path": "pokemon/092.json",
+        "sha256": "40fb9c22e9ebf34216ac0aa0955e88cc9cc726c3a2b1d97f78862d6cb768671b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/92/",
+        "path": "species/092.json",
+        "sha256": "3346b7d7557f76c65ccab8ba69191094882c2cac9600aa4e99011a3e4bcb687f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/92.png",
+        "path": "sprites/092.png",
+        "sha256": "7e69ba2bc7fb80c05c936c38914686848d1466e1f09759f4115626d45a374e0e"
+      }
+    },
+    {
+      "id": 93,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/93/",
+        "path": "pokemon/093.json",
+        "sha256": "f9d00d7a04d4f79cb5621ea4822d0e3192c5460b11610ae41e897e4f6b45472a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/93/",
+        "path": "species/093.json",
+        "sha256": "0ca2ebdee611d5bf60448ce70ce8513f8889bbbc8b391cd4de05904b6e6b2fea"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/93.png",
+        "path": "sprites/093.png",
+        "sha256": "8f661f685d5c5209bff8cc26027ba93a6f50c1cdfc62d5c0e257b6bd8e95b60b"
+      }
+    },
+    {
+      "id": 94,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/94/",
+        "path": "pokemon/094.json",
+        "sha256": "f36a0b0f3f3d4b3cca3f7826c5e6612465436954e95d9b12f42952f26e75bd91"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/94/",
+        "path": "species/094.json",
+        "sha256": "48d2a8c9120554273a56d4e2b07e3a9f10655979907713917ecce3db40b6d46c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/94.png",
+        "path": "sprites/094.png",
+        "sha256": "22784a5e4615560d74e4be4e4444374a8a788c3c34f0796d48a6942a967a9e98"
+      }
+    },
+    {
+      "id": 95,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/95/",
+        "path": "pokemon/095.json",
+        "sha256": "9d7f3b586d410a64ee0e14f64da363751fc0075dc58f76606b3cc6ed3c593020"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/95/",
+        "path": "species/095.json",
+        "sha256": "0860760bbb3cc721f09acf303eb44f522dc17ab09cee30fc6a7accae2b560958"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/95.png",
+        "path": "sprites/095.png",
+        "sha256": "c85c0b9f0fd3c121aa0a571ff760f9578d0514c618c7849b9142f52be3f28673"
+      }
+    },
+    {
+      "id": 96,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/96/",
+        "path": "pokemon/096.json",
+        "sha256": "fde68837d403f2f83289a62eb23315447a3640c3d32c4d4627fd9c3a6a67503e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/96/",
+        "path": "species/096.json",
+        "sha256": "c2ccad8db1eaa659201cde7f59a3a8bef2ce37a2fde0d64d704a543cba8d23c6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/96.png",
+        "path": "sprites/096.png",
+        "sha256": "b61470207af951a901db970bb8fe0d53e746a8e6939cdff3eed07f22e737cc67"
+      }
+    },
+    {
+      "id": 97,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/97/",
+        "path": "pokemon/097.json",
+        "sha256": "186dfd81ad0e9b67cec7d1195ba4fad50aa2cac5b9fcb8b393c8adcc81c86b53"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/97/",
+        "path": "species/097.json",
+        "sha256": "64ac940ab5cf559154f1ef9853e994bd16b51ae925d9efaaacdfa6533922ca6a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/97.png",
+        "path": "sprites/097.png",
+        "sha256": "3c170cf3be1635bcfbd5dc28bd962d79a525c0ca94c2f84b0e2ffd1dc701c605"
+      }
+    },
+    {
+      "id": 98,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/98/",
+        "path": "pokemon/098.json",
+        "sha256": "3ab3a5d87a4c07eda191010e14fd6a4c8435d36aaf24ef4307496c1a6514fa33"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/98/",
+        "path": "species/098.json",
+        "sha256": "c3a7c55c875e6aa91dcefe2d050d653c789677a080a09458d178019188ec0649"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/98.png",
+        "path": "sprites/098.png",
+        "sha256": "e5fd8a695665717783affd4cd544c27ff9900d89826c4ae308f4aa44383564af"
+      }
+    },
+    {
+      "id": 99,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/99/",
+        "path": "pokemon/099.json",
+        "sha256": "8780f52f3a22411b561566da9e3949aae741bdc47154bf669f131af6d066673f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/99/",
+        "path": "species/099.json",
+        "sha256": "dbc3a1ac2abac0d2c977ccb94cac247ba243d9683cc3528066db9944f94a131b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/99.png",
+        "path": "sprites/099.png",
+        "sha256": "04e0d32d5924cf02f3cbdc16ea457fd0f2476fd296330076ef5446a4cc939859"
+      }
+    },
+    {
+      "id": 100,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/100/",
+        "path": "pokemon/100.json",
+        "sha256": "125c97496df4f1b5d5511cf623fe96d30967f1cf3b976e1a3f0e93d4bf45a60e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/100/",
+        "path": "species/100.json",
+        "sha256": "afb6412876ec11135611fd559b9e7481bb191eb3e66116e7040377f17f060e16"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/100.png",
+        "path": "sprites/100.png",
+        "sha256": "970daafabf76ce60bd01975476d1f0d4e008730c42a4c8ce91dce7e641c8b8ed"
+      }
+    },
+    {
+      "id": 101,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/101/",
+        "path": "pokemon/101.json",
+        "sha256": "83470837027517cc6abaf5348e7ada5611319f8bb81a5905def765cfc762a4eb"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/101/",
+        "path": "species/101.json",
+        "sha256": "0f9f3e8d7d10d1cd7125fdf05fe8569602b6664496fbd692dcde9eb734b58f0a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/101.png",
+        "path": "sprites/101.png",
+        "sha256": "c7464e01ca77296f5f88a07fea4f25cf0972f875755faac921f98f7215f9edd2"
+      }
+    },
+    {
+      "id": 102,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/102/",
+        "path": "pokemon/102.json",
+        "sha256": "84fa6294ad99f3b95ddafa5176229e1c8a83d77719e528eb8d2f20c90f1786ec"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/102/",
+        "path": "species/102.json",
+        "sha256": "de1d47d6433e747c17afbb90db907b87b54c8da6c22e4594bb63062217f3df86"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/102.png",
+        "path": "sprites/102.png",
+        "sha256": "57b3af2445b8841e16ae9100f7a799c04179b507f90385944db2a0b53c4dd570"
+      }
+    },
+    {
+      "id": 103,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/103/",
+        "path": "pokemon/103.json",
+        "sha256": "bb0110ecb4b44aa3c58dd8a08b6a2e6a8fa0cb01b299283aa5273481f49fe5c8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/103/",
+        "path": "species/103.json",
+        "sha256": "8c796cc93fac3cf5e53151363c35b5c33c6186e78d85953181855f5b459c9cea"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/103.png",
+        "path": "sprites/103.png",
+        "sha256": "e66f98cf3173a9b7d06d6f55df3b2ffaa8104d9d9cb7881e4a486b74ed271e7f"
+      }
+    },
+    {
+      "id": 104,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/104/",
+        "path": "pokemon/104.json",
+        "sha256": "889b214956e1276c3ce797f7a3e17d3705d7830b37529411540da4627f307b65"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/104/",
+        "path": "species/104.json",
+        "sha256": "0f0b367bab7c03e8e0cc86db8e86f595c427c77c5486106ccdd2476c898bd942"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/104.png",
+        "path": "sprites/104.png",
+        "sha256": "f1f37bdfe0cd1525d483f7c8d674baa3553b643d616780f2477340f5925dedf3"
+      }
+    },
+    {
+      "id": 105,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/105/",
+        "path": "pokemon/105.json",
+        "sha256": "a551e55e1daf89503d6f04ea1b74c49a829a4168fdfd866fb3981c5e85c9680f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/105/",
+        "path": "species/105.json",
+        "sha256": "0acd3d335b5b9953bc908e57f377875354fcab281b74e08f5ddceaf3a22fbdeb"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/105.png",
+        "path": "sprites/105.png",
+        "sha256": "945ca4b5d72ed03f10bdc336f56a489681c956d88561700d69e02398d38bcf9a"
+      }
+    },
+    {
+      "id": 106,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/106/",
+        "path": "pokemon/106.json",
+        "sha256": "87c8f90d183827dfe6da0d306cf204a5a794d36cf089451490656ae143cdd975"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/106/",
+        "path": "species/106.json",
+        "sha256": "36fca27af0c153efd2d97f43934333e56ddfb19931ad467347e4e38ff631db82"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/106.png",
+        "path": "sprites/106.png",
+        "sha256": "5afcff7c38a3448c07ba708447808b156a91466aa609ea55081279816ad8e38f"
+      }
+    },
+    {
+      "id": 107,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/107/",
+        "path": "pokemon/107.json",
+        "sha256": "9f9a56b003a0d23f8a6d6c063d1618bc31385da52ca5c500d92a3f0edd3724a6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/107/",
+        "path": "species/107.json",
+        "sha256": "435ea148b3b2c1adf3207607ef30ec543584d4d3f4fdfd078a8a32453a454f95"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/107.png",
+        "path": "sprites/107.png",
+        "sha256": "5b43f22ff68228e7111ccb00502f423c5f19e37a8863d160483d09d6495f47a2"
+      }
+    },
+    {
+      "id": 108,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/108/",
+        "path": "pokemon/108.json",
+        "sha256": "a18c19210ad581b5f6f50cfc53ed3bc1d775e38b3960651eb411ac7a99e454ac"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/108/",
+        "path": "species/108.json",
+        "sha256": "3f778216e257ef0c5664413581dd8af11533d860bcadc88fe738a3a75c0d3e1f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/108.png",
+        "path": "sprites/108.png",
+        "sha256": "8438ccb2f39c6d633814bd2d4f873640ff60a6ab12cf629b496cbe58671b2939"
+      }
+    },
+    {
+      "id": 109,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/109/",
+        "path": "pokemon/109.json",
+        "sha256": "21b6622c04f3d987f517c311fa0d22950bdf56755fb9f5c3f76ea153ea13956e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/109/",
+        "path": "species/109.json",
+        "sha256": "937a0d611f7d473ab55e2636d0491f19632c6fa82acab31737fa7a55020d8b9a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/109.png",
+        "path": "sprites/109.png",
+        "sha256": "dfea6357078532657a9b0306b74ef5a9a6edbbcd3ec397f94e2c521ce021ad98"
+      }
+    },
+    {
+      "id": 110,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/110/",
+        "path": "pokemon/110.json",
+        "sha256": "db2482075b964bb880070c172ba7164520f59f73e1723c1c7822496107d321e2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/110/",
+        "path": "species/110.json",
+        "sha256": "23abb8ac68d49caf012c14b2b8bc003606fa6c2df7a4b4722a3dfe5982eecc75"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/110.png",
+        "path": "sprites/110.png",
+        "sha256": "339d3901755189aa8493727f787a4ed5988a693c0570c3cf552efb797997d7c2"
+      }
+    },
+    {
+      "id": 111,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/111/",
+        "path": "pokemon/111.json",
+        "sha256": "3ae1ccad0e772cf500d4cb2dbf6baacf91ab1fb3acbe8e5ab93af39363dcd4d5"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/111/",
+        "path": "species/111.json",
+        "sha256": "a4e91127d5082307fc2c5cae2921984cbfc81426b7b88fc80de116e5db4a7bc2"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/111.png",
+        "path": "sprites/111.png",
+        "sha256": "564350b6052b1b4e627e48f42434db201e6a3e9edfa4fa40f48e185b1adf825b"
+      }
+    },
+    {
+      "id": 112,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/112/",
+        "path": "pokemon/112.json",
+        "sha256": "d436c4e08d7c3b895f8fcc0cbaef5b08853619f996e6c29183717810524738b9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/112/",
+        "path": "species/112.json",
+        "sha256": "5c3ecbef84fe463a6e86721ecbac12e082276d35b89a3d85136a992aa5a006e9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/112.png",
+        "path": "sprites/112.png",
+        "sha256": "8cf21f7147b0be91f3aad65c44395a9ca6b1eb3d8022e96889e7220228693c80"
+      }
+    },
+    {
+      "id": 113,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/113/",
+        "path": "pokemon/113.json",
+        "sha256": "2a52c8405f45ee55f29b53ee4ea047af68d843c52101b994f74f10c42804da86"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/113/",
+        "path": "species/113.json",
+        "sha256": "cb89dd0ae4e5393c547cb2292dcb2cbc8c9845fb342dd55f5c435a9ed4a93db9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/113.png",
+        "path": "sprites/113.png",
+        "sha256": "108dd8b22667bbcf235f4a8344223655dface7a54539e00e5de43f1bd1188d93"
+      }
+    },
+    {
+      "id": 114,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/114/",
+        "path": "pokemon/114.json",
+        "sha256": "81ec7f33608829c0be4b67a96299e3c2e384f9181dfa647f4345490a35e8cf01"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/114/",
+        "path": "species/114.json",
+        "sha256": "8e89a428b7ad1b43a665cb9a4ceadbc9a1dbb2d94ccd2442eff2c17544103337"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/114.png",
+        "path": "sprites/114.png",
+        "sha256": "434e99f664fe5868bfbea522a8b1b45527d91f433d01461db848eda1c80e2379"
+      }
+    },
+    {
+      "id": 115,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/115/",
+        "path": "pokemon/115.json",
+        "sha256": "9a0231bc36e0b079930b1c8470b514b87478ba15cb3a06df3b5ab8df9172f225"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/115/",
+        "path": "species/115.json",
+        "sha256": "246e0e0663f6ac0d71d7dc3040f40f59f675b93ebc0964523b75b331125f3486"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/115.png",
+        "path": "sprites/115.png",
+        "sha256": "a4d582f785c613b554447b44cf5f1c5c2c4fe8b4b5820a9860b850def410a44e"
+      }
+    },
+    {
+      "id": 116,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/116/",
+        "path": "pokemon/116.json",
+        "sha256": "ab0a0310bb9335c5bcd64a639d44d2c7edb95ee7032c4738d0d643c7a35ec79d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/116/",
+        "path": "species/116.json",
+        "sha256": "abd1e17a1e0fa6496da0fb415b2e515ef3af6a4f84e4b4f10da453142cfdce55"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/116.png",
+        "path": "sprites/116.png",
+        "sha256": "b9b90f2920b20fb357831413ee42fa81dd9ce6d38ef38bc63e4b9f3283bb155c"
+      }
+    },
+    {
+      "id": 117,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/117/",
+        "path": "pokemon/117.json",
+        "sha256": "48f9309170933187adcb1cc63103c0ff7199c43ca5d6fe0077b610778f3b56fd"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/117/",
+        "path": "species/117.json",
+        "sha256": "408d138784d27e91e609ff96ab0fafd7de440ea57599ed4d477a6f5c54a86a03"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/117.png",
+        "path": "sprites/117.png",
+        "sha256": "0ee6f9aff657c6089450759f57a71e0b7702925c294e1e9a125790f286c0626a"
+      }
+    },
+    {
+      "id": 118,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/118/",
+        "path": "pokemon/118.json",
+        "sha256": "046b2ff4e50dd72366269cf2c01f54a403bb152d5799de6094ff699db0b7204f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/118/",
+        "path": "species/118.json",
+        "sha256": "68684134f6e6da0076d1d5de00f449fca787123be99a334ebaaeaf6be003c091"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/118.png",
+        "path": "sprites/118.png",
+        "sha256": "9cc2ad49c5337eab4e83a87aebc9f2f923efd194232d50142e88a98715dbac3f"
+      }
+    },
+    {
+      "id": 119,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/119/",
+        "path": "pokemon/119.json",
+        "sha256": "79289ddd5a5096dd37bfafe0082b132bc2a5cae0671424bef645e3160b3875c2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/119/",
+        "path": "species/119.json",
+        "sha256": "70ebfae3940ddc1444032ee3bced8fb6ffd1cb1061b7268fec8ead9e0071c97d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/119.png",
+        "path": "sprites/119.png",
+        "sha256": "73b55a5f4fb903834062c2f2cc1a3b5099219798570f496b957eeb9f70fcb6a7"
+      }
+    },
+    {
+      "id": 120,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/120/",
+        "path": "pokemon/120.json",
+        "sha256": "f795fcc60d2188de6ce192de37b05bb60b8b7be48aeb7d57d8b4058e5b1f0853"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/120/",
+        "path": "species/120.json",
+        "sha256": "1932b39c2b9de90c130d7c230871616c4d59868628a2edde610665f7cb605f97"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/120.png",
+        "path": "sprites/120.png",
+        "sha256": "af36a3a14683f2c9274468957b35deeb79209547bdee3068723cb2ecae275b0d"
+      }
+    },
+    {
+      "id": 121,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/121/",
+        "path": "pokemon/121.json",
+        "sha256": "69820c616d34c51db518da3e6694ea28c67ed9c434269a677c0c8754d5e2e87b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/121/",
+        "path": "species/121.json",
+        "sha256": "291c9a8b88cf9c8c68da1816ac2dbab2529bf1145a7dd8a45446f0d8a9bbfc37"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/121.png",
+        "path": "sprites/121.png",
+        "sha256": "515405c52d450d712be62897aa0eea2d3b0749375193a0139df774101b24ca10"
+      }
+    },
+    {
+      "id": 122,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/122/",
+        "path": "pokemon/122.json",
+        "sha256": "80dcd590a9252f415b6cc0a2cc0d11a62fb81174ff4fddc3ea924eaad9702e1c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/122/",
+        "path": "species/122.json",
+        "sha256": "8a316413823c664ec91ead37f5d7cd532f9e985951270f2c94e48ff7e48826ac"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/122.png",
+        "path": "sprites/122.png",
+        "sha256": "4bd8df87e46797ba96028010e799e6975ed0ed6fde166d27250f1feca9568624"
+      }
+    },
+    {
+      "id": 123,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/123/",
+        "path": "pokemon/123.json",
+        "sha256": "0cda5e05910babc117e9055b352dbbb17dcec2f93b35dd1cbdfe58b91015b52e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/123/",
+        "path": "species/123.json",
+        "sha256": "e1f437d8fd0e6c54afdfd6a6be52717f9bca3b1c6016ff1a44224df7cf9ef644"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/123.png",
+        "path": "sprites/123.png",
+        "sha256": "d65c239cf2f4ab87f6fb26f53f43dddb71bb9c8a59f6cc2fae5208b17e45a8ac"
+      }
+    },
+    {
+      "id": 124,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/124/",
+        "path": "pokemon/124.json",
+        "sha256": "bc9b3d67cb04473e5c59cedf7b7ed7aa4d6b72b185f4045d9a79976cbc67207a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/124/",
+        "path": "species/124.json",
+        "sha256": "36107f031d69ac778eb0b3f1664196b0d77fe8f2ec85fc898984ed191c5e6adb"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/124.png",
+        "path": "sprites/124.png",
+        "sha256": "715a07f1cace435765405f2c663b3897e34aea3a1fd458424d0fb0791281cdaf"
+      }
+    },
+    {
+      "id": 125,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/125/",
+        "path": "pokemon/125.json",
+        "sha256": "eafb459890ac3c87170ac47e9e192aed44eeb5bf3c2db5d00eb73e32eb24e8c3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/125/",
+        "path": "species/125.json",
+        "sha256": "bf7378490459c19da0041fb7b6ef186c2ad6f6c6992f8ec391058a50f55ef632"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/125.png",
+        "path": "sprites/125.png",
+        "sha256": "4df1c0d25b6da727b1002069a376d39da29fd0d546da320d47e8f22b47120800"
+      }
+    },
+    {
+      "id": 126,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/126/",
+        "path": "pokemon/126.json",
+        "sha256": "18c756f69cc9a707a0f45e69cebee42c3af9656656d10bca75debe63b8d4c8c0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/126/",
+        "path": "species/126.json",
+        "sha256": "92f92389495943a789c9a76e7652cf22bc99b4d4bb9e0b0bf3a70c64deba67da"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/126.png",
+        "path": "sprites/126.png",
+        "sha256": "ccbd16e0e992632ed8bac9b0b04b28befbe56acf00f3f1ddafe1e5311ad2c7ae"
+      }
+    },
+    {
+      "id": 127,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/127/",
+        "path": "pokemon/127.json",
+        "sha256": "f61163d09cbc1d3b660d7c9b1e90f3bae9ca54e7fc2578f3f8f8dad71b168edf"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/127/",
+        "path": "species/127.json",
+        "sha256": "a24e7b83ac39f9b92494fce9cf7754d2095ddd25e738d699143d9fcfeed20f68"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/127.png",
+        "path": "sprites/127.png",
+        "sha256": "2917e1ddcaa7bad26bf962f9b78c4964ff80559758d251d2f32dc65685f00c80"
+      }
+    },
+    {
+      "id": 128,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/128/",
+        "path": "pokemon/128.json",
+        "sha256": "f6393bd5bde9c5392c585c59cb3bdbf7dd3d8f3e59677f5e1861bec6d0b419df"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/128/",
+        "path": "species/128.json",
+        "sha256": "e36f0f4a8cf2f10a571302693afaf5c1a9e812f781fbe0e302a6b96ec3836a70"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/128.png",
+        "path": "sprites/128.png",
+        "sha256": "39d9cf70dc0c5b522f72ef9438574a2191b0be52627c386d36d53f3cfe8a2c77"
+      }
+    },
+    {
+      "id": 129,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/129/",
+        "path": "pokemon/129.json",
+        "sha256": "b8289f77d03936640352977d500b317704419b3b3e359f89dbef706de9275c11"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/129/",
+        "path": "species/129.json",
+        "sha256": "43726703f95be1d007d0434b80f5d240f471e5921b20d957393963301e52b6fb"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/129.png",
+        "path": "sprites/129.png",
+        "sha256": "3b64c0a34bb203e5d58b92a5ab5a9391bd55ac91d5085d341e30af0503dae38b"
+      }
+    },
+    {
+      "id": 130,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/130/",
+        "path": "pokemon/130.json",
+        "sha256": "7598240e439334aa9ff14d7a4a56eca8f53f52357114b114fc7cfa6932a8d9fc"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/130/",
+        "path": "species/130.json",
+        "sha256": "0b49263eee41464dffa41148d733bd88fa4690906f7db0aff51c60bcb863c321"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/130.png",
+        "path": "sprites/130.png",
+        "sha256": "8868f4e2c966269c9bbf3fc9678694343a1d408c61cd14819ebfe9e3ffe2b2ef"
+      }
+    },
+    {
+      "id": 131,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/131/",
+        "path": "pokemon/131.json",
+        "sha256": "2f923b4181be5fe471518448a12c358360780a6e93c5f014abf7af95c189bd8f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/131/",
+        "path": "species/131.json",
+        "sha256": "8b1ab089aa520322c6dd8760a3b1760b1b95dd440aecc4423a99dc9832b8cb2b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/131.png",
+        "path": "sprites/131.png",
+        "sha256": "f2110bb14751d37098736e491d6889af550c08dd5106c9a81ea10b67855f11f8"
+      }
+    },
+    {
+      "id": 132,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/132/",
+        "path": "pokemon/132.json",
+        "sha256": "f6d4a3271959f1e4c2d4e99365a3f637280385136b64ebdc7224a4041e777112"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/132/",
+        "path": "species/132.json",
+        "sha256": "e5bad12e3be2aa4c5561d1de2a1e3bc0dc6250daf6541c8700150c363e6cbf46"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/132.png",
+        "path": "sprites/132.png",
+        "sha256": "0e7f2caa9d81cd750743b80c02f9f630c483d5f291dfb82aec585b607196c655"
+      }
+    },
+    {
+      "id": 133,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/133/",
+        "path": "pokemon/133.json",
+        "sha256": "538fc14188eb1745f32d1e3e472fa2a1ff5167ecc609b48cd3e8c26844ace697"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/133/",
+        "path": "species/133.json",
+        "sha256": "b397af6301a7ac885249cdd9221141827d3d5b915b5a6a432e61720e30a5d563"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/133.png",
+        "path": "sprites/133.png",
+        "sha256": "8e3e4127d1754eb1d32e22e26b52c554d845295e15d4a72927eec6c6d768b571"
+      }
+    },
+    {
+      "id": 134,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/134/",
+        "path": "pokemon/134.json",
+        "sha256": "7e7bd90cc4cf48f96b62862a5e0dc62ec30baa29a115b2915fc38a2b914b9025"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/134/",
+        "path": "species/134.json",
+        "sha256": "8c60e09d4fa24346a0e95217f73cd1b83f7961394d47e2d1578fff5faa01a97d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/134.png",
+        "path": "sprites/134.png",
+        "sha256": "a3989479d8ce6ee76db20e58a0034a6d08b24305ee958eeb39e7fdfe8fb09947"
+      }
+    },
+    {
+      "id": 135,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/135/",
+        "path": "pokemon/135.json",
+        "sha256": "09177021da54971b35a2c208b260f9ef0401c252e16798f2f929176848eda8d6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/135/",
+        "path": "species/135.json",
+        "sha256": "a1c2330a1583a60a5d1a26ca4e94256a2fc1e05d0fb5464b59778991a41bab48"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/135.png",
+        "path": "sprites/135.png",
+        "sha256": "27c1ff049aa703cdeed8999added591bed8af1f246cfb19704602a150180e66e"
+      }
+    },
+    {
+      "id": 136,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/136/",
+        "path": "pokemon/136.json",
+        "sha256": "0c5db5a546e0ed6f4fa8e23bef56a3cbef3c5264e40e030661a8b9258e911fdc"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/136/",
+        "path": "species/136.json",
+        "sha256": "8b9b1ab051d0400f50941b037c20f5a7aba81d5b5f7cf6783341be61a93724d0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/136.png",
+        "path": "sprites/136.png",
+        "sha256": "6981cc9db8f60faf2cc850ab9ea6a521619b75847821f33707b65abc82da3358"
+      }
+    },
+    {
+      "id": 137,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/137/",
+        "path": "pokemon/137.json",
+        "sha256": "32340a73df4bc6a179df11295bf7b8015cd9d691ea7502858f61df901fbe8fe1"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/137/",
+        "path": "species/137.json",
+        "sha256": "82fda8a28d6c9376921d5a3016e8e01faa29c81a51829aa03100994417b68478"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/137.png",
+        "path": "sprites/137.png",
+        "sha256": "c043f9e666b0d96f1b381996154e01ed7988387928855f431522e5935f86235a"
+      }
+    },
+    {
+      "id": 138,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/138/",
+        "path": "pokemon/138.json",
+        "sha256": "14d2c354ac10901069f40e008c9203fd22992fdd03fc5638b7c2d4bcc8fbc497"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/138/",
+        "path": "species/138.json",
+        "sha256": "e4b8ea86f707e4458a172f638ed801bf47aba49feba6f073c360e36d5f053de8"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/138.png",
+        "path": "sprites/138.png",
+        "sha256": "b228f5c8ee92373ef629513fdf8902226f7a22331205f49238c5db1e3ae9bf1c"
+      }
+    },
+    {
+      "id": 139,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/139/",
+        "path": "pokemon/139.json",
+        "sha256": "e52a3e263ebc5088ae67a96d295e96d301debbfbbb5de8ddb67e21c4689d85fe"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/139/",
+        "path": "species/139.json",
+        "sha256": "15fd449da373d4c4d2557a72797ccee4f8096868b5352ce5a7e08bbd9380723d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/139.png",
+        "path": "sprites/139.png",
+        "sha256": "b9de3e46c94a6cdabf5ee370edc99d97f8a16e61642b21c3b0d0865566ed3b10"
+      }
+    },
+    {
+      "id": 140,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/140/",
+        "path": "pokemon/140.json",
+        "sha256": "856364233a3874489528c7eec0eacf6051288aa3f69451b2e30ab96a90421428"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/140/",
+        "path": "species/140.json",
+        "sha256": "ade636fad9479436ee0a49bb411f752f2deceeb5101abe612299da57b23d33ac"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/140.png",
+        "path": "sprites/140.png",
+        "sha256": "2d9d232d8e4c6094b1ab4a75629d5690619542a6ecaf767afff4093e4a882d6c"
+      }
+    },
+    {
+      "id": 141,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/141/",
+        "path": "pokemon/141.json",
+        "sha256": "7d939c7cf26656b907821434c5da0476d0a435cadb97b224f70a5393c28cdf0b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/141/",
+        "path": "species/141.json",
+        "sha256": "6308228cbc9e72236973a012ba19b5a3447894e2aacdb16f41aad9a744647473"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/141.png",
+        "path": "sprites/141.png",
+        "sha256": "d5c0c6c1eb6621381ab5c89bd64f5a92d3d0a45b6ef1b8a19807dc069582f339"
+      }
+    },
+    {
+      "id": 142,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/142/",
+        "path": "pokemon/142.json",
+        "sha256": "61b9c51cb5bfaa30addb01272b10531032bb3867759c1aad3e8c023fcdbd29f2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/142/",
+        "path": "species/142.json",
+        "sha256": "10d0f6752ff4ae65d4e8c6abc08b66c31a86d952487387b34d6c51193e2923dd"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/142.png",
+        "path": "sprites/142.png",
+        "sha256": "bfb2fb45c078339efb2e28302e5e0643e06f3c4a7d1a9ebd4bd8f71b44948be7"
+      }
+    },
+    {
+      "id": 143,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/143/",
+        "path": "pokemon/143.json",
+        "sha256": "5b6ac1101ab35c4a3a4b91164b60fb943c40233f55d804e262d1a03deb552bbf"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/143/",
+        "path": "species/143.json",
+        "sha256": "211fa83c6fb8492f36d2e04fcd78ada57679c0c8d4382e0a037321e6f2f37a40"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/143.png",
+        "path": "sprites/143.png",
+        "sha256": "3268592330c1c0751bf73ace87988b7d841004799ed90c32a923a033af901bca"
+      }
+    },
+    {
+      "id": 144,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/144/",
+        "path": "pokemon/144.json",
+        "sha256": "2929fccad078275223f904cbb57d6de276a0563604988afaed11ef629def022e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/144/",
+        "path": "species/144.json",
+        "sha256": "fac79a06a72f7eb960281bb0ff5896f660ea31c10a6559393dfc019465bd9a9f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/144.png",
+        "path": "sprites/144.png",
+        "sha256": "9e9794d69f36f4f0bc5322b9d4ca25ee93f6018a787695a83f2176eb0be4c5e9"
+      }
+    },
+    {
+      "id": 145,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/145/",
+        "path": "pokemon/145.json",
+        "sha256": "bec491ab5ba48d3fd09e5eb5460fb15b9915f3e7e1d3d010c772cd9b5ed61378"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/145/",
+        "path": "species/145.json",
+        "sha256": "fb7e0840c2cebaabf8b1cbfa7a121c83a420fd9b5f589873f7b3d786816a7dc1"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/145.png",
+        "path": "sprites/145.png",
+        "sha256": "f9f07815d86cc9e5c8942230a12f9c5262453f0d2ff03280340588ddb8d37b31"
+      }
+    },
+    {
+      "id": 146,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/146/",
+        "path": "pokemon/146.json",
+        "sha256": "65d8fa4cc88d55a68dbb525e956e80dd2fc5b662eec40e44ef75d128a1977552"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/146/",
+        "path": "species/146.json",
+        "sha256": "edcc48317cc6ef3a711494529160b09115d92e762a72b2208fba7d4b7542800d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/146.png",
+        "path": "sprites/146.png",
+        "sha256": "22bf57ba98010119474287d08f1c181b6a4e57d9c2b24a9175059d5e1ab21e57"
+      }
+    },
+    {
+      "id": 147,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/147/",
+        "path": "pokemon/147.json",
+        "sha256": "3d4245e7428efd8293b03e086e7bdec6b8f27668a2f75383c131312fe9a02e3d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/147/",
+        "path": "species/147.json",
+        "sha256": "b0d671a837b6cd5aad493449b6e8bc4d8e82d162c285469d98f1120ca6792ebf"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/147.png",
+        "path": "sprites/147.png",
+        "sha256": "1b08c5c32a218a7ff80974345eed210d8ee9887fc6894eabf60f14d9408ca092"
+      }
+    },
+    {
+      "id": 148,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/148/",
+        "path": "pokemon/148.json",
+        "sha256": "786e47b2fe6c44a7f63466e6035d7b996b4d4ce94be0e0a91ccb9b4130337a3d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/148/",
+        "path": "species/148.json",
+        "sha256": "5d7a89aa42af2a30d79f8cd1dba8d9b50b2e8bb46bd5ed1fcafab4f7579bc740"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/148.png",
+        "path": "sprites/148.png",
+        "sha256": "b59bd483dd2c903bf2d9db21a496d2a50a833ae629b625e7b1e3faba7f36fac7"
+      }
+    },
+    {
+      "id": 149,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/149/",
+        "path": "pokemon/149.json",
+        "sha256": "3a4fc2e4129de8030566cbcb2a0aaa73031cf1a9b72002c19b296ce06181f8f2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/149/",
+        "path": "species/149.json",
+        "sha256": "9dab8286b9bf0bf5def3c1667872c1137baac7c937bcefd057910fed6a265597"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/149.png",
+        "path": "sprites/149.png",
+        "sha256": "2fab6922aa79c065883c4bd08f09d23bdd96601f0a3fa0216ddca1e2f771b6b8"
+      }
+    },
+    {
+      "id": 150,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/150/",
+        "path": "pokemon/150.json",
+        "sha256": "f1bc322edbb1ad344869e4fd57fce9919878bb6534dbd8edbedc72a2611422df"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/150/",
+        "path": "species/150.json",
+        "sha256": "09c9fe83921bf30c9a0731449ee0e9a97a5c6f3ffac1fc5c3a36d8b247de4ad1"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/150.png",
+        "path": "sprites/150.png",
+        "sha256": "e4d690eef94c1db4b1a5655996501a25deefd0e2b0cd8444524e141ace0687a1"
+      }
+    },
+    {
+      "id": 151,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/151/",
+        "path": "pokemon/151.json",
+        "sha256": "851296833621713ad7b0b3d639f38da86efe931a0cecb0bc59964395f6a99c4a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/151/",
+        "path": "species/151.json",
+        "sha256": "3ac9988e842f485bd2feaffb78cbeb8187c4c8408dc1a6b350a34340972c4434"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/151.png",
+        "path": "sprites/151.png",
+        "sha256": "039d05e32be449116c248de7ea2476476da5feb2aa20b2165e5e51af9fc60a1b"
+      }
+    },
+    {
+      "id": 152,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/152/",
+        "path": "pokemon/152.json",
+        "sha256": "f1d4b0fe8ea3e9d204248211a4cec69c511b494aeb148e6c641ef019118cd5b7"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/152/",
+        "path": "species/152.json",
+        "sha256": "ba30f080bd2c4022ea7e4f1fdf0ca86d15aa7bdb6961227044a64c6d0f460e5d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/152.png",
+        "path": "sprites/152.png",
+        "sha256": "7501e41cbcec6dbaf7abfee974472ac134c14dae627fb75b05b57d0dd9b50e54"
+      }
+    },
+    {
+      "id": 153,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/153/",
+        "path": "pokemon/153.json",
+        "sha256": "8e76848ff15cea351c601f2b6e1c0bc0028870b00b81850e6f9efe9d9c936b65"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/153/",
+        "path": "species/153.json",
+        "sha256": "db53c61d532d2aee407ed0ac7b31d691685cb51b5d1a48a24cfad3c53fd06466"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/153.png",
+        "path": "sprites/153.png",
+        "sha256": "82e39a9b95d74765c0399cbeb060cd42049ec0c0e39397d56a3119dc99d9c179"
+      }
+    },
+    {
+      "id": 154,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/154/",
+        "path": "pokemon/154.json",
+        "sha256": "5de80991a51dca5dc0a6f26f28c44a8471a4a06b4768df4257dd466da7311b10"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/154/",
+        "path": "species/154.json",
+        "sha256": "e47e1c403bd2459bef97e93b1be1b622f77aff0b9b025dd1d4475cdf6591a27a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/154.png",
+        "path": "sprites/154.png",
+        "sha256": "edbb0d5a57efc45a03d7ef8dc6b5d7e048c985d85fbbc3317fa1dae035792e9e"
+      }
+    },
+    {
+      "id": 155,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/155/",
+        "path": "pokemon/155.json",
+        "sha256": "7578a1a679d59cbfbc459a2becb2f0f7475748a9d29d79025e2d9a48872a3079"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/155/",
+        "path": "species/155.json",
+        "sha256": "9507cb17889635eeca4941cfe0dc820099429bc948730c7dad9456386bf937b9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/155.png",
+        "path": "sprites/155.png",
+        "sha256": "dc2dad1620251146d2f7a0c12ca5125c581f354fbc78b886969e98fdbc1953cd"
+      }
+    },
+    {
+      "id": 156,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/156/",
+        "path": "pokemon/156.json",
+        "sha256": "6829d5877eeca1e2c1d360de340c22154b808c014d8d55261255da0380655695"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/156/",
+        "path": "species/156.json",
+        "sha256": "0b028b4e1b60027b852c902911454cb9097332ab02896f05fbd9068ef18727c6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/156.png",
+        "path": "sprites/156.png",
+        "sha256": "2d3995846f068a6dc15b27f1058cee2522eba40fc436d96ed5e55a2f0c7ff0f1"
+      }
+    },
+    {
+      "id": 157,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/157/",
+        "path": "pokemon/157.json",
+        "sha256": "1e15ce38dd018c439d9429a1f1bd7dfbbe697278501909660f2fbd1825967562"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/157/",
+        "path": "species/157.json",
+        "sha256": "20a7ce484bec1e49a8547ef190f4f8cd3e34dfa075827b6940b64615aaf3142d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/157.png",
+        "path": "sprites/157.png",
+        "sha256": "2df74b0839540c8b3977bdfd4e81db1e8b0df49afb14ec2fae8f14dafa021a9a"
+      }
+    },
+    {
+      "id": 158,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/158/",
+        "path": "pokemon/158.json",
+        "sha256": "a17aab6bd436c2c38ca59c2ddf6185504e19459b9aa446d004362853754e70bf"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/158/",
+        "path": "species/158.json",
+        "sha256": "b16949cb71f2bf3ac06bce2ad3a342b14bd178dba11bd36e3856fc40c7642c71"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/158.png",
+        "path": "sprites/158.png",
+        "sha256": "15363bc0d608513376db3ae7d864a83f0267e5826c1d3ae77d21f5dc2a30bd86"
+      }
+    },
+    {
+      "id": 159,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/159/",
+        "path": "pokemon/159.json",
+        "sha256": "e9a645bcf353f65e9ca08c5839c64df26f7d9b33c359cfac79944f95f8a6ec06"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/159/",
+        "path": "species/159.json",
+        "sha256": "7a70ebca467d866b3b7cfc98612bfb66aae8b0d3cd3cac1f80cddf63c3471f9c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/159.png",
+        "path": "sprites/159.png",
+        "sha256": "1c84b8eb5930358dffae6a5f01a5f5bafc1cb861b572febd9173d003b62d2ddd"
+      }
+    },
+    {
+      "id": 160,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/160/",
+        "path": "pokemon/160.json",
+        "sha256": "cd83c905170f996bd3fd53d4553795df8953ccddc66de76c0c164be69c7c745b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/160/",
+        "path": "species/160.json",
+        "sha256": "bb46598a2ec14de14e68ae0cbc2e4115c96655d5a9ca2ce7f5c32111b81b5c49"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/160.png",
+        "path": "sprites/160.png",
+        "sha256": "b69b11add8ec1ab21e55fd62e1bfae3fc1f4719b4bf8dec820f5ac6b24be59ab"
+      }
+    },
+    {
+      "id": 161,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/161/",
+        "path": "pokemon/161.json",
+        "sha256": "71e4a05312022f66e8b210c957126c1dffe5788f594347ec9646fb70fdf8f1f6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/161/",
+        "path": "species/161.json",
+        "sha256": "8d1973b1274ddd0d98ebf91ffef5471a8bc26fb377695703147532cf61714cbd"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/161.png",
+        "path": "sprites/161.png",
+        "sha256": "b3b59e39e66a2b11caa545df3506c52e59dd6a90ea8e4992b621844c316d427a"
+      }
+    },
+    {
+      "id": 162,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/162/",
+        "path": "pokemon/162.json",
+        "sha256": "d3f2ddb2622aa25e90dc5821ddc6bb5c1e439b24af4dbd97899d317be7320a02"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/162/",
+        "path": "species/162.json",
+        "sha256": "b649ce24de3643f7ffe355ab0e13e04894ec3fe83fbeaf1db453a52e7cdc30d7"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/162.png",
+        "path": "sprites/162.png",
+        "sha256": "80a4327eed28e54cf5bd46a33d0b7dcb1725b4f7bbbab6dc9f05b7c0492cf9c7"
+      }
+    },
+    {
+      "id": 163,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/163/",
+        "path": "pokemon/163.json",
+        "sha256": "69e81106ec0a6bdb37e9ea932ed663f142d9aa191f583902d4836ab611fe4f5c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/163/",
+        "path": "species/163.json",
+        "sha256": "f9e6265bd9db80bfe58f08567b15be1f7fca048acb84d836c15a96051a95d701"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/163.png",
+        "path": "sprites/163.png",
+        "sha256": "0c97393eff7ca77758735de4c0e980fb6006faf84f12b2e77c7b707cbee4c3d7"
+      }
+    },
+    {
+      "id": 164,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/164/",
+        "path": "pokemon/164.json",
+        "sha256": "b3bdc2a3a944058a5e8ed933b2b85a52bb91b88f53a5187240c7217d769b3835"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/164/",
+        "path": "species/164.json",
+        "sha256": "170252b40a9a077dd179696a7380ee48aec384f97171a89b684ed5ffee2eae01"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/164.png",
+        "path": "sprites/164.png",
+        "sha256": "28ad08e7058ef958f3ef01ac3021dcb9e327eae5d33c16fdfd5097498228dd8a"
+      }
+    },
+    {
+      "id": 165,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/165/",
+        "path": "pokemon/165.json",
+        "sha256": "efbf3f7816f3cc90b2ee8c9c77d04ec030c48ad628c7c49efaf003fb2d794023"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/165/",
+        "path": "species/165.json",
+        "sha256": "b1269c1cafe50a872a68d3b27010ba7008f2916c243d007218fb684a2ca3059b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/165.png",
+        "path": "sprites/165.png",
+        "sha256": "c7046e54893f4a334491bfa0eb0a8b1e09ca016a01d838afdf43638922caa694"
+      }
+    },
+    {
+      "id": 166,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/166/",
+        "path": "pokemon/166.json",
+        "sha256": "81cb03b6d196ad82d7d17ae1f4c29cf2b404f4d5e3dca154d27450df09542c9a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/166/",
+        "path": "species/166.json",
+        "sha256": "e31c43896de3ce57fb12cb982c739e063f177404d28b87b3b6fb7c305e67ae8b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/166.png",
+        "path": "sprites/166.png",
+        "sha256": "09b14f830eea1654d1b466c6fb808c6eeaa0f451ad6f5dd2f20ddb7bd5d5210e"
+      }
+    },
+    {
+      "id": 167,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/167/",
+        "path": "pokemon/167.json",
+        "sha256": "b1a6a85781d71ed4b9075e6a1d6eb9bdce686ddb09a4e851cf53943144d1e9b7"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/167/",
+        "path": "species/167.json",
+        "sha256": "10d20222d8c8a5273a7957cbda43e790274ea160f89978f63dd3d0069920d4b8"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/167.png",
+        "path": "sprites/167.png",
+        "sha256": "727a311173efa18a841564c94f9e960b7dd623409accdc2a8731ee84c46b680d"
+      }
+    },
+    {
+      "id": 168,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/168/",
+        "path": "pokemon/168.json",
+        "sha256": "e6b7b44570420c9251450c0576b973c536b63909c07edd72c0708e905250e140"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/168/",
+        "path": "species/168.json",
+        "sha256": "f35a98b52f50fe53b8069bf95c164a3f71af650878d6a67dbc43476ba75cea37"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/168.png",
+        "path": "sprites/168.png",
+        "sha256": "f40a09974fa0386965e5e6f7d1ab0c43b817202f412b7ef87547973a44fb5bec"
+      }
+    },
+    {
+      "id": 169,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/169/",
+        "path": "pokemon/169.json",
+        "sha256": "b0d595391631bdeedfaabace57e10d16142b9a5a9ae0b4c6bb0ecdfc5244cae3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/169/",
+        "path": "species/169.json",
+        "sha256": "3c4b372568557addbfa5d53277f5b56d2791008821c33540c22862df9af85989"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/169.png",
+        "path": "sprites/169.png",
+        "sha256": "82d59dc89764f4f58e3a35d9c61ca006788291056a7590de7e4fe98813327acc"
+      }
+    },
+    {
+      "id": 170,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/170/",
+        "path": "pokemon/170.json",
+        "sha256": "6d8dd8b9e6c20bde8209b24b43ad8217513551555fe99a9598c751c78614bea0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/170/",
+        "path": "species/170.json",
+        "sha256": "021bb3e168c59bfeca204cb4ab20b2afb4430b844cf3fe38d8d9e24cf006929b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/170.png",
+        "path": "sprites/170.png",
+        "sha256": "7dbfab03496d5789e8e216a9e2c990536a5dfd1569bddf4777014500a71e402c"
+      }
+    },
+    {
+      "id": 171,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/171/",
+        "path": "pokemon/171.json",
+        "sha256": "26c91ad80c32654851047980674cc3bdadbc3e44481c2e64b7b1c6dcbdd45a41"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/171/",
+        "path": "species/171.json",
+        "sha256": "914ce7873d5a7afd549b770335484af8f8611d31a6bdf6d03fa6347dd61b443a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/171.png",
+        "path": "sprites/171.png",
+        "sha256": "5880bb50a0a3cd687019148efd2cf40f21791ffd99277e78ce09a69a298c4e5d"
+      }
+    },
+    {
+      "id": 172,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/172/",
+        "path": "pokemon/172.json",
+        "sha256": "ed4d5360401eeec858b4b8d5244ffc0e2ad4c311ce7e77422fd8ff619ef47a5e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/172/",
+        "path": "species/172.json",
+        "sha256": "22696a9d001c36883eefa34cd944db3ad8a2f390c2f4efe354fbe691e2091da3"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/172.png",
+        "path": "sprites/172.png",
+        "sha256": "060e08b905cb1d1d4a82f3225809446020c30ff7a1e1ce93ae24380640a50776"
+      }
+    },
+    {
+      "id": 173,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/173/",
+        "path": "pokemon/173.json",
+        "sha256": "0133f47d3cf03cd71bae0955f38b5deb2749ac2675644913e7cfaa405574610c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/173/",
+        "path": "species/173.json",
+        "sha256": "4fc8aa9ace35d5405d9555d8c580e396ae03f2d7747cb71c9270a90b52621b3e"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/173.png",
+        "path": "sprites/173.png",
+        "sha256": "d38b0e9f388d2a6ad4370b7b35978c534eca4cfad8271354930045e8206b1493"
+      }
+    },
+    {
+      "id": 174,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/174/",
+        "path": "pokemon/174.json",
+        "sha256": "87532ec3845a6e1ba79349fb7841799fce63a8dc2f9559aa470004f84dbb0841"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/174/",
+        "path": "species/174.json",
+        "sha256": "579537c3df714887eb2f833f6f111afabd8adb916d0f1d566e2432f3bd5061a4"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/174.png",
+        "path": "sprites/174.png",
+        "sha256": "55842828435f6c7bcd99dcc773bf01609a25cd4c1544213b956397111114f6ca"
+      }
+    },
+    {
+      "id": 175,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/175/",
+        "path": "pokemon/175.json",
+        "sha256": "4213c2ad0391f6a29de9720a7d51483d0030c3b28a7bbb2397cb578de1d89bab"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/175/",
+        "path": "species/175.json",
+        "sha256": "6eb4a47e8e03920b58bb74ebb812958aad9a09d3daf6951cfc5fe99e4387f03f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/175.png",
+        "path": "sprites/175.png",
+        "sha256": "c86f3749de00eaf0aee0eaea0180df4494a26471309aeda9eb7316f48efc6989"
+      }
+    },
+    {
+      "id": 176,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/176/",
+        "path": "pokemon/176.json",
+        "sha256": "67f889db5cbcc7ad62aa981bc08b2e6e16a7fb3cdaebdedcbd33d6cd4c09daf8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/176/",
+        "path": "species/176.json",
+        "sha256": "4e9afe51dbf13c1c16942956ca210da28396e6eca89e64317877d15d3663d77c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/176.png",
+        "path": "sprites/176.png",
+        "sha256": "c87d56c06fb305a2fe8faedc86511b45e41c300867b1993e449adcceb4c03260"
+      }
+    },
+    {
+      "id": 177,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/177/",
+        "path": "pokemon/177.json",
+        "sha256": "3200fa40ad10a0bd600a9b90c4872e629a3ccd7157d33356e319af7e05bfc553"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/177/",
+        "path": "species/177.json",
+        "sha256": "c49de4f193b3fc9cb3228bc76db275940c517abee06d51438b0431dee48b6f5b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/177.png",
+        "path": "sprites/177.png",
+        "sha256": "b574c5dc30c35988294dbb9dcd3755639c1639ac5c3f5226c00f1430d6836fba"
+      }
+    },
+    {
+      "id": 178,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/178/",
+        "path": "pokemon/178.json",
+        "sha256": "ba31bac13a8940d6452f4c75386bf547dda43927319be25ee21fbea7b6f42ee4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/178/",
+        "path": "species/178.json",
+        "sha256": "8a5ae669baf56fbe621bfe37e5e0925ccbf396fd59ca0a7c95adca764725a8f6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/178.png",
+        "path": "sprites/178.png",
+        "sha256": "ae774afefb7591425960b7dc61685250646d664e6a1c6ee4da5a19f8420b2f9f"
+      }
+    },
+    {
+      "id": 179,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/179/",
+        "path": "pokemon/179.json",
+        "sha256": "c82848d4c309291873ffab648cacc55d8c57bdd9b354718ac7fed6dec2d76f66"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/179/",
+        "path": "species/179.json",
+        "sha256": "3967d9c755299d8941d7f65f9f9e40d818841d18e57984958f3c9b87ae15492c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/179.png",
+        "path": "sprites/179.png",
+        "sha256": "010e317836b9f924e87b67e7b9fa1cb5d4d7c45d83450fed904fe6450dd4ce04"
+      }
+    },
+    {
+      "id": 180,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/180/",
+        "path": "pokemon/180.json",
+        "sha256": "4a7bef5d9171bc38752d3b5b39df4c3427c5c02ce820b32e2dba0048e8071a97"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/180/",
+        "path": "species/180.json",
+        "sha256": "cf622d5a6a70a93ec59b50ec379698020df20eef05f32aaf48102674ca0568f2"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/180.png",
+        "path": "sprites/180.png",
+        "sha256": "c66f9ea36385bb92e4170454fde02fd5a75f56cc760efdba64e198804f0f0573"
+      }
+    },
+    {
+      "id": 181,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/181/",
+        "path": "pokemon/181.json",
+        "sha256": "5dd8734a39ec368be54465f3fd36beeeecad64ca51af10c6c782fbca12b76a89"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/181/",
+        "path": "species/181.json",
+        "sha256": "d2300b373e7ebf305519db362a94dd391df29f81e1fbd688b7c98bc37d916916"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/181.png",
+        "path": "sprites/181.png",
+        "sha256": "3f5bd3b702eca0986023329a242499413e3fd0ad9f2b339ef452e4840ab9c8b7"
+      }
+    },
+    {
+      "id": 182,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/182/",
+        "path": "pokemon/182.json",
+        "sha256": "f39da89f34cb699560512cc0525924ab501b35e84ba82d03bee54a9546b1e016"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/182/",
+        "path": "species/182.json",
+        "sha256": "7692d89d853e4772b146efc2f3f74214c84d1314a2d7531a3eb4c5a9d8dc3558"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/182.png",
+        "path": "sprites/182.png",
+        "sha256": "43a77fc6f8475a0c12357d7a3b0427e17865fb2ff7ac29f1b55d45d76e39a7f5"
+      }
+    },
+    {
+      "id": 183,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/183/",
+        "path": "pokemon/183.json",
+        "sha256": "3e10d4c7abe8da9c2e0958a608da8d391faffa4a27d169b7d1bbc45886379828"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/183/",
+        "path": "species/183.json",
+        "sha256": "83f629c97dcc9a6f31448976fc9b830c7cc5305dbdb579d79b56b562c8cccf69"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/183.png",
+        "path": "sprites/183.png",
+        "sha256": "451f7bcda4c56a155c13cfb61a673241241353e3784c8742e5059b90e2b3d62a"
+      }
+    },
+    {
+      "id": 184,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/184/",
+        "path": "pokemon/184.json",
+        "sha256": "758ed301c0753a42cf923d32e33f37c18ac4d450959afa02c5be31a57e75f578"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/184/",
+        "path": "species/184.json",
+        "sha256": "099c846579d72bed16118b8d1405dd6d1184010743620c2003c39bd2737872b5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/184.png",
+        "path": "sprites/184.png",
+        "sha256": "370aeffdbbe7342d843c538114aeca6fd3d1a3b6e527c28d5cdd3649c3e453d5"
+      }
+    },
+    {
+      "id": 185,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/185/",
+        "path": "pokemon/185.json",
+        "sha256": "09bc7bb930ea2c84cbeeee89bdde7818b6fe10d13684420c49d6fa238be6b642"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/185/",
+        "path": "species/185.json",
+        "sha256": "8ead181c500328c76030f38ea2d87a325cc0b0b977986982a92962ff14f3ad48"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/185.png",
+        "path": "sprites/185.png",
+        "sha256": "f4680f5407d615eaeb227d68a011a27ccd4458026b41fcc790fb30557c645d53"
+      }
+    },
+    {
+      "id": 186,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/186/",
+        "path": "pokemon/186.json",
+        "sha256": "5ce16ae4d5b760f2c45275e056d25e008a3bd67971fb839ced5004c53bfd60ef"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/186/",
+        "path": "species/186.json",
+        "sha256": "5ec651581ea8eb1e48106d11bbc80b65ac6d63cb49e71c6abfb33e9ba6a7aa2b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/186.png",
+        "path": "sprites/186.png",
+        "sha256": "313da6d9cee6705e3956fec1e13391a41b76df554b962e2c3350505c02d30538"
+      }
+    },
+    {
+      "id": 187,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/187/",
+        "path": "pokemon/187.json",
+        "sha256": "32fdba651a3875db891c889fa7e8b35a96c9e0a6929d69202e1e1a8eda11a4f6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/187/",
+        "path": "species/187.json",
+        "sha256": "c416869e3cfe8ab997485d0b734f0a40cc4cff975bf3f8d7ed6be8c3c52d15ea"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/187.png",
+        "path": "sprites/187.png",
+        "sha256": "8072f0189b97b1d364d6995ed183f5569c945d39004d897de23d32636c4bc267"
+      }
+    },
+    {
+      "id": 188,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/188/",
+        "path": "pokemon/188.json",
+        "sha256": "b43431f6aba3033433d3fd9ea39fa69669b5ef337d78dae8ef6b4932a85d6147"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/188/",
+        "path": "species/188.json",
+        "sha256": "cb2094e252f7b831940285f9dd0ec4053ba147e4b88f1b17c89507dd86cc2014"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/188.png",
+        "path": "sprites/188.png",
+        "sha256": "8801384b2864396bf55966f6a11158ffc063fd0dbfb36506375b90dde436b69e"
+      }
+    },
+    {
+      "id": 189,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/189/",
+        "path": "pokemon/189.json",
+        "sha256": "5e3a86cd5d7f228cf48d531659027dcbd2186ec9ad7dc88af05aacca15116c4e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/189/",
+        "path": "species/189.json",
+        "sha256": "135f9ee915040df145639ca47b77297a1c9c47456dcc05272c370fe6bb8e5972"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/189.png",
+        "path": "sprites/189.png",
+        "sha256": "b04d527d182e304ff0998779e91926eb5afe41101c4fec00eee420a90bacbd17"
+      }
+    },
+    {
+      "id": 190,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/190/",
+        "path": "pokemon/190.json",
+        "sha256": "cc964f2fd43f1db5ea06ce54831ef2c53c7250f7e8014d9385737c8fc20af04e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/190/",
+        "path": "species/190.json",
+        "sha256": "9a7fd28f3751b9b073472476882e48632143ee889827264b41d6d7e78979e183"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/190.png",
+        "path": "sprites/190.png",
+        "sha256": "d81f654ab5ab04f78847769bd6b7d9a2e8bb8ec488bc43e6c5d950b81263defa"
+      }
+    },
+    {
+      "id": 191,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/191/",
+        "path": "pokemon/191.json",
+        "sha256": "31ca5a20a8342244719620e54592618877e3005c0021b8e226c5ec018942652a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/191/",
+        "path": "species/191.json",
+        "sha256": "5fee6477a9a2950b74f19ce3ad8b396ce94257d2b28b40bd54e64a61973fdb9e"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/191.png",
+        "path": "sprites/191.png",
+        "sha256": "d4de1302b279b722c911703438d1bb740d77d61261b3c66524390af6393c8d83"
+      }
+    },
+    {
+      "id": 192,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/192/",
+        "path": "pokemon/192.json",
+        "sha256": "7e4e886d03a8a5cbfbce943f06f0b6680cea87de78da0f79810cc0bc2318c65f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/192/",
+        "path": "species/192.json",
+        "sha256": "0ea1b0f79d4739dce1f7a14e8865b6a86145baf3bca8813ac33d0e206976b4d3"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/192.png",
+        "path": "sprites/192.png",
+        "sha256": "d8225927f897fdca17c566b0ba6f70f52c7e0f5fe511d9cf7f9a0571f9199c85"
+      }
+    },
+    {
+      "id": 193,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/193/",
+        "path": "pokemon/193.json",
+        "sha256": "3e6ec046017958cafa5f75aad0be78e66b617f5bb90154256fe94f87e2e5aac0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/193/",
+        "path": "species/193.json",
+        "sha256": "ee9f2d296c191eaba332a9d66ea53c806f0a13028db9fd920ebed35a3e57fa98"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/193.png",
+        "path": "sprites/193.png",
+        "sha256": "dc65ef4ee25731144f679228cc8ad1f9d6837be9dd522ce2fe28586fe1f485c4"
+      }
+    },
+    {
+      "id": 194,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/194/",
+        "path": "pokemon/194.json",
+        "sha256": "2d67114c30abd1b8400b6b0c41c8290615203cb4f953451e9db821ca923555f4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/194/",
+        "path": "species/194.json",
+        "sha256": "05af188406d26b94e4a63acf00824c55d8c117d3cee3f87987076fa78c2ac920"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/194.png",
+        "path": "sprites/194.png",
+        "sha256": "6cf87fdff9f01567afc06b6f58484117b7fdf071860333add243c3ad481ab319"
+      }
+    },
+    {
+      "id": 195,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/195/",
+        "path": "pokemon/195.json",
+        "sha256": "fe5b1f92efe7c5024b85eeef9664cc00c95b2767fd0a294ba1366ab6ce216d2a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/195/",
+        "path": "species/195.json",
+        "sha256": "4ab3fd544cec22ed533f8eef690dfa26335c291aba7edd391a7bfeeef60b739d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/195.png",
+        "path": "sprites/195.png",
+        "sha256": "8119ddaeed336f2e3a8e3f47f28b279ef114441092cffd47278363035415a1a4"
+      }
+    },
+    {
+      "id": 196,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/196/",
+        "path": "pokemon/196.json",
+        "sha256": "78bbb25c6df66ff4bf15f25652336dbdecaf1af919adb3f326387a548348e979"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/196/",
+        "path": "species/196.json",
+        "sha256": "14aeb91f48a75be72618b324166b184fe5aac83820c488367d752a07a3089229"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/196.png",
+        "path": "sprites/196.png",
+        "sha256": "36cb50cc099ce5bbf939966cced1f9b55eeadb4b99160d773b07a15f597c865b"
+      }
+    },
+    {
+      "id": 197,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/197/",
+        "path": "pokemon/197.json",
+        "sha256": "380ca5d8956388d245a38619125db4feac84a6934ee390f00c5e05b48f745def"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/197/",
+        "path": "species/197.json",
+        "sha256": "d4967f558fb59673472ae64a1363b9d99aeb16dc32053a60b98c52969086b302"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/197.png",
+        "path": "sprites/197.png",
+        "sha256": "dbc928f8e1db17b3f2a40010f0f791a3b7760c770e35c54b8a42b68dabaa5528"
+      }
+    },
+    {
+      "id": 198,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/198/",
+        "path": "pokemon/198.json",
+        "sha256": "a0f8780e347b5b915be8e608c863ac283c2bbd59a353ba714d467535cad3f51b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/198/",
+        "path": "species/198.json",
+        "sha256": "53837e58fcd03271ee749757ef93445e2a1657ac217deee342d27c5093dfee22"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/198.png",
+        "path": "sprites/198.png",
+        "sha256": "bd2dd1a439bb157e15123c7815e14260f2578b0bc0de32d9b2bf783277935348"
+      }
+    },
+    {
+      "id": 199,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/199/",
+        "path": "pokemon/199.json",
+        "sha256": "7da91604c46826f1bff49836a74740d07cff11f1f23975c8f1934d31184daab9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/199/",
+        "path": "species/199.json",
+        "sha256": "8a1d4f0125d865d79e581f5846d240e3212aa792e1947f3d3127964591afcb31"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/199.png",
+        "path": "sprites/199.png",
+        "sha256": "6124ac0bddc908066c3cc5767006ae7076d45a3ecdd6d660aa33780abb32d153"
+      }
+    },
+    {
+      "id": 200,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/200/",
+        "path": "pokemon/200.json",
+        "sha256": "017a9d137c0de18ec1648a917a143532f682a8291b25549588daf216e0998bc9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/200/",
+        "path": "species/200.json",
+        "sha256": "c370a16b7e3f3531f29c8879802c053e2eb9f8118ef435daa847830337223c9d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/200.png",
+        "path": "sprites/200.png",
+        "sha256": "83daeeb80e8bddd1de424de12b15fac04e6f7e7ac6c71bff4c5a255f7764685d"
+      }
+    },
+    {
+      "id": 201,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/201/",
+        "path": "pokemon/201.json",
+        "sha256": "e332e3501003e7e95679565e8a0e3aba98493d120403cc750f3857a0adeca6c9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/201/",
+        "path": "species/201.json",
+        "sha256": "932163a4f8b1203e5d887dd3270561a76cc37bca6626a38179bf4f18372b8e16"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/201.png",
+        "path": "sprites/201.png",
+        "sha256": "4a6528981cee13091c1559b601c550e764a4cd24ad6489267d1b42d14467f93f"
+      }
+    },
+    {
+      "id": 202,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/202/",
+        "path": "pokemon/202.json",
+        "sha256": "9602f7c9a98df1b0315447f1b769bd47b2244e390cae3b161d501a126d32b21a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/202/",
+        "path": "species/202.json",
+        "sha256": "13153ef65da420804e45440731c653e8d50a210f3ba39d633c4e3a8500fb8dba"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/202.png",
+        "path": "sprites/202.png",
+        "sha256": "97aadbfb9b0ccf7e40c311ed13f940576f751b77ddb8b526bc6cd1dfcacf7d82"
+      }
+    },
+    {
+      "id": 203,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/203/",
+        "path": "pokemon/203.json",
+        "sha256": "ba19a31fb15d86cea39c413d48701535f60ed09de890829202a6b2a3e220dcc7"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/203/",
+        "path": "species/203.json",
+        "sha256": "28293e56f1a873eb375644a656210a2931472061ff436b9c30cdbf8c8d3747b3"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/203.png",
+        "path": "sprites/203.png",
+        "sha256": "98934388c0fd741ac9a8f314653d19964080167ed59b4b1bdb0171ca91545043"
+      }
+    },
+    {
+      "id": 204,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/204/",
+        "path": "pokemon/204.json",
+        "sha256": "c95160c7fe8e4f1849cb2b1d7522052c1d5c33ea8b399c3370f97175999f4ba0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/204/",
+        "path": "species/204.json",
+        "sha256": "a564b3cee94ad8ee7cc8d37763986eb6a9111f7b9cabee7cc14a7f2d405fea93"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/204.png",
+        "path": "sprites/204.png",
+        "sha256": "fe6ed9f4c98a2f3af323040a36c41f575afa1e8a79c0f82d88224950213e79ab"
+      }
+    },
+    {
+      "id": 205,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/205/",
+        "path": "pokemon/205.json",
+        "sha256": "4eca351b5a4cea94e7e256048fd4c95041c2d97c762207e1dba4b38146c8d7f4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/205/",
+        "path": "species/205.json",
+        "sha256": "a244f3c38c58fb3a9dabaaefa991adf6d2dd80cbd0e36c6922632ab4f742e00c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/205.png",
+        "path": "sprites/205.png",
+        "sha256": "36d4b2f4f0b4e34652d84d934b23457a546925665783d5f71173a741ce1a5a09"
+      }
+    },
+    {
+      "id": 206,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/206/",
+        "path": "pokemon/206.json",
+        "sha256": "217f056cac86d9800052263719a840d6b9fcc40d8cc6fb684969228dd0b323fd"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/206/",
+        "path": "species/206.json",
+        "sha256": "d38f33458bdef28d8efbbbf2c7db598606f7844b17860e59398cd135c8325a6e"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/206.png",
+        "path": "sprites/206.png",
+        "sha256": "4b21ccdf014fee610e3b2cc80adacbe40d4a7d7d15dfde2c6780f22e940cb5c2"
+      }
+    },
+    {
+      "id": 207,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/207/",
+        "path": "pokemon/207.json",
+        "sha256": "0af9d64db4871c2001a13fafcc9f64c24c019f85d9c570941bd153848d71a1fe"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/207/",
+        "path": "species/207.json",
+        "sha256": "98415fb508d71ad577dbfbdbca43c99027916f175afc231746f8c7d65244e184"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/207.png",
+        "path": "sprites/207.png",
+        "sha256": "f59ac5b9eabadbb824a4387a27db36ac16ecb813106d62f3af93e6f50ddb898d"
+      }
+    },
+    {
+      "id": 208,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/208/",
+        "path": "pokemon/208.json",
+        "sha256": "019b5fb0b11392bf50ee560c5ec1258170cbb99befad81194278375b971a1f28"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/208/",
+        "path": "species/208.json",
+        "sha256": "e4f72421f9a3b400fb60463180d842d19a20daf0d9c784648e37f42b8e050c7c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/208.png",
+        "path": "sprites/208.png",
+        "sha256": "25a8e6004199143217aba2c960fd7af18447245a36f43153aa4b9cd5720597e4"
+      }
+    },
+    {
+      "id": 209,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/209/",
+        "path": "pokemon/209.json",
+        "sha256": "4a63de07afda2a8ef4a6605e7fdb76036f49b707ef9404627c47d85185119e85"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/209/",
+        "path": "species/209.json",
+        "sha256": "194a8f7b07957e91fa5bb19be69a468594686f94e817ebd29133d036d7351310"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/209.png",
+        "path": "sprites/209.png",
+        "sha256": "b4b3cbe42855f305c213ad86322a05e27d8e4ecca1b1a412ac25b2121a40001b"
+      }
+    },
+    {
+      "id": 210,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/210/",
+        "path": "pokemon/210.json",
+        "sha256": "bb98cb52af08275c9ed4068626aaaafe1d1ffb3bb3887ec8882b707790aaa623"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/210/",
+        "path": "species/210.json",
+        "sha256": "dc156c2da2ca5d2d74a9d94d92ec1ac3bb7c3b5c46702794ba836ecb39ed7312"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/210.png",
+        "path": "sprites/210.png",
+        "sha256": "c3754ce467d4d1974c4572e4c74a8ac85d303f04191a1dc59ef82aa9cbef077e"
+      }
+    },
+    {
+      "id": 211,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/211/",
+        "path": "pokemon/211.json",
+        "sha256": "6ba55b991241440083ed29998166dbfd02cffc3610e68b9d81c67bbfa79d59c6"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/211/",
+        "path": "species/211.json",
+        "sha256": "a4d92e7d9945b3f17d30cb98ce0b18a52f309daec79331205c91cf76fa10df67"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/211.png",
+        "path": "sprites/211.png",
+        "sha256": "695e491c5b1b54e7ea8768d7a1b489650c0e046ef41a34e565e5c380e5cce582"
+      }
+    },
+    {
+      "id": 212,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/212/",
+        "path": "pokemon/212.json",
+        "sha256": "8b04df648ffc4a0e90cf6aa856d30d921f3e9a581736ced2b0f9048aa64dae29"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/212/",
+        "path": "species/212.json",
+        "sha256": "b1148fa214ac8a24471fca49789e2197fb246d4e3023c9e39fc515b14d8081bd"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/212.png",
+        "path": "sprites/212.png",
+        "sha256": "da6694e9a970f94300dbf9e4e7fe4495921f14441b566009aefb6e651f87e7e8"
+      }
+    },
+    {
+      "id": 213,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/213/",
+        "path": "pokemon/213.json",
+        "sha256": "5792a9bf9bda78c771aa83759370871bdffd0b7e941c655cdc5621d60bd60d7b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/213/",
+        "path": "species/213.json",
+        "sha256": "e41dd9b50f2fed1757aba60b608113c66a21fa6169b767409437950fc83acbee"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/213.png",
+        "path": "sprites/213.png",
+        "sha256": "96227db517f9050ac20ae45132542f143c78f3622f5c10ce984274c2fdc179f2"
+      }
+    },
+    {
+      "id": 214,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/214/",
+        "path": "pokemon/214.json",
+        "sha256": "81c3f98c49e817b7272cf68d9fb04dd111602cfae1e71cfb995a8f55953b41b1"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/214/",
+        "path": "species/214.json",
+        "sha256": "c2be5b55119d43d508898c14f6b161ae7e11abc8780997494bcdce5ce02fa107"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/214.png",
+        "path": "sprites/214.png",
+        "sha256": "593b3fda0ca1fcbc1eb3865ddb3708b661bc311074a8a41b98305689520d06b7"
+      }
+    },
+    {
+      "id": 215,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/215/",
+        "path": "pokemon/215.json",
+        "sha256": "bb90f065f2c734ca59bc7ff329733d310403fecb02944772e600e0948b4fe3af"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/215/",
+        "path": "species/215.json",
+        "sha256": "6c8f63227090a3a6dcf1bb2c846583fbbaef2b8037e0304bd852f32b44a1698a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/215.png",
+        "path": "sprites/215.png",
+        "sha256": "e3d0bd131e707d6411a311237fa90c39a19696d571f19742c83b42c313392286"
+      }
+    },
+    {
+      "id": 216,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/216/",
+        "path": "pokemon/216.json",
+        "sha256": "96fd39d73a43d638eb9a772e616ddf5ab7edaeafdcc70e1224f869065674bb7e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/216/",
+        "path": "species/216.json",
+        "sha256": "bf786b718b2eca1c833bb45a0bf1f011c9cc5c24eca97ed15dbbbe70e1d2fdf5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/216.png",
+        "path": "sprites/216.png",
+        "sha256": "0ba835524d557bf39a34228c4853dcdd34affd1c23aef17c38582d3d33d56118"
+      }
+    },
+    {
+      "id": 217,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/217/",
+        "path": "pokemon/217.json",
+        "sha256": "8556f683a96aeecc5481c16ecc149910e531549ff3d3554ab898e6784b653ab8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/217/",
+        "path": "species/217.json",
+        "sha256": "78a7f2fc04b4e8d83b455e2399fe93cca3a06bb6fcf1391ac99dea8dbc5ecb1c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/217.png",
+        "path": "sprites/217.png",
+        "sha256": "157c041bb0d88c20935273b29d8d5fa775f949b9b689746f379e77f8c794efbd"
+      }
+    },
+    {
+      "id": 218,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/218/",
+        "path": "pokemon/218.json",
+        "sha256": "78a658286e64fab5bd0c2fcfdcdde962d0bf89a2eceb46ba109303de4ae29d7f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/218/",
+        "path": "species/218.json",
+        "sha256": "d0b0f77f125cfb294ffe95278d8759af92171650a259f555a0ec9fa0e20da8d5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/218.png",
+        "path": "sprites/218.png",
+        "sha256": "968c609a9cdfe5bb97a7fcf0668b7e6a8979564d90a10fcd2eda79099c27546c"
+      }
+    },
+    {
+      "id": 219,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/219/",
+        "path": "pokemon/219.json",
+        "sha256": "b4b9d4ae5663b6c307022c70afb01b24fed62cac37d56101f5f0309d68592ea3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/219/",
+        "path": "species/219.json",
+        "sha256": "f2df3878738e9ba315735f27fc492d392d137183eac1c93d941ebfdd29bad0e3"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/219.png",
+        "path": "sprites/219.png",
+        "sha256": "26c2de843b42c3bf7da97e97446fce418ab312e778a1d208defd5cf7715295af"
+      }
+    },
+    {
+      "id": 220,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/220/",
+        "path": "pokemon/220.json",
+        "sha256": "61b83b10a920138437a82a260b8b189d66b78081700ea47f5701f0b9a7d2f656"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/220/",
+        "path": "species/220.json",
+        "sha256": "603abbeb1ede7022cd2e9c1e259bd83070b62eba1cfc29baf60d4785bb64e7b9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/220.png",
+        "path": "sprites/220.png",
+        "sha256": "e1565ca731e8deed08cfd2bbe3934e77c77b1a47dde8acd62a7eaf874aef2b20"
+      }
+    },
+    {
+      "id": 221,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/221/",
+        "path": "pokemon/221.json",
+        "sha256": "a2690d21d4736a4aade7518b3cbb3b326f2897db49e262ac2c17e8209749a61d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/221/",
+        "path": "species/221.json",
+        "sha256": "263b4db016a928aa9cefb90d1fcd50a56a84c6f6dd7d73fd23bb613208d33cc9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/221.png",
+        "path": "sprites/221.png",
+        "sha256": "d62390f76d0c65bce134faff2c240cbb26441349e1f8bdebc26b2f8ab8865098"
+      }
+    },
+    {
+      "id": 222,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/222/",
+        "path": "pokemon/222.json",
+        "sha256": "2683db6b4bc72cbee3978c334d705ad1234f0459803aa06b3c21b97e37b9bf3c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/222/",
+        "path": "species/222.json",
+        "sha256": "ce8a37f78e3fabbe895748d7b786153ea5bee9b7fa3464a4123b3c3d6558f3d6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/222.png",
+        "path": "sprites/222.png",
+        "sha256": "8e1ca5a441bae5e2eb297d86291fbdd20fa224ad1a5ccb25387e77dbbf9740d2"
+      }
+    },
+    {
+      "id": 223,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/223/",
+        "path": "pokemon/223.json",
+        "sha256": "c0c88be1bb0b727310abcd1d12ca30ea876f1dce686efb671411e63d4179d3b0"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/223/",
+        "path": "species/223.json",
+        "sha256": "bc3e62fd950cde1bc8f420e7d3329de59af86d1aa5877eb8a7a54a4329ce07d0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/223.png",
+        "path": "sprites/223.png",
+        "sha256": "508202c2af5f9b4a645c020f3379441e4811bf672443e13802f5adb734326ba3"
+      }
+    },
+    {
+      "id": 224,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/224/",
+        "path": "pokemon/224.json",
+        "sha256": "cda5331a34cdf2de44086dd6d288921f03625cc36e5a627fbc0531f09a81dbf3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/224/",
+        "path": "species/224.json",
+        "sha256": "ae7341df6e8b565a7ef1fcd645d969fbc085cf172acda002439a33c43ee86c88"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/224.png",
+        "path": "sprites/224.png",
+        "sha256": "f8a101b26606638e4d943b88b72538cb3f8ff4a0ae7c2a5bf7df9146a3b60535"
+      }
+    },
+    {
+      "id": 225,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/225/",
+        "path": "pokemon/225.json",
+        "sha256": "6d85b3bf89d085a7478f3a35cc4f6d9b66b57eb3fbfaf1d005f62bda1c3b8751"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/225/",
+        "path": "species/225.json",
+        "sha256": "c4104e115edcbb76127ea3ce824a95127b51424e68d5d833b1825113a9804572"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/225.png",
+        "path": "sprites/225.png",
+        "sha256": "24adc9b133e6986b0f32b1b8964dfe0dfffeb882187b91c991052e8fc9449483"
+      }
+    },
+    {
+      "id": 226,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/226/",
+        "path": "pokemon/226.json",
+        "sha256": "ab2c94130450aa6d36b84dce9b97a0af588431720e0be329c07ca25c5efe26cb"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/226/",
+        "path": "species/226.json",
+        "sha256": "baacd65133addd04547fbb8f6c8a71b7e9aaa2a1fb6f1840cc16304287099041"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/226.png",
+        "path": "sprites/226.png",
+        "sha256": "3770e20b6e2cdf6a2e7d0b7ebae9743fb18a8f265c80cd61bc0bf439e98ce71a"
+      }
+    },
+    {
+      "id": 227,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/227/",
+        "path": "pokemon/227.json",
+        "sha256": "4f42971ef50406b6f6af1fd5c91e4538ec3c3cb578d491234b66d3d3604ac357"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/227/",
+        "path": "species/227.json",
+        "sha256": "1433cd7bd1080cf68bc7cc526b9a346c08611dd993c5dac19c3e11d3a3f9f4df"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/227.png",
+        "path": "sprites/227.png",
+        "sha256": "6e1c73a6071e2a474b14e596b3039e1358a6e210c24b0ffd7f9fe002785e9769"
+      }
+    },
+    {
+      "id": 228,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/228/",
+        "path": "pokemon/228.json",
+        "sha256": "6e43404460eed5c8575cfd0371202e2735d136a2689329329a1b8cac6b3e5b35"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/228/",
+        "path": "species/228.json",
+        "sha256": "aa40b6957f7ee64b0173b4ecbe48bb3bec9ad8185984040a269e926930b17014"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/228.png",
+        "path": "sprites/228.png",
+        "sha256": "2893ff86bbcf1c421ae5c66964a01cb5a2f418a4ecb456fd40df5419d6470de0"
+      }
+    },
+    {
+      "id": 229,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/229/",
+        "path": "pokemon/229.json",
+        "sha256": "e3ec19c8d55224c2ccc4391b0884c3afab480e794fe70475f47d77c83a186a9f"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/229/",
+        "path": "species/229.json",
+        "sha256": "5b0e40351e15391a4c896dde90ce6e6befce9005252ff663456d4f0f401cb459"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/229.png",
+        "path": "sprites/229.png",
+        "sha256": "03e350e43e49329f8a9d62c84537fb99755ecbea94113731232e73d66eca68fb"
+      }
+    },
+    {
+      "id": 230,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/230/",
+        "path": "pokemon/230.json",
+        "sha256": "3bd64237e22cfabec618f2979e195ea361a8edb163751b26f82af5713f09e4c3"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/230/",
+        "path": "species/230.json",
+        "sha256": "9ae7dbba4aac0166437ea5d06d1b7e74996dd3b9238ecfb734ea6395c635b4f7"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/230.png",
+        "path": "sprites/230.png",
+        "sha256": "6987a31deeecae715e7f0a9158480ea0386332c07211fde6459941b6d9eadf37"
+      }
+    },
+    {
+      "id": 231,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/231/",
+        "path": "pokemon/231.json",
+        "sha256": "dbfa23ca61af84b56e55f74bc255cb9d5ce37362c403df6fdc9d6dfe750d58d9"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/231/",
+        "path": "species/231.json",
+        "sha256": "70d949ceb4af9a17a6204b468cfc0068eaac6961875e540e8fcf58ec14654fb0"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/231.png",
+        "path": "sprites/231.png",
+        "sha256": "eb81fc56ac252d54d69f756ed50ca0f5a409f2a6f134161078eb518bcf273d2c"
+      }
+    },
+    {
+      "id": 232,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/232/",
+        "path": "pokemon/232.json",
+        "sha256": "f3312098186df4162e614bae1fbb30eb7c05000250c2f29432d86863715ca8c8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/232/",
+        "path": "species/232.json",
+        "sha256": "bf8818b702a162cb2f71997388b131e69a03edf081e94095f1ef071f145368e4"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/232.png",
+        "path": "sprites/232.png",
+        "sha256": "4729dce7b8e424a6673cfbf5123b6f8b6accda40710ac7e43bb1bab6416759da"
+      }
+    },
+    {
+      "id": 233,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/233/",
+        "path": "pokemon/233.json",
+        "sha256": "577cf06ac5d5ec66587f14eb7b93eee9ed52d47f077d22a0c9c7fa94a551a982"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/233/",
+        "path": "species/233.json",
+        "sha256": "d8242ec72634740af942feaa418e1c5fedc33f479e2b8624fda55c9226ce43cb"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/233.png",
+        "path": "sprites/233.png",
+        "sha256": "1b62c6a3d90dfe9a8c963a5d6d0c05d0185344df9111d88a1a46425639a627eb"
+      }
+    },
+    {
+      "id": 234,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/234/",
+        "path": "pokemon/234.json",
+        "sha256": "3db33f2aaf1d2f16e66694d7b60fefea2b2c7beb593c588794d413a096933d1a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/234/",
+        "path": "species/234.json",
+        "sha256": "de04b9221ccdc5384068dc9173860d1967e8a67188c7f28875ada1d3811b688f"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/234.png",
+        "path": "sprites/234.png",
+        "sha256": "2af747c828c22289b74a1554484a700b3f42f542cefa309d0d8ba8fb78da18ed"
+      }
+    },
+    {
+      "id": 235,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/235/",
+        "path": "pokemon/235.json",
+        "sha256": "5bae1ff4455ede5c49024cc9808387ca652943504ee17c61ffa73cf6c6e0eeed"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/235/",
+        "path": "species/235.json",
+        "sha256": "eeea526d4cb49eb3b2d6292ca4a10b9dd3971b88db1d049950cb2ee2425d96f6"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/235.png",
+        "path": "sprites/235.png",
+        "sha256": "0cf5f2b9a0f6c885360476ff4f04b4145f67e00a4fe7a4cdc6ad20e91de7b0a3"
+      }
+    },
+    {
+      "id": 236,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/236/",
+        "path": "pokemon/236.json",
+        "sha256": "40520e23f21604f280314d2b6e16a0d70a8cedd5f9957c5f88b4987157550a34"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/236/",
+        "path": "species/236.json",
+        "sha256": "2f49b98dedd373f59db9d66d09b2025085a5d09c1cb3e71aadb2a58d18ec3c31"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/236.png",
+        "path": "sprites/236.png",
+        "sha256": "925f4c263d5fe38b9b0fa8bf31aff62b664c1e2da64c76050c99d285430b5b31"
+      }
+    },
+    {
+      "id": 237,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/237/",
+        "path": "pokemon/237.json",
+        "sha256": "dd651ef5938d184adf22d393a7ee7b8918c7dbd43e43a54c8459c8eebd48507c"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/237/",
+        "path": "species/237.json",
+        "sha256": "f8a7b0fde36947e57cadc8b7d3aeb4a283e6fb829f2003f4086a578d3a073a5d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/237.png",
+        "path": "sprites/237.png",
+        "sha256": "a1b5f21544f1f2944b0d6387d91e37577a4dcc8a526332bbdecf027842eb43f5"
+      }
+    },
+    {
+      "id": 238,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/238/",
+        "path": "pokemon/238.json",
+        "sha256": "58a4abe596bb8865a73ef79ef855a0940ae5a0faed3d3116cf6a41c68848d05b"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/238/",
+        "path": "species/238.json",
+        "sha256": "d4a78b2088806426ff20e163736f74b830d76fb9c88bbe41b33182529ec29161"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/238.png",
+        "path": "sprites/238.png",
+        "sha256": "1426ae1a4087af34772ba998cada09f145dbb64ea57879104ff2adfb4f454536"
+      }
+    },
+    {
+      "id": 239,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/239/",
+        "path": "pokemon/239.json",
+        "sha256": "613421451fb59444c9b426f88c3dd151f08bfdfc39cf932c803fc6d8119f51b2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/239/",
+        "path": "species/239.json",
+        "sha256": "7332a616e312f3a4b5a2aec9969670044122c597734699074bbe8094fb0a376b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/239.png",
+        "path": "sprites/239.png",
+        "sha256": "5641207d6f23e3ab3ea3bf4f04dab33152a4a902bbcea639dfc414aa546c1d38"
+      }
+    },
+    {
+      "id": 240,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/240/",
+        "path": "pokemon/240.json",
+        "sha256": "ea851a2d0a310e14106ad1ddf9e4fed65e3b65ca33412be280668dfba4cccba2"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/240/",
+        "path": "species/240.json",
+        "sha256": "507b4370e0dc324df450b94a8c95abc4bf86680faf74b82432b9f717258072de"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/240.png",
+        "path": "sprites/240.png",
+        "sha256": "339680f6dcd7f5f7e3dcc221cec2f434e74bf199b094d15e9e1f25fca9ccf993"
+      }
+    },
+    {
+      "id": 241,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/241/",
+        "path": "pokemon/241.json",
+        "sha256": "47a2aa81fc845a18b26848068654babfff5c2a636ae6bf4313661f54b75fc11a"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/241/",
+        "path": "species/241.json",
+        "sha256": "4958caac87794ad88b7164ecc3a69949a4886fde7502f239c12c25ab91b72e2b"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/241.png",
+        "path": "sprites/241.png",
+        "sha256": "96dbe94e83cea658ca21caf3d40f81facf0553a8fdc67efb3062493706d658b2"
+      }
+    },
+    {
+      "id": 242,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/242/",
+        "path": "pokemon/242.json",
+        "sha256": "102703e06e8a7e24064a82fca97ec314906017fcb48a0437bb00e490cc3a3bf8"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/242/",
+        "path": "species/242.json",
+        "sha256": "93514e689631446a17008d2e1b0440f81c92a9c44eec999d53d98284782dcefd"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/242.png",
+        "path": "sprites/242.png",
+        "sha256": "3f841d585f2a632ae3a4dcd8f783b4405fdffe71225da5119ab3f22701e36ce4"
+      }
+    },
+    {
+      "id": 243,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/243/",
+        "path": "pokemon/243.json",
+        "sha256": "5c8068c6f21789c53d080f146f486c619934084ed7edbe7229cb7c72aab4bf22"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/243/",
+        "path": "species/243.json",
+        "sha256": "cc05a9ed37f1a0fda10218248f8eeafd4fdfd2e12c73de9eba7f79f4c6308b4a"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/243.png",
+        "path": "sprites/243.png",
+        "sha256": "4166482664fd58d9e51af67e31913a80f002a732d3783e939863f0588167bb27"
+      }
+    },
+    {
+      "id": 244,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/244/",
+        "path": "pokemon/244.json",
+        "sha256": "799d81c018a0fcce4007e5d25987b8cc266e61b7c0e97f56f492032883212a1d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/244/",
+        "path": "species/244.json",
+        "sha256": "612f4c32f0705fe95acab9e3bbaa3d7a8384d35b2e62e44896e9916928b45cfe"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/244.png",
+        "path": "sprites/244.png",
+        "sha256": "630069197f47fe0d6b29c85b511fb8cd74041c08e8da9891258f2331a72113e6"
+      }
+    },
+    {
+      "id": 245,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/245/",
+        "path": "pokemon/245.json",
+        "sha256": "d98941888d1679d3672041893913a43ea7289a3e91b4af4378aaf3c15bc6d13d"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/245/",
+        "path": "species/245.json",
+        "sha256": "82607a07a6c219281aea1641faf4f219c5b965ec4c748e5c40495187d65f6c44"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/245.png",
+        "path": "sprites/245.png",
+        "sha256": "5875d5d1e246cd85feeaa0db9bae58606db04a357a44f065f8f01b6ac9d552b8"
+      }
+    },
+    {
+      "id": 246,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/246/",
+        "path": "pokemon/246.json",
+        "sha256": "c426d022ed6249c349ade667848ffd7231b84db96f0ff44703d4f3387c26e343"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/246/",
+        "path": "species/246.json",
+        "sha256": "26126f280925b5e37628a3154159faea10a24c26af3069c9927443ec5970dcc9"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/246.png",
+        "path": "sprites/246.png",
+        "sha256": "6f1a433e2651cadeeaf4d64037f3ee9d1ab3fa089ba073d24d205445bcb2e2e0"
+      }
+    },
+    {
+      "id": 247,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/247/",
+        "path": "pokemon/247.json",
+        "sha256": "35ec6a10da5d433936f3664d4f579efef61e5a61c4da89f7c5b6ecb588f9b3f4"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/247/",
+        "path": "species/247.json",
+        "sha256": "98f9f44d23212f092320c0787032e3a152cb4b4b53165d1d7454698511dd05a3"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/247.png",
+        "path": "sprites/247.png",
+        "sha256": "f938edaa7fe2d99a1da6a580f3fa17c3ee40ddb6f193a970706b8ac897b22316"
+      }
+    },
+    {
+      "id": 248,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/248/",
+        "path": "pokemon/248.json",
+        "sha256": "66a05453c0af9bb42afab0494412f1170c4051fef4513841eae52154d6ae3458"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/248/",
+        "path": "species/248.json",
+        "sha256": "93df29d12a528745b8e3d039acd4359a742c459a57791b53700c935baa834fc5"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/248.png",
+        "path": "sprites/248.png",
+        "sha256": "a66cbdba44e3190b0b981a0f45c4522ed4a11432ecfa1d682ff86d9546c3cf67"
+      }
+    },
+    {
+      "id": 249,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/249/",
+        "path": "pokemon/249.json",
+        "sha256": "b2b3b226fe010ca1fa2ce4e37d73ef9ecffc0d875538f858218decba8b46ce33"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/249/",
+        "path": "species/249.json",
+        "sha256": "32d8f1aa97d1279626889f66db523124b9fbd2223501b578f040cc91c6ce435e"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/249.png",
+        "path": "sprites/249.png",
+        "sha256": "4997f6e38e740dabf4b7d881b8ff8b12f3272a6470190048b4b5637ffff0fa16"
+      }
+    },
+    {
+      "id": 250,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/250/",
+        "path": "pokemon/250.json",
+        "sha256": "bf680e8af149e8028fa4fe36f60b0312845fdad1ab82fb1caa942cdd5a491783"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/250/",
+        "path": "species/250.json",
+        "sha256": "f6b499883f150d11720f04362aa853c1d86d11e7b38bd313c366a4dbfef7b31c"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/250.png",
+        "path": "sprites/250.png",
+        "sha256": "f44b8b76c0f887ddbe840b8b4920d14e6508ecb456814bb22699995893843110"
+      }
+    },
+    {
+      "id": 251,
+      "pokemon": {
+        "url": "https://pokeapi.co/api/v2/pokemon/251/",
+        "path": "pokemon/251.json",
+        "sha256": "8abe66e07e21141535b29946fd4075bdf5febb068e5385500bd48c411b60600e"
+      },
+      "species": {
+        "url": "https://pokeapi.co/api/v2/pokemon-species/251/",
+        "path": "species/251.json",
+        "sha256": "ef62740b5717d0fd12d32d8868bd7c4f932227193cbce01a592b94d79201600d"
+      },
+      "sprite": {
+        "url": "https://raw.githubusercontent.com/PokeAPI/sprites/8dfa3d97e953caaafaafd4963eff7621811af08e/sprites/pokemon/versions/generation-ii/crystal/251.png",
+        "path": "sprites/251.png",
+        "sha256": "cd40147ad6463d9263efb7a705e6c4013f93f957ef237b8fa35558fe8c763653"
+      }
+    }
+  ]
+}

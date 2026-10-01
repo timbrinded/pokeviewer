@@ -14,7 +14,7 @@ use pokeviewer_firmware::{FailureKind, render_failure_screen};
 
 type TaskResult = Result<(), String>;
 
-const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v1.pack");
+const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v2.pack");
 const DEFAULT_OUTPUT: &str = "target/render-samples";
 const DEFAULT_CONTACT_SHEET: &str = "target/all-cards-contact-sheet.png";
 const DEFAULT_SETUP_SCREEN: &str = "target/setup-screen.png";
@@ -54,7 +54,7 @@ pub(crate) fn samples_command(output_dir: Option<&str>) -> TaskResult {
 
 pub(crate) fn contact_sheet_command(output_file: Option<&str>) -> TaskResult {
     const COLUMNS: usize = 10;
-    const ROWS: usize = 16;
+    const ROWS: usize = 26;
     const GUTTER: usize = 8;
     const SHEET_WIDTH: usize = COLUMNS * DISPLAY_WIDTH + (COLUMNS - 1) * GUTTER;
     const SHEET_HEIGHT: usize = ROWS * DISPLAY_HEIGHT + (ROWS - 1) * GUTTER;
@@ -65,7 +65,7 @@ pub(crate) fn contact_sheet_command(output_file: Option<&str>) -> TaskResult {
     let pack =
         ContentPack::parse(PACK).map_err(|error| format!("invalid content pack: {error:?}"))?;
     let mut sheet = vec![u8::MAX; SHEET_ROW_BYTES * SHEET_HEIGHT];
-    for dex_id in 1..=151 {
+    for dex_id in 1..=251 {
         let framebuffer = render_record(&pack, dex_id, weekday_for_id(dex_id))?;
 
         let card_index = usize::from(dex_id - 1);
@@ -82,7 +82,7 @@ pub(crate) fn contact_sheet_command(output_file: Option<&str>) -> TaskResult {
 
     write_one_bit_png(&output_file, SHEET_WIDTH, SHEET_HEIGHT, &sheet)?;
     println!(
-        "{}: 151 cards, {}x{} actual pixels",
+        "{}: 251 cards, {}x{} actual pixels",
         output_file.display(),
         SHEET_WIDTH,
         SHEET_HEIGHT

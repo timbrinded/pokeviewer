@@ -12,8 +12,8 @@ use super::{
 
 const HEADER_LENGTH: usize = 32;
 const RECORD_LENGTH: usize = 6;
-const RECORD_COUNT: usize = 151;
-const MAX_PACK_BYTES: usize = 65_536;
+const RECORD_COUNT: usize = LAST_ID as usize;
+const MAX_PACK_BYTES: usize = 262_144;
 
 pub(super) fn convert_cache(
     cache_dir: &Path,
@@ -38,7 +38,7 @@ pub(super) fn convert_cache(
         validate_entry_contract(entry, expected_id)?;
         let pokemon = read_and_hash(cache_dir, expected_id, &entry.pokemon, "Pokémon response")?;
         let species = read_and_hash(cache_dir, expected_id, &entry.species, "species response")?;
-        let sprite = read_and_hash(cache_dir, expected_id, &entry.sprite, "Yellow sprite")?;
+        let sprite = read_and_hash(cache_dir, expected_id, &entry.sprite, "Crystal sprite")?;
         let record = parse_source(expected_id, &pokemon, &species, &sprite)?;
         provenance.push(PackManifestEntry {
             id: expected_id,
@@ -137,7 +137,7 @@ fn validate_entry_contract(entry: &SourceEntry, id: u16) -> TaskResult {
     let expected_pokemon_url = format!("https://pokeapi.co/api/v2/pokemon/{id}/");
     let expected_species_url = format!("https://pokeapi.co/api/v2/pokemon-species/{id}/");
     let expected_sprite_url = format!(
-        "https://raw.githubusercontent.com/PokeAPI/sprites/{SPRITES_REVISION}/sprites/pokemon/versions/generation-i/yellow/{id}.png"
+        "https://raw.githubusercontent.com/PokeAPI/sprites/{SPRITES_REVISION}/sprites/pokemon/versions/generation-ii/crystal/{id}.png"
     );
     let expected_pokemon_path = format!("pokemon/{id:03}.json");
     let expected_species_path = format!("species/{id:03}.json");
@@ -216,7 +216,9 @@ fn build_pack(records: &[ConvertedRecord]) -> TaskResult<Vec<u8>> {
 
     let schedule: Vec<u8> = (0..RECORD_COUNT)
         .map(|index| {
-            u8::try_from((73 * index) % RECORD_COUNT + 1).map_err(|_| "schedule value exceeds u8")
+            u8::try_from(index)
+                .map(pokeviewer_core::scheduled_dex_id)
+                .map_err(|_| "schedule index exceeds u8")
         })
         .collect::<Result<_, _>>()?;
     let mut payload = record_bytes;
@@ -287,7 +289,8 @@ fn validation_report(records: &[ConvertedRecord], pack_bytes: usize) -> Validati
 
 fn write_contact_sheet(records: &[ConvertedRecord], path: &Path) -> TaskResult {
     const COLUMNS: usize = 16;
-    const ROWS: usize = 10;
+    const ROWS: usize = 16;
+    const GREYS: [u8; 4] = [255, 170, 85, 0];
     let width = COLUMNS * SPRITE_WIDTH;
     let height = ROWS * SPRITE_HEIGHT;
     let mut pixels = vec![255; width * height];
@@ -295,13 +298,11 @@ fn write_contact_sheet(records: &[ConvertedRecord], path: &Path) -> TaskResult {
         let cell_x = (record_index % COLUMNS) * SPRITE_WIDTH;
         let cell_y = (record_index / COLUMNS) * SPRITE_HEIGHT;
         for sprite_index in 0..SPRITE_WIDTH * SPRITE_HEIGHT {
-            let byte = record.sprite[sprite_index / 8];
-            let is_black = byte & (1 << (7 - sprite_index % 8)) != 0;
-            if is_black {
-                let x = cell_x + sprite_index % SPRITE_WIDTH;
-                let y = cell_y + sprite_index / SPRITE_WIDTH;
-                pixels[y * width + x] = 0;
-            }
+            let byte = record.sprite[sprite_index / 4];
+            let shade = (byte >> (6 - 2 * (sprite_index % 4))) & 0b11;
+            let x = cell_x + sprite_index % SPRITE_WIDTH;
+            let y = cell_y + sprite_index / SPRITE_WIDTH;
+            pixels[y * width + x] = GREYS[usize::from(shade)];
         }
     }
 

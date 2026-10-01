@@ -6,7 +6,7 @@ use pokeviewer_core::{
     next_rollover, render_daily_card, render_setup_screen, select_daily_pokemon,
 };
 
-const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
+const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
 
 /// The retained screen produced by one complete application pass.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -183,7 +183,7 @@ fn render_selection(
 mod tests {
     use pokeviewer_core::{
         BatteryState, ContentPack, DailySelection, DisplayDate, Framebuffer, LocalDateTime,
-        SetupReason, Weekday,
+        SetupReason, Weekday, scheduled_dex_id,
     };
 
     use super::{
@@ -202,6 +202,10 @@ mod tests {
         include_bytes!("../../../tests/goldens/cards/friday-122.bin");
     const SATURDAY_PIKACHU: &[u8; 5_000] =
         include_bytes!("../../../tests/goldens/cards/saturday-025.bin");
+    const THURSDAY_UMBREON: &[u8; 5_000] =
+        include_bytes!("../../../tests/goldens/cards/thursday-197.bin");
+    const SUNDAY_CELEBI: &[u8; 5_000] =
+        include_bytes!("../../../tests/goldens/cards/sunday-251.bin");
     const TEST_BATTERY: BatteryState = BatteryState::Normal;
 
     #[test]
@@ -235,10 +239,12 @@ mod tests {
         let pack = ContentPack::parse(PACK).unwrap();
         for (cycle_index, dex_id, weekday, expected) in [
             (0, 1, Weekday::Monday, MONDAY_BULBASAUR),
-            (149, 6, Weekday::Tuesday, TUESDAY_CHARIZARD),
-            (4, 142, Weekday::Wednesday, WEDNESDAY_AERODACTYL),
-            (12, 122, Weekday::Friday, FRIDAY_MR_MIME),
-            (81, 25, Weekday::Saturday, SATURDAY_PIKACHU),
+            (211, 6, Weekday::Tuesday, TUESDAY_CHARIZARD),
+            (127, 142, Weekday::Wednesday, WEDNESDAY_AERODACTYL),
+            (36, 122, Weekday::Friday, FRIDAY_MR_MIME),
+            (59, 25, Weekday::Saturday, SATURDAY_PIKACHU),
+            (189, 197, Weekday::Thursday, THURSDAY_UMBREON),
+            (8, 251, Weekday::Sunday, SUNDAY_CELEBI),
         ] {
             let mut framebuffer = Framebuffer::default();
             render_selection(
@@ -255,12 +261,12 @@ mod tests {
     #[test]
     fn every_packed_entry_renders_through_the_integrated_path() {
         let pack = ContentPack::parse(PACK).unwrap();
-        for cycle_index in 0..151 {
-            let dex_id = u8::try_from((73 * cycle_index) % 151 + 1).unwrap();
+        for cycle_index in 0..=250 {
+            let dex_id = scheduled_dex_id(cycle_index);
             let mut framebuffer = Framebuffer::default();
             render_selection(
                 &pack,
-                selection(u8::try_from(cycle_index).unwrap(), dex_id, Weekday::Sunday),
+                selection(cycle_index, dex_id, Weekday::Sunday),
                 TEST_BATTERY,
                 &mut framebuffer,
             )
@@ -315,7 +321,7 @@ mod tests {
             second: 59,
         };
         let prior = plan_wake(before, None).unwrap();
-        assert_eq!(prior.selection.dex_id, 79);
+        assert_eq!(prior.selection.dex_id, 158);
         assert_eq!(
             prior.next_wake,
             LocalDateTime {
@@ -416,7 +422,7 @@ mod tests {
                 plan.next_wake.month,
                 plan.next_wake.day
             ),
-            (63, 1, 2)
+            (114, 1, 2)
         );
     }
 

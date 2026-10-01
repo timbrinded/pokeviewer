@@ -20,7 +20,7 @@ use manifest::{CASES, GoldenCase, GoldenManifest, GoldenSpec, weekday_label};
 
 type TaskResult = Result<(), String>;
 
-const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v1.pack");
+const PACK: &[u8] = include_bytes!("../../content/generated/pokeviewer-v2.pack");
 const GOLDEN_ROOT: &str = "tests/goldens";
 const DEFAULT_DIFF_DIR: &str = "target/visual-diff";
 const DEFAULT_DEMO_DIR: &str = "target/golden-failure-demo";
@@ -74,7 +74,7 @@ pub(crate) fn update_command() -> TaskResult {
         &root.join("manifest.json"),
         &GoldenManifest {
             schema_version: 3,
-            renderer_version: 3,
+            renderer_version: 4,
             cases,
         },
     )?;
@@ -88,7 +88,7 @@ pub(crate) fn check_command(diff_dir: Option<&str>) -> TaskResult {
     clear_directory(&diff_dir)?;
     let manifest = read_manifest(&root.join("manifest.json"))?;
     if manifest.schema_version != 3
-        || manifest.renderer_version != 3
+        || manifest.renderer_version != 4
         || manifest.cases.len() != CASES.len()
     {
         return Err("golden manifest version or case count is unsupported".to_owned());

@@ -1,8 +1,8 @@
 //! Hardware-independent renderer for the 200 × 200 monochrome panel buffer.
 
 use crate::{
-    BatteryState, CONTENT_SPRITE_BYTES, DISPLAY_HEIGHT, DISPLAY_WIDTH, FRAMEBUFFER_BYTES,
-    PokemonType, Weekday, font,
+    BatteryState, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, DISPLAY_HEIGHT, DISPLAY_WIDTH,
+    FRAMEBUFFER_BYTES, PokemonType, Weekday, font,
 };
 
 const NAME_MAX_BYTES: usize = 16;
@@ -20,6 +20,18 @@ const BATTERY_X_MARGIN: usize = 3;
 const BATTERY_Y: usize = 3;
 const RECHARGE_Y: usize = 192;
 const LIGHTNING_GLYPH: [u8; font::HEIGHT] = [0x04, 0x0c, 0x1c, 0x06, 0x0c, 0x08, 0x10];
+const BLACK_SHADE: u8 = 3;
+/// Black panel pixels out of the four in a sprite pixel's 2 × 2 cell, indexed
+/// by the pack's shade from `0` white to `3` black: white, 25 %, 50 %, black.
+const SHADE_INK: [u8; 4] = [0, 1, 2, 4];
+/// Ink for a black sprite pixel whose eight neighbours are also black. Large
+/// black areas drop to 75 % so the body keeps its form, while outlines and
+/// thin black detail stay solid.
+const SOLID_INTERIOR_INK: u8 = 3;
+/// Ordered-dither thresholds for one 2 × 2 cell. A panel pixel is black when
+/// the cell's ink exceeds its threshold, so 25 % is one dot, 50 % is a
+/// checkerboard, and adjacent cells tile without seams.
+const DITHER_THRESHOLDS: [[u8; SPRITE_SCALE]; SPRITE_SCALE] = [[0, 2], [3, 1]];
 
 /// Typed input accepted by the shared daily-card renderer.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -32,7 +44,7 @@ pub struct DailyCard<'a> {
     pub primary_type: PokemonType,
     /// Distinct canonical secondary type, when present.
     pub secondary_type: Option<PokemonType>,
-    /// Decoded 56 × 56 sprite, with `1` representing black.
+    /// Decoded 56 × 56 sprite of two-bit shades, from `0` white to `3` black.
     pub sprite: &'a [u8; CONTENT_SPRITE_BYTES],
     /// Coarse non-interactive battery status.
     pub battery_state: BatteryState,
@@ -273,22 +285,48 @@ fn draw_glyph(
 }
 
 fn draw_sprite(framebuffer: &mut Framebuffer, sprite: &[u8; CONTENT_SPRITE_BYTES]) {
-    let sprite_width = 56 * SPRITE_SCALE;
+    let sprite_width = CONTENT_SPRITE_SIZE * SPRITE_SCALE;
     let x = (DISPLAY_WIDTH - sprite_width) / 2;
-    for source_y in 0..56 {
-        for source_x in 0..56 {
-            let index = source_y * 7 + source_x / 8;
-            let mask = 0x80 >> (source_x % 8);
-            if sprite[index] & mask != 0 {
-                fill_scaled_pixel(
-                    framebuffer,
-                    x + source_x * SPRITE_SCALE,
-                    SPRITE_Y + source_y * SPRITE_SCALE,
-                    SPRITE_SCALE,
-                );
+    for source_y in 0..CONTENT_SPRITE_SIZE {
+        for source_x in 0..CONTENT_SPRITE_SIZE {
+            let ink = sprite_ink(sprite, source_x, source_y);
+            for (offset_y, thresholds) in DITHER_THRESHOLDS.iter().enumerate() {
+                for (offset_x, threshold) in thresholds.iter().enumerate() {
+                    if ink > *threshold {
+                        framebuffer.set_black(
+                            x + source_x * SPRITE_SCALE + offset_x,
+                            SPRITE_Y + source_y * SPRITE_SCALE + offset_y,
+                        );
+                    }
+                }
             }
         }
     }
+}
+
+fn sprite_ink(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> u8 {
+    let shade = sprite_shade(sprite, x, y);
+    if shade == BLACK_SHADE && is_solid_interior(sprite, x, y) {
+        SOLID_INTERIOR_INK
+    } else {
+        SHADE_INK[usize::from(shade)]
+    }
+}
+
+fn is_solid_interior(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> bool {
+    let last = CONTENT_SPRITE_SIZE - 1;
+    if x == 0 || y == 0 || x == last || y == last {
+        return false;
+    }
+    (y - 1..=y + 1).all(|neighbour_y| {
+        (x - 1..=x + 1)
+            .all(|neighbour_x| sprite_shade(sprite, neighbour_x, neighbour_y) == BLACK_SHADE)
+    })
+}
+
+fn sprite_shade(sprite: &[u8; CONTENT_SPRITE_BYTES], x: usize, y: usize) -> u8 {
+    let index = y * CONTENT_SPRITE_SIZE + x;
+    (sprite[index / 4] >> (6 - 2 * (index % 4))) & 0b11
 }
 
 fn fill_scaled_pixel(framebuffer: &mut Framebuffer, x: usize, y: usize, scale: usize) {

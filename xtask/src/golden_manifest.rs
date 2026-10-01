@@ -13,7 +13,7 @@ pub(super) struct GoldenSpec {
 
 const NORMAL_BATTERY: BatteryState = BatteryState::Normal;
 
-pub(super) const CASES: [GoldenSpec; 9] = [
+pub(super) const CASES: [GoldenSpec; 12] = [
     GoldenSpec {
         slug: "monday-001",
         dex_id: 1,
@@ -54,6 +54,24 @@ pub(super) const CASES: [GoldenSpec; 9] = [
         slug: "sunday-151",
         dex_id: 151,
         weekday: Weekday::Sunday,
+        battery_state: NORMAL_BATTERY,
+    },
+    GoldenSpec {
+        slug: "thursday-197",
+        dex_id: 197,
+        weekday: Weekday::Thursday,
+        battery_state: NORMAL_BATTERY,
+    },
+    GoldenSpec {
+        slug: "sunday-251",
+        dex_id: 251,
+        weekday: Weekday::Sunday,
+        battery_state: NORMAL_BATTERY,
+    },
+    GoldenSpec {
+        slug: "friday-045",
+        dex_id: 45,
+        weekday: Weekday::Friday,
         battery_state: NORMAL_BATTERY,
     },
     GoldenSpec {

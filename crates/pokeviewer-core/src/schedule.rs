@@ -6,11 +6,16 @@ const EPOCH: Date = match Date::from_ordinal_date(2026, 1) {
     Ok(date) => date,
     Err(_) => panic!("the fixed schedule epoch must be valid"),
 };
-const CYCLE_LENGTH: i64 = 151;
 const ROLLOVER_HOUR: u8 = 7;
 
+/// Number of display days in one schedule cycle, one per Pokémon.
+pub(crate) const CYCLE_LENGTH: u8 = 251;
+/// Coprime with the prime cycle length, so the cycle is a permutation. Any
+/// seven consecutive days are at least 31 Pokédex numbers apart.
+const CYCLE_MULTIPLIER: u16 = 94;
+
 /// Version of the repository-owned daily schedule.
-pub const SCHEDULE_VERSION: u16 = 1;
+pub const SCHEDULE_VERSION: u16 = 2;
 
 /// Day of the week derived from a validated display date.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -131,18 +136,18 @@ impl From<Date> for DisplayDate {
     }
 }
 
-/// Complete schedule-v1 result for one valid RTC reading.
+/// Complete schedule-v2 result for one valid RTC reading.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct DailySelection {
     /// Date and weekday that must be rendered together.
     pub display_date: DisplayDate,
-    /// Zero-based position in the 151-day schedule.
+    /// Zero-based position in the 251-day schedule.
     pub cycle_index: u8,
-    /// National Pokédex ID selected by schedule v1.
+    /// National Pokédex ID selected by schedule v2.
     pub dex_id: u8,
 }
 
-/// Select the deterministic schedule-v1 entry for a local RTC reading.
+/// Select the deterministic schedule-v2 entry for a local RTC reading.
 ///
 /// Times before 07:00:00 retain the prior display date. The calculation uses
 /// Euclidean modulo, so every valid RTC date before and after the epoch is
@@ -159,16 +164,25 @@ pub fn select_daily_pokemon(local: LocalDateTime) -> Result<DailySelection, Inva
     }
 
     let epoch_offset = (display_date - EPOCH).whole_days();
-    let cycle_index =
-        u8::try_from(epoch_offset.rem_euclid(CYCLE_LENGTH)).map_err(|_| InvalidDateTime)?;
-    let dex_id = u8::try_from((73 * i64::from(cycle_index)) % CYCLE_LENGTH + 1)
+    let cycle_index = u8::try_from(epoch_offset.rem_euclid(i64::from(CYCLE_LENGTH)))
         .map_err(|_| InvalidDateTime)?;
 
     Ok(DailySelection {
         display_date: display_date.into(),
         cycle_index,
-        dex_id,
+        dex_id: scheduled_dex_id(cycle_index),
     })
+}
+
+/// National Pokédex ID shown on the zero-based schedule-v2 `cycle_index`.
+///
+/// Indexes at or above the 251-day cycle length wrap into the cycle.
+#[must_use]
+pub fn scheduled_dex_id(cycle_index: u8) -> u8 {
+    let position = CYCLE_MULTIPLIER * u16::from(cycle_index) % u16::from(CYCLE_LENGTH);
+    // The remainder is below 251, so the conversion and the 1-based ID never
+    // overflow.
+    u8::try_from(position).map_or(u8::MAX, |position| position + 1)
 }
 
 /// Calculate the first 07:00:00 local transition strictly after `local`.

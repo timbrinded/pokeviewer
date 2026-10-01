@@ -8,7 +8,7 @@ use super::TaskResult;
 
 pub(super) const SPRITE_WIDTH: usize = 56;
 pub(super) const SPRITE_HEIGHT: usize = 56;
-pub(super) const SPRITE_BYTES: usize = SPRITE_WIDTH * SPRITE_HEIGHT / 8;
+pub(super) const SPRITE_BYTES: usize = SPRITE_WIDTH * SPRITE_HEIGHT / 4;
 pub(super) const NO_SECONDARY_TYPE: u8 = 0xff;
 const MAX_NAME_BYTES: usize = 16;
 const SOURCE_PALETTE_COLORS: usize = 4;
@@ -39,17 +39,17 @@ struct Sprites {
 
 #[derive(Deserialize)]
 struct Versions {
-    #[serde(rename = "generation-i")]
-    generation_one: GenerationOne,
+    #[serde(rename = "generation-ii")]
+    generation_two: GenerationTwo,
 }
 
 #[derive(Deserialize)]
-struct GenerationOne {
-    yellow: YellowSprites,
+struct GenerationTwo {
+    crystal: CrystalSprites,
 }
 
 #[derive(Deserialize)]
-struct YellowSprites {
+struct CrystalSprites {
     front_default: String,
 }
 
@@ -110,13 +110,13 @@ pub(super) fn parse_source(
     if !pokemon
         .sprites
         .versions
-        .generation_one
-        .yellow
+        .generation_two
+        .crystal
         .front_default
         .ends_with(&sprite_suffix)
     {
         return Err(format!(
-            "Pokémon ID {id}: Pokémon schema: Yellow front sprite URL has an unexpected file"
+            "Pokémon ID {id}: Pokémon schema: Crystal front sprite URL has an unexpected file"
         ));
     }
     let (primary_type, secondary_type) = parse_types(id, pokemon.types)?;
@@ -217,13 +217,20 @@ fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> 
     let x_offset = (SPRITE_WIDTH - decoded.width) / 2;
     let y_offset = (SPRITE_HEIGHT - decoded.height) / 2;
     for (source_index, [red, green, blue, alpha]) in decoded.pixels.into_iter().enumerate() {
-        let color = [red, green, blue];
-        if alpha == 255 && palette[..SOURCE_PALETTE_COLORS / 2].contains(&color) {
-            let source_x = source_index % decoded.width;
-            let source_y = source_index / decoded.width;
-            let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
-            output[output_index / 8] |= 1 << (7 - output_index % 8);
+        if alpha != 255 {
+            continue;
         }
+        // The palette runs from darkest to lightest; shade 3 is black.
+        let rank = palette
+            .iter()
+            .position(|color| *color == [red, green, blue])
+            .ok_or_else(|| format!("Pokémon ID {id}: sprite palette: colour is not ranked"))?;
+        let shade = u8::try_from(SOURCE_PALETTE_COLORS - 1 - rank)
+            .map_err(|_| format!("Pokémon ID {id}: sprite palette: shade exceeds u8"))?;
+        let source_x = source_index % decoded.width;
+        let source_y = source_index / decoded.width;
+        let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
+        output[output_index / 4] |= shade << (6 - 2 * (output_index % 4));
     }
     Ok((output, decoded.width, decoded.height))
 }
@@ -353,7 +360,7 @@ mod tests {
         {"slot": 2, "type": {"name": "poison"}},
         {"slot": 1, "type": {"name": "grass"}}
       ],
-      "sprites": {"versions": {"generation-i": {"yellow": {
+      "sprites": {"versions": {"generation-ii": {"crystal": {
         "front_default": "https://example.invalid/1.png"
       }}}}
     }"#;
@@ -371,7 +378,7 @@ mod tests {
         assert_eq!(record.primary_type, 4);
         assert_eq!(record.secondary_type, 7);
         assert_eq!(record.sprite.len(), SPRITE_BYTES);
-        assert_eq!(record.sprite[0], 0b1100_1100);
+        assert_eq!(record.sprite[0], 0b1110_0100);
     }
 
     #[test]
@@ -396,8 +403,10 @@ mod tests {
         let record =
             parse_source(1, POKEMON, SPECIES, &fixture_png_with_dimensions(40, 40)).unwrap();
 
-        assert!(record.sprite[..57].iter().all(|byte| *byte == 0));
-        assert_eq!(record.sprite[57], 0b1100_1100);
+        // A 40 × 40 source starts eight rows and eight columns in.
+        let first = (8 * SPRITE_WIDTH + 8) / 4;
+        assert!(record.sprite[..first].iter().all(|byte| *byte == 0));
+        assert_eq!(record.sprite[first], 0b1110_0100);
     }
 
     #[test]

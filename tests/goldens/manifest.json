@@ -1,6 +1,6 @@
 {
   "schema_version": 3,
-  "renderer_version": 3,
+  "renderer_version": 4,
   "cases": [
     {
       "case": "monday-001",
@@ -10,9 +10,9 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/monday-001.bin",
       "png_file": "cards/monday-001.png",
-      "framebuffer_crc32": "510affbe",
-      "framebuffer_sha256": "f0fcc6fd8dbb6e6b4e53e7b4f900963e76b5be3746983908a336c4b891529d60",
-      "png_sha256": "53c45454a5a18e7e2f713344239839c97b602afeddbb7d11afa1188ebc0667d3"
+      "framebuffer_crc32": "78a3122c",
+      "framebuffer_sha256": "4c4bd9bfdb967336e565097a6360247ad62c6682ba3de6831a3aa2345f9e3dad",
+      "png_sha256": "b2c7b77893b56f9017acc5bc6d38267d05b09ff13efe4e698fa9f9455e3fd564"
     },
     {
       "case": "tuesday-006",
@@ -22,9 +22,9 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/tuesday-006.bin",
       "png_file": "cards/tuesday-006.png",
-      "framebuffer_crc32": "89b5477c",
-      "framebuffer_sha256": "af4a42befc8c609338014bc4420dd0a19156a7421356cadc52b0c21151117f74",
-      "png_sha256": "a710f690be2f7dc6c4eb64f85a2e3f6e90569a005c3ea9339b7f0f4313190d31"
+      "framebuffer_crc32": "eb09da5e",
+      "framebuffer_sha256": "3fcadc44f1abd830061c6e1c87d91ad94ffff3d189eb99c940963fa9afbc5e10",
+      "png_sha256": "8da050a9162bc36f3656a5c494318389430bda0481554646317ffb908ef18b75"
     },
     {
       "case": "wednesday-142",
@@ -34,9 +34,9 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/wednesday-142.bin",
       "png_file": "cards/wednesday-142.png",
-      "framebuffer_crc32": "358b4693",
-      "framebuffer_sha256": "056dd7395e1c714911b1f5e82ad70ab7c20b281aa258508c363132a7987baa61",
-      "png_sha256": "671bd6848c63f8642ceada09145c47055f73dc2c1fd0b7ab87316f743f75e970"
+      "framebuffer_crc32": "33538c87",
+      "framebuffer_sha256": "561b3a291bd53860eadad7e4b9058499caab68d3507e3a07cd1c5b95e3b618de",
+      "png_sha256": "bbc5bac9fca2a5d426ee50bb6b2dbda1b6ca98dfa244db0781a870f6d8103bc0"
     },
     {
       "case": "thursday-029",
@@ -46,9 +46,9 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/thursday-029.bin",
       "png_file": "cards/thursday-029.png",
-      "framebuffer_crc32": "c42b1dbd",
-      "framebuffer_sha256": "a7870855ce07d84f69c9ee8b9162a8b412994e73e0bd5816bfd2c9fab23f5e5c",
-      "png_sha256": "c0684acc187564215b230ced9e143c3a44f8fe89bbc878cffe7913c3188c390c"
+      "framebuffer_crc32": "7a305f54",
+      "framebuffer_sha256": "c2c872f257cb539aef0d72c910c9f571e367ade7b73c71530f3980b2d85d321c",
+      "png_sha256": "ba53c1a8d8f7d2f01b95359458bfcb4795d74f36a102e377a917c2eaa194b711"
     },
     {
       "case": "friday-122",
@@ -58,9 +58,9 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/friday-122.bin",
       "png_file": "cards/friday-122.png",
-      "framebuffer_crc32": "9f8992a7",
-      "framebuffer_sha256": "0c681da3674d5c621b3edd6c48bd1ebff0b1550efd326b36f99cf90035b1ea53",
-      "png_sha256": "df24d024b796c5d871bb2a01931de0d3df95a244894984fcb74c5c138dca2cf6"
+      "framebuffer_crc32": "e1fa91f1",
+      "framebuffer_sha256": "2c250f50c7e097c7f242cf69da652947685a746ca45791055b8dbc5e8b123c6f",
+      "png_sha256": "d6e70a02e8fd9b1fa605fd963866792a1bdd76a80baf3398a9637bc278314caf"
     },
     {
       "case": "saturday-025",
@@ -70,9 +70,9 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/saturday-025.bin",
       "png_file": "cards/saturday-025.png",
-      "framebuffer_crc32": "b3faf81a",
-      "framebuffer_sha256": "26ceed65235ff6de0bdfe0653736e2d561a92a9241d7cfbd25f69c5957074fd7",
-      "png_sha256": "a62716d79b40942810232461daf460e09f420005e1b6e5d774574621a8a515db"
+      "framebuffer_crc32": "817917f3",
+      "framebuffer_sha256": "60c44608986fd7070fcc4d3c30ab299707bffc882a27e56424f34cb08929e817",
+      "png_sha256": "b562565cddf98dd365a686e261992e284c30944dd3d0e923d84a88be1694f868"
     },
     {
       "case": "sunday-151",
@@ -82,9 +82,45 @@
       "battery_state": "normal",
       "framebuffer_file": "cards/sunday-151.bin",
       "png_file": "cards/sunday-151.png",
-      "framebuffer_crc32": "32199147",
-      "framebuffer_sha256": "6b905032c9502df0a8c2e7cad8ea7c0426b3354a2a1c94ec83f1d0622dd729a8",
-      "png_sha256": "cceab89593d9c190f62f8eb0e84b2a9a2da541b9ee7fb7e7822f0321fd279671"
+      "framebuffer_crc32": "e64f6cda",
+      "framebuffer_sha256": "386dabea1cec9dde33882fcf51250f1d7d0588df3b95fa367059b047cd83d3bd",
+      "png_sha256": "6689fcc65a050af84d96ce6a3daaad01edde7f1dcabe70ebdf40988d263f1966"
+    },
+    {
+      "case": "thursday-197",
+      "dex_id": 197,
+      "name": "Umbreon",
+      "weekday": "Thursday",
+      "battery_state": "normal",
+      "framebuffer_file": "cards/thursday-197.bin",
+      "png_file": "cards/thursday-197.png",
+      "framebuffer_crc32": "f1b0c7dc",
+      "framebuffer_sha256": "4f57f5d2710e82f3746693991800558b0d595866e6e74bba5a9f06979d7ed025",
+      "png_sha256": "2fc5abe6320ad4e38308e59caa25f474de9bf741614943aeca687806e23b50d6"
+    },
+    {
+      "case": "sunday-251",
+      "dex_id": 251,
+      "name": "Celebi",
+      "weekday": "Sunday",
+      "battery_state": "normal",
+      "framebuffer_file": "cards/sunday-251.bin",
+      "png_file": "cards/sunday-251.png",
+      "framebuffer_crc32": "b8e18869",
+      "framebuffer_sha256": "c3040671514f18c80891bb7400ed45954f96dcc292c7b9c3db1fe7851cfafb78",
+      "png_sha256": "9329c942e4bdb8e1157799b1e4ae2ca46b41f8409b0ba4d5b086c3c738ed76ae"
+    },
+    {
+      "case": "friday-045",
+      "dex_id": 45,
+      "name": "Vileplume",
+      "weekday": "Friday",
+      "battery_state": "normal",
+      "framebuffer_file": "cards/friday-045.bin",
+      "png_file": "cards/friday-045.png",
+      "framebuffer_crc32": "8988f245",
+      "framebuffer_sha256": "e7ab122779b6e35974c610e359255df1f264ffbe0ff34da0b57482f79976bdf3",
+      "png_sha256": "6933337d9236f4eadae9a58649b52d7b4307000e9dc11096e2601db3d41c050f"
     },
     {
       "case": "battery-recharge-025",
@@ -94,9 +130,9 @@
       "battery_state": "recharge",
       "framebuffer_file": "cards/battery-recharge-025.bin",
       "png_file": "cards/battery-recharge-025.png",
-      "framebuffer_crc32": "5c67397a",
-      "framebuffer_sha256": "0a1ba81885109742dac4c16aae6239009c6cead27ace957410252b912b0f6093",
-      "png_sha256": "d51c6e8afd975df31fabc9fe39ea1f2947a13a37d85c0230aba201fbcb5a53c3"
+      "framebuffer_crc32": "6ee4d693",
+      "framebuffer_sha256": "160535cbffbc4860f797445bafd9e3a3c6e411d261ec05bb3bcd6acb4e30bae5",
+      "png_sha256": "8219438ecd6cc75d391e7a14691b3ec55528a9c0ab3d79119f02495236f48623"
     },
     {
       "case": "battery-unavailable-025",
@@ -106,9 +142,9 @@
       "battery_state": "unavailable",
       "framebuffer_file": "cards/battery-unavailable-025.bin",
       "png_file": "cards/battery-unavailable-025.png",
-      "framebuffer_crc32": "fb7d16dd",
-      "framebuffer_sha256": "85fdbf71aa133c80dd537d39bba8b5b864f94ba538443e5530bc9f83fc7fd152",
-      "png_sha256": "6bf875fece08c1e577e468e41dccb6bacfbadf8da3b092476c519f0d03b7e840"
+      "framebuffer_crc32": "c9fef934",
+      "framebuffer_sha256": "4681746c81de76c43012496d2c85b5247a82cb86a01c786522b9e88f476dd2cd",
+      "png_sha256": "95d8a7c3f9da1bc6e16b4b43d2d8c64e0c05a8b57babaa7595802f88d057bc29"
     }
   ]
 }
