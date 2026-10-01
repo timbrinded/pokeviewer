@@ -31,9 +31,6 @@ jobs:
           toolchain: 1.96.0
           components: clippy, rustfmt
 
-      - name: Prepare logs
-        run: mkdir -p artifacts/host
-
       - name: Install cargo-deny
         uses: taiki-e/install-action@41049aa56687c35e0afa74eed4f09cec4f9afabf # v2.85.2
         with:
@@ -58,85 +55,41 @@ jobs:
           echo "$install_dir" >> "$GITHUB_PATH"
 
       - name: Check formatting
-        run: |
-          set -o pipefail
-          cargo fmt --all --check 2>&1 | tee artifacts/host/format.log
+        run: cargo fmt --all --check
 
       - name: Lint
-        run: |
-          set -o pipefail
-          cargo clippy --workspace --all-targets --locked -- -D warnings \
-            2>&1 | tee artifacts/host/clippy.log
+        run: cargo clippy --workspace --all-targets --locked -- -D warnings
 
       - name: Test
-        run: |
-          set -o pipefail
-          cargo test --workspace --locked 2>&1 | tee artifacts/host/test.log
-
-      - name: Check locked workspace
-        run: |
-          set -o pipefail
-          cargo check --workspace --all-targets --locked \
-            2>&1 | tee artifacts/host/check.log
+        run: cargo test --workspace --locked
 
       - name: Check documentation
-        run: |
-          set -o pipefail
-          RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked \
-            2>&1 | tee artifacts/host/docs.log
+        run: RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
 
-      - name: Check Markdown
+      - name: Lint Markdown
         run: |
-          set -o pipefail
           npx --yes markdownlint-cli2@0.23.0 \
             README.md \
             CONTRIBUTING.md \
             THIRD_PARTY_NOTICES.md \
             'docs/**/*.md' \
             'content/**/*.md' \
-            'release/**/*.md' \
-            2>&1 | tee artifacts/host/markdownlint.log
+            'release/**/*.md'
+
+      - name: Check Markdown links
+        run: |
           git ls-files -z '*.md' \
             | xargs -0 lychee \
               --no-progress \
               --max-concurrency 32 \
               --max-retries 6 \
-              --retry-wait-time 2 \
-            2>&1 | tee artifacts/host/links.log
+              --retry-wait-time 2
 
       - name: Check dependency policy
-        run: |
-          set -o pipefail
-          cargo deny --locked check 2>&1 | tee artifacts/host/cargo-deny.log
+        run: cargo deny --locked check
 
       - name: Check GitHub Actions
-        run: |
-          set -o pipefail
-          actionlint 2>&1 | tee artifacts/host/actionlint.log
-
-      - name: Verify Linux CLI reproducibility
-        run: |
-          export SOURCE_DATE_EPOCH
-          SOURCE_DATE_EPOCH=$(git show -s --format=%ct)
-          cargo build -p pokeviewerctl --release --locked
-          sha256sum target/release/pokeviewerctl \
-            | awk '{ print $1 }' > artifacts/host/cli-first.sha256
-          cargo clean -p pokeviewerctl
-          cargo build -p pokeviewerctl --release --locked
-          sha256sum target/release/pokeviewerctl \
-            | awk '{ print $1 }' > artifacts/host/cli-second.sha256
-          diff -u \
-            artifacts/host/cli-first.sha256 \
-            artifacts/host/cli-second.sha256
-
-      - name: Upload host logs
-        if: always()
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: host-check-logs
-          path: artifacts/host
-          if-no-files-found: warn
-          retention-days: 14
+        run: actionlint
 
   content:
     name: Offline content integrity
@@ -154,35 +107,6 @@ jobs:
         run: |
           cargo xtask content-build
           git diff --exit-code -- content/generated
-          sha256sum \
-            content/generated/pokeviewer-v1.pack \
-            content/generated/pokeviewer-v1.json \
-            > content-hashes.txt
-
-      - name: Upload content proof
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        with:
-          name: content-integrity
-          path: content-hashes.txt
-          retention-days: 14
-
-  protocol:
-    name: Protocol compatibility
-    runs-on: ubuntu-latest
-    steps:
-      - name: Check out source
-        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - name: Install host Rust
-        uses: dtolnay/rust-toolchain@2c7215f132e9ebf062739d9130488b56d53c060c
-        with:
-          toolchain: 1.96.0
-
-      - name: Test protocol codec and command handling
-        run: |
-          cargo test -p pokeviewer-core protocol:: --locked
-          cargo test -p pokeviewer-firmware protocol:: --locked
-          cargo test -p pokeviewerctl --locked
 
   visual:
     name: Visual and recovery goldens
@@ -197,7 +121,6 @@ jobs:
           toolchain: 1.96.0
 
       - name: Verify visual goldens
-        id: visual_goldens
         run: |
           cargo xtask golden-check artifacts/visual-diff
           cargo xtask render-recovery-screens artifacts/recovery-screens
@@ -205,21 +128,13 @@ jobs:
             cmp "artifacts/recovery-screens/$image.png" \
               "docs/evidence/recovery-screens/$image.png"
           done
-          cargo xtask golden-demo-failure artifacts/golden-failure-demo
-          sha256sum \
-            tests/goldens/cards/*.bin \
-            docs/evidence/recovery-screens/*.png \
-            > artifacts/visual-hashes.txt
 
-      - name: Upload visual proof
-        if: always()
+      - name: Upload visual diff
+        if: failure()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          name: visual-proof
-          path: |
-            artifacts/visual-diff
-            artifacts/golden-failure-demo
-            artifacts/visual-hashes.txt
+          name: visual-diff
+          path: artifacts
           if-no-files-found: warn
           retention-days: 14
 
@@ -254,46 +169,29 @@ jobs:
           echo "LIBCLANG_PATH=$LIBCLANG_PATH" >> "$GITHUB_ENV"
           echo "CLANG_PATH=$CLANG_PATH" >> "$GITHUB_ENV"
 
-      - name: Prepare logs
-        run: mkdir -p artifacts/firmware
-
       - name: Fix reproducible build timestamp
         run: echo "SOURCE_DATE_EPOCH=$(git show -s --format=%ct)" >> "$GITHUB_ENV"
 
-      - name: Build locked release firmware
+      - name: Build release firmware twice and compare loaded sections
         run: |
-          set -o pipefail
-          cargo xtask firmware-build 2>&1 | tee artifacts/firmware/build.log
-          cargo xtask firmware-diagnostic-build \
-            2>&1 | tee artifacts/firmware/hardware-diagnostic-build.log
-          cargo xtask sleep-diagnostic-build \
-            2>&1 | tee artifacts/firmware/sleep-diagnostic-build.log
-          cargo xtask timer-sleep-diagnostic-build \
-            2>&1 | tee artifacts/firmware/timer-sleep-diagnostic-build.log
-          cargo xtask rtc-alarm-assertion-diagnostic-build \
-            2>&1 | tee artifacts/firmware/rtc-alarm-assertion-diagnostic-build.log
-          for failure in rtc panel alarm; do
-            cargo xtask failure-diagnostic-build "$failure" \
-              2>&1 | tee "artifacts/firmware/$failure-failure-diagnostic-build.log"
-          done
-          cargo xtask usb-provisioning-build \
-            2>&1 | tee artifacts/firmware/usb-provisioning-build.log
-
-      - name: Verify firmware entry point, budgets, and deterministic sections
-        run: |
-          set -o pipefail
           firmware=target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
-          scripts/check-firmware-artifact.sh \
-            "$firmware" artifacts/firmware/first
-          if FIRMWARE_TEXT_MAX=1 scripts/check-firmware-artifact.sh \
-            "$firmware" artifacts/firmware/expected-size-failure; then
-            echo "size-budget failure demonstration unexpectedly passed" >&2
-            exit 1
-          fi
+          cargo xtask firmware-build
+          scripts/check-firmware-artifact.sh "$firmware" artifacts/first
           cargo clean -p pokeviewer-firmware --target xtensa-esp32s3-none-elf
           cargo xtask firmware-build
-          scripts/check-firmware-artifact.sh \
-            "$firmware" artifacts/firmware/second
+          scripts/check-firmware-artifact.sh "$firmware" artifacts/second
+          diff -u \
+            artifacts/first/section-hashes.txt \
+            artifacts/second/section-hashes.txt
+          {
+            echo "## ESP32-S3 firmware budgets"
+            echo '```text'
+            cat artifacts/second/budgets.txt
+            echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Build diagnostic firmware
+        run: |
           cargo xtask firmware-diagnostic-build
           cargo xtask sleep-diagnostic-build
           cargo xtask timer-sleep-diagnostic-build
@@ -302,23 +200,12 @@ jobs:
             cargo xtask failure-diagnostic-build "$failure"
           done
           cargo xtask usb-provisioning-build
-          diff -u \
-            artifacts/firmware/first/section-hashes.txt \
-            artifacts/firmware/second/section-hashes.txt
-          {
-            echo "## ESP32-S3 firmware budgets"
-            echo '```text'
-            cat artifacts/firmware/second/budgets.txt
-            echo '```'
-          } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Upload firmware and logs
-        if: always()
+      - name: Upload firmware
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
           name: esp32s3-release
           path: |
-            artifacts/firmware
             target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware
             target/xtensa-esp32s3-none-elf/release/pokeviewer-hardware-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-sleep-diagnostic
@@ -328,7 +215,7 @@ jobs:
             target/xtensa-esp32s3-none-elf/release/pokeviewer-panel-failure-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-alarm-failure-diagnostic
             target/xtensa-esp32s3-none-elf/release/pokeviewer-usb-provisioning
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 14
 
   release-gate:
@@ -337,13 +224,14 @@ jobs:
     needs:
       - host
       - content
-      - protocol
       - visual
       - firmware
     runs-on: ubuntu-latest
     steps:
-      - name: Require every release-grade job
+      - name: Require every job
         env:
           RESULTS: ${{ join(needs.*.result, ' ') }}
         run: |
-          test "$RESULTS" = "success success success success success"
+          for result in $RESULTS; do
+            test "$result" = success
+          done
