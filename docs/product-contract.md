@@ -3,8 +3,8 @@
 - Status: accepted
 - Decision issue: [P01 / #2][issue-2]
 
-This document is the authoritative product boundary. Changing it requires an
-accepted [decision record](decisions/README.md) first.
+This document is the authoritative product boundary. Change it in the same
+pull request as the behaviour it governs.
 
 ## Supported device
 
@@ -49,8 +49,7 @@ or `Unavailable`. `Normal` shows no battery text or icon. `Recharge` shows a
 custom lightning icon and `CHARGE!`. `Unavailable` shows `BAT ?`. The card
 does not show a percentage.
 
-The content set is National Pokédex IDs 1 through 251, Generations I and II,
-as decided in [ADR 0012](decisions/0012-show-generations-one-and-two-with-shaded-crystal-sprites.md).
+The content set is National Pokédex IDs 1 through 251, Generations I and II.
 A fixed, versioned, non-repeating permutation selects one entry per display day
 and repeats after 251 display days.
 

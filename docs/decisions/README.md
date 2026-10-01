@@ -1,8 +1,9 @@
-# Architecture decision log
+# Architecture decision log (closed)
 
-Architecture decisions use Markdown Architectural Decision Record structure and
-four-digit sequence numbers. Accepted records are not rewritten to change their
-outcome; a later decision supersedes them and links in both directions.
+This log is closed: the project no longer writes ADRs. The records below are
+kept as history for the documents that link to them, and they may be out of
+date. The current behaviour is defined by the
+[product contract](../product-contract.md) and the documents it links.
 
 | ADR | Status | Decision |
 | --- | --- | --- |
@@ -17,4 +18,3 @@ outcome; a later decision supersedes them and links in both directions.
 | [0009](0009-use-a-wake-gated-low-voltage-battery-state.md) | partly superseded by ADR-0011 | Use a wake-gated low-voltage battery state |
 | [0010](0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md) | accepted | Use BOOT as an adult restart and GPIO3 as a status light |
 | [0011](0011-recheck-the-battery-every-three-hours.md) | accepted | Re-check the battery every three hours and after a BOOT restart |
-| [0012](0012-show-generations-one-and-two-with-shaded-crystal-sprites.md) | proposed | Show Generations I and II with shaded Crystal sprites |

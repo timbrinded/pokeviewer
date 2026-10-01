@@ -10,7 +10,7 @@
 
 ## Reviewer notes
 
-<!-- Changed goldens, contract or ADR updates, new assets, or anything else worth a closer look. Delete if none. -->
+<!-- Changed goldens, contract updates, new assets, or anything else worth a closer look. Delete if none. -->
 
 ## Privacy and licensing
 

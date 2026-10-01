@@ -1,8 +1,6 @@
 # Content-pack and daily-schedule contract v1
 
-- Status: superseded by [contract v2](content-pack-v2.md) if
-  [ADR 0012](decisions/0012-show-generations-one-and-two-with-shaded-crystal-sprites.md)
-  is accepted
+- Status: superseded by [contract v2](content-pack-v2.md)
 - Contract issue: [D09 / #10][issue-10]
 - Binary format version: 1
 - Content revision: 2

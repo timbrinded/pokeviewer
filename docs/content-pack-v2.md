@@ -1,6 +1,6 @@
 # Content-pack and daily-schedule contract v2
 
-- Status: proposed with [ADR 0012](decisions/0012-show-generations-one-and-two-with-shaded-crystal-sprites.md)
+- Status: current
 - Contract issues: [D09 / #10][issue-10], [#40][issue-40]
 - Binary format version: 2
 - Content revision: 3
@@ -67,11 +67,12 @@ maintainer cache. Conversion:
 8. applies no dithering. The renderer owns how shades appear on the panel; see
    [rendering](development/rendering.md#sprite-shading).
 
-Luminance order differs from the original Game Boy shade order for eight
-sprites (21, 22, 83, 106, 123, 124, 137, and 233). The converter keeps the
-luminance rule for them;
-[ADR 0012](decisions/0012-show-generations-one-and-two-with-shaded-crystal-sprites.md)
-records why.
+All 251 Pokémon use Crystal sprites, including Generation I, so every card
+shares one art style. Luminance order differs from the original Game Boy shade
+order for eight sprites (21, 22, 83, 106, 123, 124, 137, and 233): the
+pret/pokecrystal build marks exactly these palettes `--reverse`. Neither order
+looked consistently better on the panel, so the converter keeps one luminance
+rule and no exception list.
 
 Output-canvas pixels serialize by row from top to bottom and within each row
 from left to right. Each pixel is two bits; the most-significant pair of a
