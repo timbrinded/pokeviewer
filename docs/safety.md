@@ -1,4 +1,4 @@
-# Safety for an adult-built child-adjacent gadget
+# Safety
 
 Pokeviewer source and the Waveshare development board are not a certified,
 enclosed, impact-tested, waterproof, fire-tested, or regulatory-approved

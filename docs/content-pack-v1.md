@@ -5,7 +5,6 @@
 - Binary format version: 1
 - Content revision: 2
 - Schedule version: 1
-- Last reviewed: 2026-07-28
 
 This contract defines the only Pokémon data consumed by v1 firmware and the
 mapping from local civil time to one daily record. It refines the accepted
@@ -191,11 +190,10 @@ Format changes require a new format version. Content or schedule changes require
 their own reviewed revision and a firmware release. V1 firmware rejects
 unsupported versions rather than attempting forward compatibility.
 
-On any validation failure, firmware records a bounded sanitized error code,
-does not select a record, and does not power or overwrite the e-paper. The last
-valid retained card therefore remains visible; an adult recovers the device by
-installing a compatible release artifact whose published SHA-256 checksum
-matches.
+On any validation failure, firmware selects no record and shows the `PACK` /
+`REFLASH` recovery screen described in the
+[failure table](hardware/wake-sleep-state-machine.md#failure-path). An adult
+recovers the device by flashing a verified release.
 
 ## Size budget
 
