@@ -19,7 +19,8 @@ has no successful `Release matrix` check, or if the tag already exists.
 
 `scripts/build-release.sh` builds and checks the archive:
 
-- the release notes heading and README file names match the version;
+- the release notes heading matches the version, and every `vX.Y.Z` in the
+  README names it;
 - `cargo xtask content-build` leaves `content/generated` unchanged;
 - the firmware has an entry point and fits its text, data, and pack budgets;
 - neither shipped binary contains a home-directory path; and
@@ -51,7 +52,8 @@ archive as a separate asset:
 - `pokeviewerctl-vX.Y.Z-x86_64-unknown-linux-gnu`;
 - `pokeviewer-v1.pack` and `content-manifest.json`;
 - `BUILD-METADATA.txt`, `MANIFEST.txt`, and `SHA256SUMS`;
-- `README.md`, `RELEASE-NOTES.md`, `SAFETY.md`, and `TROUBLESHOOTING.md`; and
+- `README.md` (with links rewritten to the shipped files or the tagged
+  source), `RELEASE-NOTES.md`, `SAFETY.md`, and `TROUBLESHOOTING.md`; and
 - `LICENSE` and `THIRD_PARTY_NOTICES.md`.
 
 ## Local package check

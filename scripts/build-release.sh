@@ -34,12 +34,11 @@ if [[ "$release_notes_heading" != "# Pokeviewer v$VERSION" ]]; then
   echo "release notes heading does not match v$VERSION" >&2
   exit 1
 fi
-# The README install commands name the release files, so a stale version
-# would send users to the previous release.
-stale_names=$(grep -oE 'pokeviewer(ctl)?-v[0-9]+\.[0-9]+\.[0-9]+' README.md |
-  grep -vFx -e "pokeviewer-v$VERSION" -e "pokeviewerctl-v$VERSION" || true)
-if [[ -n "$stale_names" ]] || ! grep -qF "pokeviewer-v$VERSION.tar.gz" README.md; then
-  echo "README.md install commands do not all use v$VERSION" >&2
+# The README quick start names the release in prose, download URLs, and file
+# names, so any other version would send users to the wrong release.
+stale_versions=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' README.md | grep -vFx "v$VERSION" || true)
+if [[ -n "$stale_versions" ]] || ! grep -qF "pokeviewer-v$VERSION.tar.gz" README.md; then
+  echo "README.md must name only v$VERSION" >&2
   exit 1
 fi
 
@@ -91,7 +90,14 @@ espflash save-image \
 cp "$CLI" "$bundle_dir/$cli_bin"
 cp content/generated/pokeviewer-v1.pack "$bundle_dir/"
 cp content/generated/pokeviewer-v1.json "$bundle_dir/content-manifest.json"
-cp README.md release/RELEASE-NOTES.md "$bundle_dir/"
+# The archive ships SAFETY.md and TROUBLESHOOTING.md beside the README; every
+# other repository link points at the tagged source on GitHub.
+readonly source_url="https://github.com/timbrinded/pokeviewer/blob/v$VERSION"
+sed -e 's#](docs/safety\.md)#](SAFETY.md)#g' \
+  -e 's#](docs/troubleshooting\.md)#](TROUBLESHOOTING.md)#g' \
+  -e "s#](\\(docs/[^)]*\\|CONTRIBUTING\\.md\\))#](${source_url}/\\1)#g" \
+  README.md >"$bundle_dir/README.md"
+cp release/RELEASE-NOTES.md "$bundle_dir/"
 cp docs/safety.md "$bundle_dir/SAFETY.md"
 cp docs/troubleshooting.md "$bundle_dir/TROUBLESHOOTING.md"
 cp LICENSE THIRD_PARTY_NOTICES.md "$bundle_dir/"
