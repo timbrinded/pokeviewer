@@ -55,21 +55,19 @@ remap_flags+=" --remap-path-prefix=$cargo_home=/src/cargo"
 remap_flags+=" --remap-path-prefix=$xtensa_sysroot=/src/xtensa"
 export CARGO_TARGET_XTENSA_ESP32S3_NONE_ELF_RUSTFLAGS="$remap_flags"
 
-pack_before=$(sha256sum content/generated/pokeviewer-v1.pack)
-manifest_before=$(sha256sum content/generated/pokeviewer-v1.json)
+mkdir -p target
+work_dir=$(mktemp -d "$PWD/target/release-work.XXXXXX")
+trap 'rm -rf "$work_dir"' EXIT
+
 cargo xtask content-build
-if [[ "$pack_before" != "$(sha256sum content/generated/pokeviewer-v1.pack)" ||
-  "$manifest_before" != "$(sha256sum content/generated/pokeviewer-v1.json)" ]]; then
+if [[ -n "$(git status --porcelain -- content/generated)" ]]; then
   echo "committed content does not match a clean offline rebuild" >&2
   exit 1
 fi
 cargo xtask firmware-build
-scripts/check-firmware-artifact.sh "$FIRMWARE" "$output_dir-firmware-check"
+scripts/check-firmware-artifact.sh "$FIRMWARE" "$work_dir/firmware-check"
 RUSTFLAGS="$remap_flags" cargo build --release --locked -p pokeviewerctl
 
-mkdir -p target
-work_dir=$(mktemp -d "$PWD/target/release-work.XXXXXX")
-trap 'rm -rf "$work_dir" "$output_dir-firmware-check"' EXIT
 bundle_name="pokeviewer-v$VERSION"
 bundle_dir="$work_dir/$bundle_name"
 mkdir -p "$bundle_dir"
