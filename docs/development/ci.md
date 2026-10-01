@@ -1,86 +1,58 @@
 # Continuous integration
 
-The `CI` workflow runs five independent jobs and one aggregate gate on every
-pull request and every push to `main`.
+The `CI` workflow (`.github/workflows/ci.yml`) runs four jobs on every pull
+request and every push to `main`. A fifth job, `Release matrix`, passes only
+when all four pass. The publish workflow requires it on the commit it
+releases.
 
-| Job | Responsibility | Artifact |
+| Job | Checks | Defect it catches |
 | --- | --- | --- |
-| `Host checks` | host quality and policy | `host-check-logs` |
-| `Offline content integrity` | regenerate and compare committed pack/assets | `content-integrity` |
-| `Protocol compatibility` | codec, firmware handler, and Linux CLI tests | none |
-| `Visual and recovery goldens` | daily frames, recovery frames, deliberate diff | `visual-proof` |
-| `ESP32-S3 release` | target builds, budgets, and two-build section hashes | `esp32s3-release` |
-| `Release matrix` | requires every preceding job to succeed | none |
+| `Host checks` | `cargo fmt --check` | unformatted code |
+| | `cargo clippy --all-targets -D warnings` | lint violations and type errors in every target |
+| | `cargo test --workspace` | logic regressions, including the protocol codec, firmware handlers, and CLI |
+| | `cargo doc` with `-D warnings` | broken intra-doc links and other rustdoc warnings |
+| | `markdownlint-cli2` | malformed Markdown |
+| | `lychee` over every tracked `.md` file | broken internal and external links |
+| | `cargo deny check` | disallowed licenses, advisories, and sources |
+| | `actionlint` | invalid workflow syntax and shell errors in workflows |
+| `Offline content integrity` | `cargo xtask content-build`, then `git diff --exit-code -- content/generated` | committed pack, manifest, or contact sheet that does not match the cache and converter |
+| `Visual and recovery goldens` | `cargo xtask golden-check`, and `render-recovery-screens` compared with `docs/evidence/recovery-screens` | any changed pixel on a daily card or recovery screen |
+| `ESP32-S3 release` | release firmware built twice and checked with `scripts/check-firmware-artifact.sh` | missing entry point, text over 200,000 bytes, data over 16,384 bytes, pack over 65,536 bytes, or nondeterministic loaded sections |
+| | the eight diagnostic images built once | target-only compile errors in diagnostic binaries |
 
-Host quality covers formatting, Clippy, tests, documentation warnings, a
-locked build, dependency policy, and workflow syntax. Content and visual checks
-are separate so their failures are independently identifiable. Target
-validation installs pinned Xtensa Rust and performs locked release builds of
-the application, sleep diagnostic, and USB provisioning images.
+On failure, the visual job uploads `visual-diff`. It holds, for each changed
+case, `*-expected.png`, `*-actual.png`, `*-diff.png` (black where pixels
+differ), and `*-report.txt` with the changed coordinates and hashes, plus the
+rendered recovery screens.
 
-Host commands do not set or inherit an embedded default target. The firmware
-job selects `xtensa-esp32s3-none-elf` through `cargo xtask firmware-build` and
-the sleep-diagnostic and USB-provisioning build commands. Neither job runs the
-content generator, so normal CI makes no PokéAPI request.
+The firmware job uploads `esp32s3-release` with all nine ELF files, so a
+reviewer can flash exactly what CI built. It also writes the size budgets to
+the job summary. The section comparison fixes `SOURCE_DATE_EPOCH` to the
+commit time and hashes `.rwtext`, `.data`, `.flash.appdesc`, `.rodata`, and
+`.text`. Debug sections are excluded because they contain build paths and are
+not flashed.
 
-The visual job uses only the committed content pack, renderer, raw 5,000-byte
-goldens, and manifest. If a frame changes, `visual-golden-diff` contains the
-expected, actual, and exact XOR PNG plus a coordinate/hash report for every
-changed case. It also regenerates every recovery PNG byte-for-byte and runs the
-intentional one-pixel failure demonstration.
+No CI job contacts PokéAPI. Third-party actions are pinned to commit SHAs, and
+tool versions are pinned in the workflow.
 
-The firmware job fixes `SOURCE_DATE_EPOCH` to the revision timestamp, verifies
-a nonzero entry point, enforces 200,000 linked text bytes, 16,384 linked data
-bytes, and a 65,536-byte content-pack limit, then rebuilds from a cleaned target
-and compares hashes of all load-bearing ELF sections. A one-byte text budget is
-run as an expected-failure demonstration. Debug-only ELF sections are excluded
-because they may contain build paths and are not flashed.
-
-Third-party actions are pinned to full commit SHAs. The comments beside action
-references record the reviewed release tag where one exists. Tool inputs also
-pin Rust, `cargo-deny`, `actionlint`, and `espup` versions.
-
-## Failure propagation
-
-Every logged command enables Bash `pipefail` before piping output through
-`tee`. A failing Cargo or policy command therefore fails its step rather than
-being hidden by a successful log write.
-
-The five work jobs deliberately do not depend on each other:
-
-- a failing host unit test fails `Host checks` before its artifact upload,
-  while the remaining jobs continue independently;
-- a target compiler or linker error fails `ESP32-S3 release`, while host tests
-  remain independently reportable;
-- corrupt generated content or protocol incompatibility has its own named
-  result; and
-- failure-oriented artifact uploads use `if: always()` so available diagnostic logs survive
-  a failed check.
-
-`Release matrix` depends on all five and is the single release-grade gate.
-Temporary known-failing commits are not retained in project history; deliberate
-failure modes are exercised as successful assertions.
-
-## Local equivalents
+## Run the checks locally
 
 ```sh
 cargo fmt --all --check
 cargo clippy --workspace --all-targets --locked -- -D warnings
 cargo test --workspace --locked
-cargo check --workspace --all-targets --locked
 RUSTDOCFLAGS="-D warnings" cargo doc --workspace --no-deps --locked
 cargo deny --locked check
 actionlint
-cargo xtask content-build
+cargo xtask content-build && git diff --exit-code -- content/generated
 cargo xtask golden-check target/visual-diff
-cargo xtask render-recovery-screens target/recovery-screens
-cargo xtask firmware-build
-cargo xtask sleep-diagnostic-build
-cargo xtask usb-provisioning-build
-scripts/check-firmware-artifact.sh \
-  target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware \
-  target/firmware-proof
 ```
 
-The final command requires the embedded setup in the
-[toolchain guide](toolchain.md).
+The firmware checks need the [embedded toolchain](toolchain.md):
+
+```sh
+cargo xtask firmware-build
+scripts/check-firmware-artifact.sh \
+  target/xtensa-esp32s3-none-elf/release/pokeviewer-firmware \
+  target/firmware-check
+```

@@ -1,122 +1,67 @@
 # Offline content tooling
 
-Content maintenance is split into an explicit network step and a deterministic
-offline step. Normal Cargo builds, firmware builds, tests, and CI do not invoke
-the network step.
+Content has two steps: an explicit network fetch into a cache, and an offline
+build from that cache. Builds, tests, and CI never run the fetch. The
+[content-pack contract](../content-pack-v1.md) defines the format, conversion,
+schedule, and size budget.
 
-## Requirements
+## Fetch a candidate cache
 
-- the repository's pinned host Rust toolchain;
-- `curl` with HTTPS support, only for an explicit cache refresh; and
-- enough disk space for 151 Pokémon responses, species responses, and sprites.
-
-The accepted sprite source is pinned to PokeAPI/sprites commit
-`8dfa3d97e953caaafaafd4963eff7621811af08e`. Pokémon and species endpoint
-responses are locked by exact URLs and SHA-256 digests in the cache manifest.
-
-## Refresh a candidate cache
-
-Run:
-
-```sh
-cargo xtask content-fetch
-```
-
-This fetches only IDs 1–151 into `content/cache-v1`. For each ID it records:
-
-- the exact Pokémon, species, and revision-pinned sprite URL;
-- repository-relative cache paths;
-- a SHA-256 digest for every response; and
-- one cache-level retrieval time and sprite revision.
-
-The command validates IDs, required response fields, English name, current
-types, Yellow sprite URL, PNG dimensions, and conversion suitability before
-accepting the cache. A failure includes the Pokémon ID and violated rule.
-
-The destination must not already exist. To review upstream changes without
-overwriting an accepted cache, provide a candidate path:
+The fetch needs `curl` with HTTPS. The destination must not exist, so fetch
+into a new directory and compare it with the accepted cache:
 
 ```sh
 cargo xtask content-fetch content/cache-candidate
 ```
 
-Diff the candidate manifest and source hashes deliberately. Do not refresh
-content in CI or as a side effect of a firmware build.
+It fetches IDs 1–151 and records each Pokémon, species, and sprite URL, the
+repository-relative file, and a SHA-256 digest, plus one retrieval time.
+Sprites come from PokeAPI/sprites commit
+`8dfa3d97e953caaafaafd4963eff7621811af08e`. The command rejects missing
+fields, a missing English name, invalid types, and unusable sprites, and names
+the Pokémon ID and rule that failed.
 
-## Build the pack offline
+Review the manifest and source differences before you replace
+`content/cache-v1`.
 
-Once a reviewed cache exists:
+## Build the pack
 
 ```sh
 cargo xtask content-build
 ```
 
-The command reads only local files and writes:
+The build reads only `content/cache-v1` and writes three files to
+`content/generated`:
 
-- `content/generated/pokeviewer-v1.pack`; and
-- `content/generated/pokeviewer-v1.json`, the deterministic provenance
-  manifest mapping every packed entry to its three source hashes.
+- `pokeviewer-v1.pack`, the firmware pack;
+- `pokeviewer-v1.json`, the provenance manifest that maps each entry to its
+  source hashes and records the pack and contact-sheet hashes; and
+- `sprites-contact-sheet.png`, every converted sprite in Pokédex order.
 
-It validates all 151 IDs in order, exact URLs and paths, every source digest,
-name/type rules, bounded native PNG dimensions, deterministic centering on the
-56 × 56 output canvas, the exact four-colour source palette, deterministic
-darkest-two palette splitting, schedule v1, section bounds, and the 64 KiB pack
-limit. It builds twice in memory and fails if the bytes differ.
+It validates every ID, URL, path, digest, name, type, sprite size, and palette,
+the schedule, and the 64 KiB limit. It builds the pack twice in memory and
+fails if the bytes differ. CI runs this command and fails if any of the three
+files changes.
 
-Optional positional arguments select a reviewed cache and separate output
-files:
+To build from another cache, pass the cache, pack, and manifest paths. The
+contact sheet is written next to the pack, so keep candidate output out of
+`content/generated`:
 
 ```sh
 cargo xtask content-build \
   content/cache-candidate \
-  content/generated/candidate.pack \
-  content/generated/candidate.json
+  target/content-candidate/pokeviewer-v1.pack \
+  target/content-candidate/pokeviewer-v1.json
 ```
 
-No converter output contains host paths, credentials, device identifiers, or
-child-related data. The generated manifest stores only the pack file name.
-
-## Reproducibility evidence
-
-Build twice from the same cache into different files:
-
-```sh
-cargo xtask content-build \
-  content/cache-v1 target/content-proof/first.pack \
-  target/content-proof/first.json
-cargo xtask content-build \
-  content/cache-v1 target/content-proof/second.pack \
-  target/content-proof/second.json
-sha256sum \
-  target/content-proof/first.pack \
-  target/content-proof/second.pack
-cmp \
-  target/content-proof/first.pack \
-  target/content-proof/second.pack
-```
-
-The two pack hashes and bytes must match. Manifest bytes differ only if the
-chosen pack file names differ, so pack bytes are the release reproducibility
-boundary.
+Do not edit generated files by hand.
 
 ## Tests
-
-The host suite uses generated 56 × 56 PNG data and representative PokeAPI
-fixtures. It covers:
-
-- out-of-order type normalization;
-- exact four-colour palette-split conversion;
-- rejection of unexpected source palettes;
-- malformed response IDs;
-- invalid sprite dimensions; and
-- byte-identical repeated pack serialization.
-
-Run:
 
 ```sh
 cargo test -p xtask --locked
 ```
 
-The [content-pack contract](../content-pack-v1.md) is authoritative for the
-wire format, conversion arithmetic, schedule, size budget, compatibility, and
-failure policy.
+The tests use generated PNG data and PokéAPI fixtures. They cover type
+ordering, palette splitting, rejection of unexpected palettes, malformed IDs,
+invalid sprite sizes, and repeatable serialization.
