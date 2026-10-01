@@ -118,6 +118,6 @@ evidence remains part of release qualification.
 ## More Information
 
 - [ADR 0004](0004-use-esp-idf-aligned-rtc-deep-sleep.md)
-- [Bounded failure and recovery contract](../hardware/failure-recovery.md)
+- [Failure path](../hardware/wake-sleep-state-machine.md#failure-path)
 - [ESP-IDF entering Deep-sleep](https://docs.espressif.com/projects/esp-idf/en/v5.5.1/esp32s3/api-reference/system/sleep_modes.html#entering-deep-sleep)
 - [Pinned ESP-HAL deep-sleep implementation](https://github.com/esp-rs/esp-hal/blob/434755e0447fc1a4ba30fd84da3cf746ec082e00/esp-hal/src/rtc_cntl/mod.rs#L389-L402)

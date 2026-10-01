@@ -1,9 +1,8 @@
 # Waveshare ESP32-S3-ePaper-1.54-EN V2 board contract
 
-- Status: accepted for implementation; physical evidence incomplete
+- Status: accepted; two device checks pending (see the end of this page)
 - Hardware issue: [H02 / #3][issue-3]
 - Vendor source revision: [`3f96beedd2e8`][vendor-commit]
-- Last reviewed: 2026-10-01
 
 Pokeviewer supports only the non-touch
 `ESP32-S3-ePaper-1.54-EN` V2 board, Waveshare SKU 32299. V1 firmware and pin
@@ -69,9 +68,12 @@ or making the touch and non-touch SKUs behave differently.
 | 47 | I²C SDA | bidirectional | RTC bus |
 | 48 | I²C SCL | output | RTC bus |
 
-The display has no MISO connection. Firmware uses SPI mode 0 and a 5,000-byte
-one-bit framebuffer. The panel datasheet limits write-mode SCLK to 20 MHz;
-Pokeviewer must not copy the vendor example's contradictory 40 MHz setting.
+The display has no MISO connection. Firmware uses SPI2 at 10 MHz, mode 0, and
+a 5,000-byte one-bit framebuffer, with full refreshes only. The panel datasheet
+limits write-mode SCLK to 20 MHz; do not copy the vendor example's 40 MHz
+setting.
+
+The I²C bus runs at 100 kHz.
 
 ## Shared I²C bus
 
@@ -96,11 +98,10 @@ required RTC address and must not infer board identity from a scan.
 - GPIO17 high holds the battery-controlled system path on; driving it low asks
   the board to power off.
 - GPIO6 low powers the e-paper rail. It must be high before deep sleep.
-- GPIO42 low powers the audio section. Because the ES8311 shares SDA/SCL and
-  clamps the bus when unpowered, it must remain low and be held low through deep
-  sleep. Firmware applies the vendor ES8311 software-suspend sequence; the
-  audio rail remains powered while the panel rail is off. The rail is not
-  described as suspended; only the codec is software-suspended.
+- GPIO42 low powers the audio section. The ES8311 shares SDA/SCL and clamps
+  the bus when unpowered, so GPIO42 stays low and is held low through deep
+  sleep. The audio rail stays powered; firmware applies the vendor ES8311
+  software-suspend sequence to the codec.
 - The PCF85063 interrupt on GPIO5 is an open-drain, active-low EXT1 wake
   source. Before sleep, firmware must enable GPIO5's RTC-domain pull-up and
   disable its RTC-domain pull-down; configuring only the digital IO-mux pull-up
@@ -119,15 +120,9 @@ required RTC address and must not infer board identity from a scan.
   divider (about 9 µA), the MP1605 regulator quiescent current, and its
   feedback divider.
 - The e-paper keeps its image after the panel rail and MCU are inactive.
-- Battery voltage is the calibrated GPIO4 reading multiplied by two. Values
-  from 2,500 mV through 4,500 mV are plausible. The retained value is bounded
-  diagnostic data, not a precise state-of-charge or capacity measurement.
-- A plausible value below 3,750 mV enters `Recharge`. A later plausible value
-  at or above 3,850 mV clears it. An invalid scheduled observation preserves a
-  complete retained `Recharge` snapshot; otherwise it commits `Unavailable`
-  with `0` mV.
-- Only a validated RTC alarm wake commits the retained scheduled battery
-  snapshot. PWR and invalid-RTC paths do not sample or replace it.
+- Battery voltage is the calibrated GPIO4 reading multiplied by two. The
+  [firmware runtime](wake-sleep-state-machine.md#battery-state) defines how
+  it becomes a battery state.
 
 The ETA6098 charger and connector do not make an arbitrary lithium cell safe.
 Battery choice, protection, charge current, enclosure, and supervision remain
@@ -135,27 +130,26 @@ adult integration responsibilities.
 
 ## Physical verification status
 
-| Check | Status | Evidence |
+| Check | Status | Observation |
 | --- | --- | --- |
-| V2 marking | owner-confirmed | sanitized photos pending |
-| USB controller identity | verified | `303a:1001`, serial omitted |
-| Chip family/revision | verified | ESP32-S3 revision v0.2; device identifier omitted |
-| Package identity | pending | physical marking or PSRAM probe required |
-| Flash size | verified | 8 MB device probe |
-| PSRAM size/mode | pending | diagnostic firmware required |
-| RTC at `0x51` | verified | set/read-back and valid daily boot |
-| Deep-sleep entry | verified | timer diagnostic slept once and woke by timer without a reset loop |
-| GPIO5 RTC-domain pull-up | verified | alarm-driven EXT0 wake passed at a synthetic 07:00 boundary |
-| Scheduled RTC wake/reboot | verified | retained verdict reported `Ext0` with the PCF alarm flag asserted |
-| Battery millivolt accuracy | pending | one final retained USB value versus DMM comparison required |
-| RTC-versus-PWR battery commit gate | verified | 2026-10-01: retained 3,902 mV through PWR and BOOT wakes; a synthetic 07:00 alarm wake committed 4,080 mV |
-| BOOT restart and status LED | verified | 2026-10-01: tap ignored, one-second hold flashed and refreshed, 30-second hold slept with BOOT unarmed |
-| Non-touch I²C population | pending | sanitized full-bus probe required |
+| V2 marking | verified | owner-confirmed on the board |
+| USB controller | verified | `303a:1001` |
+| Chip family and revision | verified | ESP32-S3 revision v0.2 |
+| Flash size | verified | 8 MB |
+| RTC at `0x51` | verified | set, read back, and valid daily boot |
+| Timer-only deep sleep | verified | one ten-second sleep and timer wake with rails held, no reset loop |
+| PCF85063 alarm and GPIO5 | verified | alarm flag set at 07:00:00, GPIO5 went low, clearing the flag released it |
+| Scheduled RTC wake | verified | one EXT1 wake at a synthetic 07:00 with the GPIO5 status bit and alarm flag |
+| Release firmware sleep | verified | refreshed once, slept, and stayed off USB for the 45-second observation |
+| Passive image retention | verified | card retained through sleep |
+| `PWR` parent session | verified | 2026-07-30 with v1.1.0: handshake, set and read-back; a hold without a CLI command left the card unchanged |
+| RTC-versus-`PWR` battery commit gate | verified | 2026-10-01: 3,902 mV retained through `PWR` and `BOOT` wakes; a synthetic 07:00 alarm wake committed 4,080 mV |
+| `BOOT` restart and green LED | verified | 2026-10-01: tap ignored, one-second hold flashed and refreshed, 30-second hold slept with `BOOT` unarmed |
+| Battery millivolt accuracy | pending | compare one `get-battery` value with a multimeter at the cell terminals |
+| Storage mode power-off | pending | storage response, power-off after USB removal, setup after the next `PWR` press |
 
-Serial access is operational through the host's normal device group; device
-permissions were not weakened. Complete the remaining
-[sanitized probe procedure](probe-procedure.md) without publishing a device
-path or identifier.
+Package marking, PSRAM size, and absence of the touch controller at `0x38`
+have not been checked on the device. Firmware uses none of them.
 
 ## Sources
 

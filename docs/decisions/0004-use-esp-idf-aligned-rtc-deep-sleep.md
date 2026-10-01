@@ -119,7 +119,7 @@ the release battery-capacity calculation remain separate release gates.
 ## More Information
 
 - [ADR 0003](0003-stage-an-awake-runtime-before-deep-sleep-integration.md)
-- [RTC wake and deep-sleep qualification](../hardware/deep-sleep-qualification.md)
+- [Sleep diagnostics](../hardware/validation.md#diagnostic-images)
 - [07:00 runtime state machine](../hardware/wake-sleep-state-machine.md)
 - [ADR 0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md)
   supersedes the awake terminal-failure behavior; normal RTC wake is unchanged.

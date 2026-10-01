@@ -110,6 +110,6 @@ capacity.
 
 - Supersedes [ADR 0007: Use a generic LiPo OCV battery estimate](0007-use-a-generic-lipo-ocv-battery-estimate.md)
 - [Product contract](../product-contract.md)
-- [Battery state and runtime scope](../hardware/battery-sizing.md)
+- [Battery state](../hardware/wake-sleep-state-machine.md#battery-state)
 - [Wake, parent-session, and 07:00 state machine](../hardware/wake-sleep-state-machine.md)
 - [USB provisioning protocol v1](../usb-protocol-v1.md)
