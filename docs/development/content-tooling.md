@@ -40,7 +40,7 @@ The build reads only `content/cache-v2` and writes three files to
   the four shades drawn as greys.
 
 It validates every ID, URL, path, digest, name, type, sprite size, and palette,
-the schedule, and the 64 KiB limit. It builds the pack twice in memory and
+the schedule, and the 256 KiB limit. It builds the pack twice in memory and
 fails if the bytes differ. CI runs this command and fails if any of the three
 files changes.
 

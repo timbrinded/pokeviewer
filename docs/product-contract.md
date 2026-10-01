@@ -50,8 +50,8 @@ custom lightning icon and `CHARGE!`. `Unavailable` shows `BAT ?`. The card
 does not show a percentage.
 
 The content set is National Pokédex IDs 1 through 251, Generations I and II.
-A fixed, versioned, non-repeating permutation selects one entry per display day
-and repeats after 251 display days.
+A fixed, versioned permutation shows each entry once in every 251-display-day
+cycle, then repeats the cycle.
 
 Before 07:00, the display day is the previous calendar date. This includes the
 weekday: the entire previous card remains visible rather than mixing a new
@@ -59,13 +59,13 @@ weekday with yesterday's Pokémon.
 
 ## Explicit exclusions
 
-V1 has no:
+The product has no:
 
 - runtime internet access, Wi-Fi, Bluetooth, accounts, telemetry, or cloud;
 - touch support, child-facing button actions, menus, choices, scores, streaks,
   or games;
-- audio, speech, animation, colour, or partial-refresh effects, or panel
-  greyscale waveforms (sprite shading uses only black and white pixels);
+- audio, speech, animation, colour, partial refresh, or greyscale panel
+  waveforms;
 - SD-card dependency or runtime content update;
 - localization, descriptions, stats, moves, evolutions, or generations after
   Generation II;
@@ -73,6 +73,9 @@ V1 has no:
   adjustment; or
 - guaranteed battery runtime independent of the selected battery's measured
   capacity and condition.
+
+Sprite shading is a pattern of black and white panel pixels drawn with the
+normal full refresh.
 
 Battery state comes from a bounded voltage sample. It is not a fuel gauge and
 does not control shutdown, charging, or safety. The product makes no precise

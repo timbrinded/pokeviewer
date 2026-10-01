@@ -7,11 +7,12 @@
 - Schedule version: 2
 
 This contract defines the only Pokémon data consumed by the firmware and the
-mapping from local civil time to one daily record. It refines the accepted
-[offline-pack decision](decisions/0001-compile-an-offline-content-pack.md) and
-[07:00 display-day decision](decisions/0002-use-a-passive-0700-display-day.md).
-Format 1, content revision 2, and schedule v1 held the 151 Generation I
-Pokémon with one-bit Pokémon Yellow sprites.
+mapping from local civil time to one daily record. It implements the content
+and display-day rules of the [product contract](product-contract.md). The
+closed decision records
+[0001](decisions/0001-compile-an-offline-content-pack.md) and
+[0002](decisions/0002-use-a-passive-0700-display-day.md) give the original
+rationale; this contract replaces their Generation I, 151-record scope.
 
 ## Content scope
 
@@ -25,10 +26,13 @@ through 251, ordered by ID. Each record contains only:
 - one 56 × 56 sprite of two-bit shades derived from the Pokémon Crystal front
   sprite. Unown (201) uses its default form, Unown A.
 
-Names are NFC-normalized UTF-8, 1–16 bytes long, with no control or NUL
-characters. The renderer's reviewed glyph set must cover every committed
-name, including the female and male symbols used by Nidoran, the hyphen in
-Ho-Oh, and the digit in Porygon2.
+Names are UTF-8, 1–16 bytes long, with no control characters, including NUL;
+the firmware parser enforces these rules. The converter also normalizes names
+to NFC. Besides letters, committed names use a space and a period
+(Mr. Mime), the curly apostrophe U+2019 (Farfetch’d), a hyphen (Ho-Oh), the
+digit 2 (Porygon2), and the female and male signs (Nidoran♀, Nidoran♂). The
+renderer's fixed glyph set must cover every committed name; an exhaustive
+host test renders all 251.
 
 Type values are stable pack codes, not upstream strings:
 
@@ -46,38 +50,32 @@ and secondary types, and missing or extra IDs invalidate the complete pack.
 
 ### Sprite conversion
 
-The source is the unmodified Pokémon Crystal front PNG from the explicit
-maintainer cache. Conversion:
+The source is the unmodified Pokémon Crystal front PNG in the accepted
+maintainer cache, `content/cache-v2`. Conversion:
 
 1. requires a non-empty source no larger than 56 × 56;
-2. centers the native source pixels on a transparent 56 × 56 output canvas
-   without scaling, cropping, or interpolation; an odd spare pixel is placed
-   on the right or bottom;
-3. treats alpha values below 128 as white and excludes them from the source
-   palette;
+2. centers the native source pixels on a 56 × 56 canvas without scaling,
+   cropping, or interpolation; an odd spare pixel is placed on the right or
+   bottom;
+3. treats source pixels with alpha below 128 as transparent and excludes them
+   from the palette;
 4. requires every other source pixel to be fully opaque;
 5. collects their distinct RGB values and requires exactly four source colours,
    with white (`255, 255, 255`) as the lightest;
 6. orders those four colours by integer luminance,
-   `(299 * red + 587 * green + 114 * blue + 500) / 1000`;
-   ties are resolved by red, then green, then blue;
+   `(299 * red + 587 * green + 114 * blue + 500) / 1000`; among equal
+   luminances, the colour with the lower red, then green, then blue value is
+   darker;
 7. writes the colours from lightest to darkest as shades `0` (white), `1`,
-   `2`, and `3` (black), and writes transparent and out-of-source canvas
-   pixels as `0`; and
+   `2`, and `3` (black), and writes transparent pixels and canvas padding as
+   `0`; and
 8. applies no dithering. The renderer owns how shades appear on the panel; see
    [rendering](development/rendering.md#sprite-shading).
 
-All 251 Pokémon use Crystal sprites, including Generation I, so every card
-shares one art style. Luminance order differs from the original Game Boy shade
-order for eight sprites (21, 22, 83, 106, 123, 124, 137, and 233): the
-pret/pokecrystal build marks exactly these palettes `--reverse`. Neither order
-looked consistently better on the panel, so the converter keeps one luminance
-rule and no exception list.
-
-Output-canvas pixels serialize by row from top to bottom and within each row
-from left to right. Each pixel is two bits; the most-significant pair of a
-byte is the leftmost pixel. Fourteen bytes encode each 56-pixel row, so every
-sprite is exactly 784 bytes.
+For eight sprites (21, 22, 83, 106, 123, 124, 137, and 233), the
+pret/pokecrystal build reverses the palette (`--reverse`), so luminance order
+differs from the original Game Boy shade order. The converter applies the
+luminance rule to every sprite and keeps no exception list.
 
 ## Binary format
 
@@ -99,7 +97,7 @@ concatenated UTF-8 name bytes
 | 0 | 4 | magic | ASCII `PKVW` |
 | 4 | 2 | format version | `2` |
 | 6 | 2 | header length | `32` |
-| 8 | 4 | content revision | `3`; revisions `1` and `2` held one-bit Yellow sprites |
+| 8 | 4 | content revision | `3` |
 | 12 | 2 | schedule version | `2` |
 | 14 | 2 | record count | `251` |
 | 16 | 2 | permutation count | `251` |
@@ -127,24 +125,31 @@ Each six-byte record contains, in order:
 | 2 | name offset | offset within the names section |
 
 Name slices are contiguous in record order, non-overlapping, and exactly cover
-the names section. Sprite ordinal and record ordinal are identical, so no
-sprite offset is stored.
+the names section.
+
+### Sprite bitmap
+
+Each sprite is 784 bytes of two-bit shades. Pixels serialize by row from top
+to bottom and within each row from left to right; the most-significant bit
+pair of a byte is the leftmost pixel, and fourteen bytes encode each 56-pixel
+row. Every two-bit value is a valid shade. Sprite ordinal and record ordinal
+are identical, so no sprite offset is stored.
 
 ### Deterministic serialization
 
 The generator must:
 
-- read only an explicit cache and its provenance manifest;
+- read only the accepted cache and its provenance manifest;
 - process records in ascending Pokédex ID order;
 - use the type codes and sprite conversion above;
 - concatenate names in record order;
 - emit the exact schedule-v2 permutation below;
-- write every reserved or flags field as zero;
+- write the flags field as zero;
 - compute lengths and CRC only after the payload is complete; and
 - produce byte-identical output from the same cache on repeated runs.
 
 Normal CI validates the committed cache and pack without accessing PokéAPI.
-Refreshes are explicit maintainer actions.
+Cache refreshes (`cargo xtask content-fetch`) are explicit maintainer actions.
 
 ## Schedule v2
 
@@ -158,20 +163,20 @@ cycle_index = days(display_date - 2026-01-01) rem_euclid 251
 dex_id = ((94 * cycle_index) mod 251) + 1
 ```
 
-This mapping is the repository-owned schedule-v2 permutation. Because 251 is
-prime, every ID appears exactly once before the cycle repeats. Within any seven
-consecutive display days, every two IDs are at least 31 apart, the largest
-spacing any multiplier allows. The pack stores all 251 resulting IDs in
-cycle-index order; the parser rejects a list that differs from the formula.
-Firmware selects from those stored bytes and does not run a PRNG.
-
-Schedule v1 used `(73 * cycle_index) mod 151`. A device that updates from v1
-shows a different Pokémon from the next refresh; the epoch and rollover are
-unchanged.
-
 Date arithmetic uses the proleptic Gregorian calendar. Negative differences
 use Euclidean modulo, so dates before the epoch are defined rather than
 underflowing.
+
+This mapping is the repository-owned schedule-v2 permutation. Because 251 is
+prime, every ID appears exactly once before the cycle repeats. Within any seven
+consecutive display days, every two IDs are at least 31 apart. The pack stores
+all 251 resulting IDs in cycle-index order; the parser rejects a list that
+differs from the formula. Firmware selects from those stored bytes and does
+not run a PRNG.
+
+A restart before 07:00 must never combine the new calendar weekday with the
+prior Pokémon. If the restart path renders a card, both weekday and Pokémon
+come from `display_date`; otherwise the prior card stays on the panel.
 
 ### Worked examples
 
@@ -188,30 +193,42 @@ underflowing.
 | 2000-01-01 00:00:00 | 1999-12-31, Friday | 40 | 247 | earliest supported RTC reading |
 | 2099-12-31 23:59:59 | 2099-12-31, Thursday | 170 | 168 | latest supported RTC reading |
 
-A restart before 07:00 must never combine the new calendar weekday with the
-prior Pokémon. If recovery requires rendering, both weekday and Pokémon come
-from `display_date`; otherwise the retained prior card remains untouched.
-
 ## Compatibility and failure policy
 
 Firmware embeds the pack with `include_bytes!` and parses bounded byte
-slices without allocation or runtime JSON. Before powering the panel, it
-validates:
+slices without allocation or runtime JSON. When the RTC holds a valid time,
+firmware validates the pack before it renders the daily card and powers the
+panel. It checks:
 
 - magic, exact format version, header and record sizes, flags, and all lengths;
 - exact supported content revision and schedule version;
 - CRC;
-- record, name, type, permutation, and sprite invariants; and
+- record order, names, type codes, and the schedule-v2 permutation;
+- a sprite section of exactly 251 × 784 bytes; and
 - that the total input is consumed with no trailing bytes.
+
+With an invalid RTC, firmware shows the setup screen without reading the pack.
 
 Format changes require a new format version. Content or schedule changes require
 their own reviewed revision and a firmware release. Firmware rejects
-unsupported versions rather than attempting forward compatibility.
+unsupported versions rather than attempting forward compatibility, so it does
+not read format-1 packs.
 
 On any validation failure, firmware selects no record and shows the `PACK` /
 `REFLASH` recovery screen described in the
-[failure table](hardware/wake-sleep-state-machine.md#failure-path). An adult
-recovers the device by flashing a verified release.
+[failure table](hardware/wake-sleep-state-machine.md#failure-path). A renderer
+rejection of the selected record, or a stored ID that differs from the
+schedule, shows the same screen. An adult recovers the device by flashing a
+verified release.
+
+### Changes from v1
+
+Format 1 (content revisions 1 and 2, schedule v1) held the 151 Generation I
+Pokémon with one-bit Pokémon Yellow sprites and selected
+`(73 * cycle_index) mod 151`. Schedule v2 keeps the epoch and the 07:00
+rollover. A device updated from a v1 image selects from the v2 permutation from
+its next display refresh. All 251 Pokémon, including Generation I, now use
+Crystal sprites, so every card shares one art style.
 
 ## Size budget
 
@@ -225,17 +242,21 @@ recovers the device by flashing a verified release.
 | 251 sprites | 196,784 |
 | complete pack | 202,589 |
 
-The committed pack is 200,410 bytes. The hard limit is 262,144 bytes, leaving
-at least 59,555 bytes of pack-level headroom. Firmware, fonts, stack, heap, and framebuffers have separate budgets;
-the 64 KiB pack limit is not a claim about total flash or RAM use. Firmware
-keeps the pack in flash and decodes only one fixed record and sprite at a time.
+The hard limit is 262,144 bytes (256 KiB). A pack at the maximum size above
+still leaves 59,555 bytes of headroom; the committed pack is 200,410 bytes.
+Firmware, fonts, stack, heap, and framebuffers have separate budgets, so the
+256 KiB pack limit is not a claim about total flash or RAM use. Firmware keeps
+the pack in flash and decodes only one fixed record and sprite at a time.
 
 ## Provenance and redistribution
 
-Every cached response and source PNG must have its source URL, retrieval time,
-and SHA-256 digest recorded in the cache manifest. The generated pack manifest
-records the cache-manifest digest, converter version, format/content/schedule
-versions, pack length, and pack SHA-256 digest.
+The cache manifest records one retrieval time for the fetch, the pinned
+PokeAPI/sprites revision, and each cached file's source URL, repository path,
+and SHA-256 digest. The generator rejects a cache whose schema version,
+sprite revision, URLs, paths, or digests differ from the expected values. The
+generated pack manifest records the cache-manifest digest, converter version,
+format, content, and schedule versions, sprite revision, pack length, pack
+SHA-256 digest, and contact-sheet digest.
 
 PokéAPI and its sprite repository provide technical provenance, not a Pokémon
 media license. This non-commercial fan project accepts the redistribution risk
