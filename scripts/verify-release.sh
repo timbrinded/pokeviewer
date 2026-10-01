@@ -47,7 +47,7 @@ bundle_dir="$work_dir/$BUNDLE"
 expected=(
   "pokeviewer-v$VERSION-esp32s3-v2.bin"
   "pokeviewerctl-v$VERSION-x86_64-unknown-linux-gnu"
-  "pokeviewer-v1.pack"
+  "pokeviewer-v2.pack"
   "content-manifest.json"
   "BUILD-METADATA.txt"
   "README.md"
@@ -95,13 +95,13 @@ if [[ "$(metadata_value product_version)" != "$VERSION" ]]; then
 fi
 
 manifest="$bundle_dir/content-manifest.json"
-pack="$bundle_dir/pokeviewer-v1.pack"
+pack="$bundle_dir/pokeviewer-v2.pack"
 pack_hash=$(sha256sum "$pack")
 pack_hash=${pack_hash%% *}
 if [[ "$(metadata_value content_pack_sha256)" != "$pack_hash" ||
   "$(jq -er '.pack_sha256' "$manifest")" != "$pack_hash" ||
   "$(jq -er '.pack_length' "$manifest")" != "$(stat --format=%s "$pack")" ||
-  "$(jq -er '.pack_path' "$manifest")" != "pokeviewer-v1.pack" ]]; then
+  "$(jq -er '.pack_path' "$manifest")" != "pokeviewer-v2.pack" ]]; then
   echo "packaged content does not match its metadata or manifest" >&2
   exit 1
 fi

@@ -17,7 +17,7 @@ releases.
 | | `actionlint` | invalid workflow syntax and shell errors in workflows |
 | `Offline content integrity` | `cargo xtask content-build`, then `git diff --exit-code -- content/generated` | committed pack, manifest, or contact sheet that does not match the cache and converter |
 | `Visual and recovery goldens` | `cargo xtask golden-check`, and `render-recovery-screens` compared with `docs/evidence/recovery-screens` | any changed pixel on a daily card or recovery screen |
-| `ESP32-S3 release` | release firmware built twice and checked with `scripts/check-firmware-artifact.sh` | missing entry point, text over 200,000 bytes, data over 16,384 bytes, pack over 65,536 bytes, or nondeterministic loaded sections |
+| `ESP32-S3 release` | release firmware built twice and checked with `scripts/check-firmware-artifact.sh` | missing entry point, text without the content pack over 134,464 bytes, data over 16,384 bytes, pack over 262,144 bytes, or nondeterministic loaded sections |
 | | the eight diagnostic images built once | target-only compile errors in diagnostic binaries |
 
 On failure, the visual job uploads `visual-diff`. It holds, for each changed

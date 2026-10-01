@@ -88,8 +88,8 @@ espflash save-image \
   "$bundle_dir/$firmware_bin"
 
 cp "$CLI" "$bundle_dir/$cli_bin"
-cp content/generated/pokeviewer-v1.pack "$bundle_dir/"
-cp content/generated/pokeviewer-v1.json "$bundle_dir/content-manifest.json"
+cp content/generated/pokeviewer-v2.pack "$bundle_dir/"
+cp content/generated/pokeviewer-v2.json "$bundle_dir/content-manifest.json"
 # The archive ships SAFETY.md and TROUBLESHOOTING.md beside the README; every
 # other repository link points at the tagged source on GitHub.
 readonly source_url="https://github.com/timbrinded/pokeviewer/blob/v$VERSION"
@@ -112,7 +112,7 @@ if strings "$bundle_dir/$firmware_bin" "$bundle_dir/$cli_bin" | awk '
   exit 1
 fi
 
-content_hash=$(sha256sum "$bundle_dir/pokeviewer-v1.pack")
+content_hash=$(sha256sum "$bundle_dir/pokeviewer-v2.pack")
 content_hash=${content_hash%% *}
 manifest="$bundle_dir/content-manifest.json"
 content_format_version=$(jq -er '.format_version' "$manifest")
@@ -139,7 +139,7 @@ EOF
 payloads=(
   "$firmware_bin"
   "$cli_bin"
-  "pokeviewer-v1.pack"
+  "pokeviewer-v2.pack"
   "content-manifest.json"
   "BUILD-METADATA.txt"
   "README.md"
