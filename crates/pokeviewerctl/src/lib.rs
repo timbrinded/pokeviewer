@@ -21,6 +21,7 @@ const STARTUP_RETRY_TIMEOUT: Duration = Duration::from_millis(500);
 const PARENT_COMMAND_RESPONSE_TIMEOUT: Duration = Duration::from_secs(12);
 const DEVICE_WAIT_TIMEOUT: Duration = Duration::from_mins(1);
 const DEVICE_WAIT_INTERVAL: Duration = Duration::from_millis(250);
+const PERMISSION_SETTLE_TIMEOUT: Duration = Duration::from_secs(2);
 const RESPONSE_TIMEOUT_ERROR: &str = "timed out waiting for device response";
 
 #[derive(Debug, Default, PartialEq, Eq)]
@@ -187,9 +188,20 @@ fn list_devices() -> Result<String, String> {
 
 fn open_device(device: &str, wait_for_device: bool) -> Result<SerialPort, String> {
     let deadline = Instant::now() + DEVICE_WAIT_TIMEOUT;
+    let mut first_denied = None;
     loop {
         match SerialPort::open(device, BAUD_RATE) {
             Ok(port) => return Ok(port),
+            // A newly created device node can deny access until udev applies
+            // its group, so a waiting command gives it a short grace period.
+            Err(error)
+                if wait_for_device
+                    && error.kind() == io::ErrorKind::PermissionDenied
+                    && first_denied.get_or_insert_with(Instant::now).elapsed()
+                        < PERMISSION_SETTLE_TIMEOUT =>
+            {
+                thread::sleep(DEVICE_WAIT_INTERVAL);
+            }
             Err(error) if error.kind() == io::ErrorKind::PermissionDenied => {
                 return Err("permission denied for selected serial device".to_owned());
             }
@@ -487,9 +499,10 @@ mod tests {
     use serial2::SerialPort;
 
     use super::{
-        Options, RESPONSE_TIMEOUT, exchange_command, format_command_response, parse_datetime,
-        parse_handshake, parse_options, read_matching_response, read_response, run, start_session,
-        validate_command_capability, validate_options,
+        Options, PERMISSION_SETTLE_TIMEOUT, RESPONSE_TIMEOUT, exchange_command,
+        format_command_response, open_device, parse_datetime, parse_handshake, parse_options,
+        read_matching_response, read_response, run, start_session, validate_command_capability,
+        validate_options,
     };
 
     const NOW: &str = "2026-07-27T19:05:09";
@@ -791,5 +804,27 @@ mod tests {
             read_response(&mut TimeoutReader, RESPONSE_TIMEOUT).unwrap_err(),
             "timed out waiting for device response"
         );
+    }
+
+    #[test]
+    fn waiting_open_allows_only_a_short_permission_grace_period() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let path =
+            std::env::temp_dir().join(format!("pokeviewerctl-denied-{}", std::process::id()));
+        std::fs::write(&path, []).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o000)).unwrap();
+        let device = path.to_str().unwrap();
+
+        let started = std::time::Instant::now();
+        let waited = open_device(device, true).unwrap_err();
+        let elapsed = started.elapsed();
+        let immediate = open_device(device, false).unwrap_err();
+        std::fs::remove_file(&path).unwrap();
+
+        assert_eq!(waited, "permission denied for selected serial device");
+        assert_eq!(immediate, waited);
+        assert!(elapsed >= PERMISSION_SETTLE_TIMEOUT);
+        assert!(elapsed < PERMISSION_SETTLE_TIMEOUT * 3);
     }
 }
