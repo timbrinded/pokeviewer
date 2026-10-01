@@ -1163,7 +1163,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewer-core"
-version = "1.2.0"
+version = "2.0.0"
 dependencies = [
  "crc32fast",
  "time",
@@ -1171,7 +1171,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewer-esp32s3-pad-hold"
-version = "1.2.0"
+version = "2.0.0"
 dependencies = [
  "critical-section",
  "esp-hal",
@@ -1179,7 +1179,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewer-firmware"
-version = "1.2.0"
+version = "2.0.0"
 dependencies = [
  "embassy-futures",
  "embedded-graphics",
@@ -1200,7 +1200,7 @@ dependencies = [
 
 [[package]]
 name = "pokeviewerctl"
-version = "1.2.0"
+version = "2.0.0"
 dependencies = [
  "jiff",
  "pokeviewer-core",
@@ -1691,7 +1691,7 @@ dependencies = [
 
 [[package]]
 name = "xtask"
-version = "1.2.0"
+version = "2.0.0"
 dependencies = [
  "crc32fast",
  "png",

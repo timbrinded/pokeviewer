@@ -8,7 +8,7 @@ the canonical type or types. The device does not use Wi-Fi or BLE.
 
 ## Quick start
 
-These instructions install Pokeviewer v1.2.0 from the official
+These instructions install Pokeviewer v2.0.0 from the official
 [Pokeviewer releases](https://github.com/timbrinded/pokeviewer/releases) page.
 They require an x86-64 Linux computer. The release archive contains a copy of
 this guide as `README.md`.
@@ -41,17 +41,17 @@ Open a terminal.
 Run these commands:
 
 ```console
-mkdir pokeviewer-v1.2.0-install
-cd pokeviewer-v1.2.0-install
+mkdir pokeviewer-v2.0.0-install
+cd pokeviewer-v2.0.0-install
 
 curl --fail --location --remote-name \
-  https://github.com/timbrinded/pokeviewer/releases/download/v1.2.0/pokeviewer-v1.2.0.tar.gz
+  https://github.com/timbrinded/pokeviewer/releases/download/v2.0.0/pokeviewer-v2.0.0.tar.gz
 curl --fail --location --remote-name \
-  https://github.com/timbrinded/pokeviewer/releases/download/v1.2.0/pokeviewer-v1.2.0.tar.gz.sha256
+  https://github.com/timbrinded/pokeviewer/releases/download/v2.0.0/pokeviewer-v2.0.0.tar.gz.sha256
 
-sha256sum --check pokeviewer-v1.2.0.tar.gz.sha256
-tar -xzf pokeviewer-v1.2.0.tar.gz
-cd pokeviewer-v1.2.0
+sha256sum --check pokeviewer-v2.0.0.tar.gz.sha256
+tar -xzf pokeviewer-v2.0.0.tar.gz
+cd pokeviewer-v2.0.0
 sha256sum --check SHA256SUMS
 ```
 
@@ -88,8 +88,8 @@ To reach the installed firmware instead, for example to read it with `info`,
 prepare the bundled CLI and wait for the device:
 
 ```console
-chmod u+x ./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu
-./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu info \
+chmod u+x ./pokeviewerctl-v2.0.0-x86_64-unknown-linux-gnu
+./pokeviewerctl-v2.0.0-x86_64-unknown-linux-gnu info \
   --device "$DEVICE" \
   --wait-for-device
 ```
@@ -149,7 +149,7 @@ espflash write-bin \
   --port "$DEVICE" \
   --before no-reset \
   --after no-reset \
-  0x0 pokeviewer-v1.2.0-esp32s3-v2.bin
+  0x0 pokeviewer-v2.0.0-esp32s3-v2.bin
 ```
 
 Wait for the command to report a successful write.
@@ -172,7 +172,7 @@ first, hold `BOOT` for one second to start another two-minute wait.
 Set the command path:
 
 ```console
-export CLI=./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu
+export CLI=./pokeviewerctl-v2.0.0-x86_64-unknown-linux-gnu
 chmod u+x "$CLI"
 ```
 
