@@ -6,8 +6,9 @@ decisions behind it are ADRs
 [0004](../decisions/0004-use-esp-idf-aligned-rtc-deep-sleep.md),
 [0005](../decisions/0005-use-no-wake-deep-sleep-for-terminal-failures.md),
 [0006](../decisions/0006-use-pwr-gated-parent-setup-and-storage-mode.md),
-[0009](../decisions/0009-use-a-wake-gated-low-voltage-battery-state.md), and
-[0010](../decisions/0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md).
+[0009](../decisions/0009-use-a-wake-gated-low-voltage-battery-state.md),
+[0010](../decisions/0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md),
+and [0011](../decisions/0011-recheck-the-battery-every-three-hours.md).
 
 ## Wake sources
 
@@ -17,11 +18,13 @@ Deep sleep uses one ESP32-S3 EXT1 `ANY_LOW` wake source:
 - GPIO5: PCF85063 alarm interrupt, active low; and
 - GPIO18: `PWR` button, active low.
 
+Daily sleep also arms a three-hour ESP32-S3 RTC timer for the battery check.
+
 Firmware reads `EXT_WAKEUP1_STATUS` before it configures the next sleep. An
 RTC wake needs both the GPIO5 status bit and the PCF85063 alarm flag. Firmware
 does not infer wake intent from reset history or USB enumeration. It rejects
-any wake other than cold boot, reset, or EXT1 on these three pins before it
-can render a card.
+any wake other than cold boot, reset, the battery-check timer, or EXT1 on
+these three pins before it can render a card.
 
 ## Daily path
 
@@ -63,7 +66,8 @@ schedule.
 
 ## Battery state
 
-After a validated RTC alarm wake, and before the panel refresh, firmware reads
+After a validated RTC alarm wake, a battery-check timer wake, or a `BOOT`
+restart, and before any panel refresh, firmware reads
 GPIO4 (a 2:1 divider) with ADC1 at 11 dB attenuation and ESP-HAL
 `AdcCalCurve`. It waits 50 ms, discards one conversion, takes 16 calibrated
 samples 2 ms apart, averages the middle two, and doubles the result. Values
@@ -77,8 +81,10 @@ from 2,500 mV through 4,500 mV are plausible.
 | implausible, retained state `Recharge` | the whole prior snapshot is kept |
 | implausible, otherwise | `Unavailable` with `0` mV |
 
-Only that scheduled observation commits the retained snapshot. Reset, `BOOT`,
-invalid-RTC, and `PWR` paths do not sample or replace it. The card renders the
+Only those three paths commit the retained snapshot. A timer wake redraws the
+card only when the committed state differs from the displayed one; otherwise
+it sleeps again without touching the panel. Reset, invalid-RTC, and `PWR`
+paths do not sample or replace it. The card renders the
 snapshot, and the USB `get-battery` command returns it without taking a new
 sample. The value is not a fuel gauge and does not control charging, shutdown,
 or safety. The board cannot sense USB power, so firmware cannot tell a

@@ -22,7 +22,9 @@ The display now shows `Normal`, `Recharge`, or `Unavailable` battery state
 instead of a percentage. `Normal` has no battery text or icon, `Recharge`
 shows the existing lightning icon and `CHARGE!`, and `Unavailable` shows
 `BAT ?`. `Recharge` enters below 3,750 mV and clears at or above 3,850 mV.
-Only a validated RTC alarm wake commits the retained battery snapshot. The new
+The battery is measured every three hours, at 07:00, and on a one-second
+`BOOT` hold, and the card redraws only when the state changes, so `CHARGE!`
+clears within three hours of charging. The new
 `pokeviewerctl get-battery` command reports that snapshot as state and bounded
 cell millivolts. It does not report precise capacity and does not take a new
 PWR-session sample.

@@ -176,6 +176,7 @@ pub fn run_pokeviewer() -> ! {
                 boot_pin: wake_status & BOOT_BUTTON_WAKE_BIT != 0,
                 alarm_pending,
             },
+            SleepSource::Timer => WakeInput::Timer,
             _ => WakeInput::Other,
         };
         match decide_wake(input) {
@@ -286,10 +287,19 @@ pub fn run_pokeviewer() -> ! {
 
     let reading = block_on(rtc.read_datetime()).map_err(map_rtc_error);
     let wake_plan = reading.ok().and_then(|now| plan_wake(now, None).ok());
+    let displayed_battery = battery.state();
     if decision.should_commit_battery(reading.is_ok(), wake_plan.is_some()) {
         battery =
             commit_battery_observation(sample_battery_mv(peripherals.ADC1, peripherals.GPIO4));
         battery_diagnostic_flags = diagnostic_flags(battery);
+    }
+    if wake_plan.is_some() && !decision.refresh_required(displayed_battery, battery.state()) {
+        esp_println::println!(
+            "battery check; battery_state={:?}; battery_cell_mv={}; refreshed=false",
+            battery.state(),
+            battery.cell_mv(),
+        );
+        sleep_current_rtc!(rtc);
     }
     let mut framebuffer = Framebuffer::default();
     let mut frame_failure = None;
@@ -517,7 +527,7 @@ fn prepare_sleep(rtc: &mut BoardRtc, rtc_interrupt: &mut GPIO5<'static>) -> RtcS
 
 fn log_daily_ready(crc32: u32, next_wake: pokeviewer_core::LocalDateTime, battery: BatteryReading) {
     esp_println::println!(
-        "daily card ready; framebuffer_crc32={crc32:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; battery_state={:?}; battery_cell_mv={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true; wake_sources=ext1_gpio0_gpio5_gpio18",
+        "daily card ready; framebuffer_crc32={crc32:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; battery_state={:?}; battery_cell_mv={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true; wake_sources=ext1_gpio0_gpio5_gpio18,timer_3h",
         next_wake.year,
         next_wake.month,
         next_wake.day,

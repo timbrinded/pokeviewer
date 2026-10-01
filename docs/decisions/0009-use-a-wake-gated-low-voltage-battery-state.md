@@ -1,11 +1,15 @@
 ---
-status: accepted
+status: partly superseded by ADR-0011
 date: 2026-08-10
 decision-makers:
   - Project maintainer
 ---
 
 # Use a wake-gated low-voltage battery state
+
+[ADR 0011](0011-recheck-the-battery-every-three-hours.md) supersedes the
+alarm-only commit gate: the battery is also re-checked every three hours and
+on a `BOOT` restart. The states, thresholds, and invalid-sample rules remain.
 
 ## Context and Problem Statement
 

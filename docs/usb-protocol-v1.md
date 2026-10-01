@@ -73,7 +73,7 @@ source.
 
 Diagnostic bits 0 to 4 are the failure flags in the
 [runtime failure table](hardware/wake-sleep-state-machine.md#failure-path). Bit 5 means that
-a valid retained scheduled battery snapshot is available. Bit 6 means that the
+a valid retained battery snapshot is available. Bit 6 means that the
 retained state is `Recharge`. The response remains 16 bits.
 
 The read-battery response after the status byte is exactly three bytes:

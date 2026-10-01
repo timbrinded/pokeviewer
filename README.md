@@ -272,10 +272,11 @@ The supported board does not have a touchscreen.
 The card shows one battery state. `Normal` shows no battery text or icon.
 `Recharge` shows the lightning icon and `CHARGE!` at the bottom.
 `Unavailable` shows `BAT ?` in the top-right corner. The device measures the
-battery only at the scheduled 07:00 wake. The display does not show a battery
-percentage or estimate runtime.
+battery every three hours, at 07:00, and when you hold `BOOT` for one second.
+It redraws the card only when the battery state changes. The display does not
+show a battery percentage or estimate runtime.
 
-The USB CLI reports the last 07:00 reading without changing the display:
+The USB CLI reports the last reading without taking a new one:
 
 ```console
 "$CLI" get-battery --device "$DEVICE" --wait-for-device
@@ -316,8 +317,8 @@ button does not change the screen.
 | Hold while you connect USB with the battery disconnected | The device enters flashing mode. The screen does not change. Use this only to [flash the firmware](#4-flash-the-firmware). |
 
 Hold `BOOT` for one second after any error screen that says `RESET`, or if
-the screen looks wrong. A restart redraws the current day's card. It does not
-change the clock or the battery state.
+the screen looks wrong. A restart measures the battery and redraws the current
+day's card. It does not change the clock.
 
 ### Lights
 
@@ -334,15 +335,17 @@ change the clock or the battery state.
 | Screen | Meaning | What to do |
 | --- | --- | --- |
 | Weekday, Pokémon, name, and type | Normal daily card. | Nothing. It changes at 07:00. |
-| `BAT ?` in the top-right corner | The last scheduled battery reading was not valid. | Charge the battery. The next 07:00 reading replaces it. |
-| Lightning icon and `CHARGE!` at the bottom | The battery is low. | Charge the battery. |
+| `BAT ?` in the top-right corner | The last battery reading was not valid. | Charge the battery. The next reading, within three hours, replaces it. |
+| Lightning icon and `CHARGE!` at the bottom | The battery is low. | Charge until the orange light goes out, then unplug. `CHARGE!` clears within three hours, or hold `BOOT` for one second to clear it now. |
 | `SET TIME` | The clock is not set, or a computer session is open. | [Change the time](#change-the-time-later). |
 | `POKEVIEWER ERROR` with `RESET` | A bounded failure stopped the device. | Hold `BOOT` for one second. If it returns, read [troubleshooting](docs/troubleshooting.md). |
 | `POKEVIEWER ERROR` with `REFLASH` | The firmware content is damaged. | [Flash the firmware](#4-flash-the-firmware) again. |
 
 After a new clock setting or battery connection, the card can show `BAT ?`
-until the first 07:00 update. Only the scheduled 07:00 wake measures the
-battery.
+until the next battery reading, at most three hours later. A reading taken
+while USB is connected shows the charger's voltage, so the card can clear
+`CHARGE!` before the battery is full. The orange light is the reliable sign
+that charging has finished.
 
 ## Important notices
 

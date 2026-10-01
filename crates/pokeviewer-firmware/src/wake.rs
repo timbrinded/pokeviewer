@@ -1,5 +1,7 @@
 //! Target-independent interpretation of ESP32-S3 wake evidence.
 
+use pokeviewer_core::BatteryState;
+
 /// Wake category supplied by the hardware boundary.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum WakeInput {
@@ -16,6 +18,8 @@ pub enum WakeInput {
         /// The PCF85063 alarm flag is asserted.
         alarm_pending: bool,
     },
+    /// The ESP32-S3 RTC timer fired for the periodic battery check.
+    Timer,
     /// A source that release firmware did not configure.
     Other,
 }
@@ -42,6 +46,15 @@ impl WakeDecision {
     #[must_use]
     pub const fn should_commit_battery(self, rtc_valid: bool, wake_plan_valid: bool) -> bool {
         self.sample_battery && rtc_valid && wake_plan_valid
+    }
+
+    /// Return whether the panel must be redrawn after any battery commit.
+    ///
+    /// A periodic battery check redraws only when the displayed battery state
+    /// changed, so most checks leave the panel untouched.
+    #[must_use]
+    pub fn refresh_required(self, previous: BatteryState, current: BatteryState) -> bool {
+        self.refresh_daily || self.check_restart || (self.sample_battery && previous != current)
     }
 
     /// Resume only the deferred parent session after simultaneous daily work.
@@ -81,14 +94,21 @@ pub const fn decide_wake(input: WakeInput) -> Result<WakeDecision, UnexpectedWak
             alarm_pending,
         } if (rtc_pin && alarm_pending) || power_pin || boot_pin => {
             let alarm = rtc_pin && alarm_pending;
+            // An alarm refresh or parent session already covers a restart.
+            let restart = boot_pin && !alarm && !power_pin;
             Ok(WakeDecision {
                 refresh_daily: alarm,
-                sample_battery: alarm,
+                sample_battery: alarm || restart,
                 check_parent_session: power_pin,
-                // An alarm refresh or parent session already covers a restart.
-                check_restart: boot_pin && !alarm && !power_pin,
+                check_restart: restart,
             })
         }
+        WakeInput::Timer => Ok(WakeDecision {
+            refresh_daily: false,
+            sample_battery: true,
+            check_parent_session: false,
+            check_restart: false,
+        }),
         WakeInput::Ext1 { .. } | WakeInput::Other => Err(UnexpectedWake),
     }
 }
@@ -127,6 +147,8 @@ pub const fn select_sleep_wake_sources(
 
 #[cfg(test)]
 mod tests {
+    use pokeviewer_core::BatteryState;
+
     use super::{
         SleepWakeSources, WakeDecision, WakeInput, decide_wake, select_sleep_wake_sources,
     };
@@ -248,7 +270,7 @@ mod tests {
             }),
             Ok(WakeDecision {
                 refresh_daily: false,
-                sample_battery: false,
+                sample_battery: true,
                 check_parent_session: false,
                 check_restart: true,
             })
@@ -316,5 +338,55 @@ mod tests {
             select_sleep_wake_sources(lines(false, false, true), lines(false, false, true)),
             lines(false, false, false)
         );
+    }
+
+    #[test]
+    fn timer_wake_samples_the_battery_without_daily_or_button_work() {
+        assert_eq!(
+            decide_wake(WakeInput::Timer),
+            Ok(WakeDecision {
+                refresh_daily: false,
+                sample_battery: true,
+                check_parent_session: false,
+                check_restart: false,
+            })
+        );
+    }
+
+    #[test]
+    fn timer_check_redraws_only_when_the_battery_state_changes() {
+        let timer = decide_wake(WakeInput::Timer).unwrap();
+        for state in [
+            BatteryState::Normal,
+            BatteryState::Recharge,
+            BatteryState::Unavailable,
+        ] {
+            assert!(!timer.refresh_required(state, state));
+        }
+        assert!(timer.refresh_required(BatteryState::Recharge, BatteryState::Normal));
+        assert!(timer.refresh_required(BatteryState::Normal, BatteryState::Recharge));
+        assert!(timer.refresh_required(BatteryState::Normal, BatteryState::Unavailable));
+    }
+
+    #[test]
+    fn alarm_reset_and_restart_always_redraw() {
+        let restart = decide_wake(WakeInput::Ext1 {
+            rtc_pin: false,
+            power_pin: false,
+            boot_pin: true,
+            alarm_pending: false,
+        })
+        .unwrap();
+        let alarm = decide_wake(WakeInput::Ext1 {
+            rtc_pin: true,
+            power_pin: false,
+            boot_pin: false,
+            alarm_pending: true,
+        })
+        .unwrap();
+        let reset = decide_wake(WakeInput::Reset).unwrap();
+        for decision in [restart, alarm, reset] {
+            assert!(decision.refresh_required(BatteryState::Normal, BatteryState::Normal));
+        }
     }
 }

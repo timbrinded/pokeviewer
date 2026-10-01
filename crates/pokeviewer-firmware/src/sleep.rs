@@ -22,6 +22,8 @@ pub(crate) const BOOT_BUTTON_WAKE_BIT: u32 = 1 << 0;
 pub(crate) const RTC_INTERRUPT_WAKE_BIT: u32 = 1 << 5;
 pub(crate) const POWER_BUTTON_WAKE_BIT: u32 = 1 << 18;
 const WAKE_RELEASE_POLLS: u32 = 200;
+// Each check costs a short boot without a panel refresh; see ADR 0011.
+const BATTERY_CHECK_INTERVAL: Duration = Duration::from_hours(3);
 const WAKE_RELEASE_POLL_MS: u32 = 50;
 
 macro_rules! held_high_restorer {
@@ -55,11 +57,14 @@ pub(crate) struct SleepResources {
 impl SleepResources {
     /// Enter deep sleep until an adult holds BOOT to restart the firmware.
     pub(crate) fn sleep_until_restart(self) -> ! {
-        self.sleep_ext1(SleepWakeSources {
-            rtc_alarm: false,
-            power_button: false,
-            boot_button: true,
-        })
+        self.sleep_ext1(
+            SleepWakeSources {
+                rtc_alarm: false,
+                power_button: false,
+                boot_button: true,
+            },
+            None,
+        )
     }
 
     /// Enter deep sleep with only the ESP32-S3 RTC timer as a wake source.
@@ -96,13 +101,17 @@ impl SleepResources {
         low_power.sleep_deep(&[]);
     }
 
-    /// Enter deep sleep until the RTC alarm, PWR, or BOOT becomes active-low.
+    /// Enter deep sleep until the RTC alarm, PWR, BOOT, or the periodic
+    /// battery-check timer wakes the board.
     pub(crate) fn sleep(self) -> ! {
-        self.sleep_ext1(SleepWakeSources {
-            rtc_alarm: true,
-            power_button: true,
-            boot_button: true,
-        })
+        self.sleep_ext1(
+            SleepWakeSources {
+                rtc_alarm: true,
+                power_button: true,
+                boot_button: true,
+            },
+            Some(BATTERY_CHECK_INTERVAL),
+        )
     }
 
     /// Enter deep sleep until only the RTC alarm becomes active-low.
@@ -110,23 +119,29 @@ impl SleepResources {
     /// The alarm-wake diagnostic uses this so a button press cannot be mistaken
     /// for an alarm wake.
     pub(crate) fn sleep_for_alarm(self) -> ! {
-        self.sleep_ext1(SleepWakeSources {
-            rtc_alarm: true,
-            power_button: false,
-            boot_button: false,
-        })
+        self.sleep_ext1(
+            SleepWakeSources {
+                rtc_alarm: true,
+                power_button: false,
+                boot_button: false,
+            },
+            None,
+        )
     }
 
     /// Enter deep sleep until PWR or BOOT becomes active-low.
     pub(crate) fn sleep_for_setup(self) -> ! {
-        self.sleep_ext1(SleepWakeSources {
-            rtc_alarm: false,
-            power_button: true,
-            boot_button: true,
-        })
+        self.sleep_ext1(
+            SleepWakeSources {
+                rtc_alarm: false,
+                power_button: true,
+                boot_button: true,
+            },
+            None,
+        )
     }
 
-    fn sleep_ext1(self, requested: SleepWakeSources) -> ! {
+    fn sleep_ext1(self, requested: SleepWakeSources, battery_check: Option<Duration>) -> ! {
         let Self {
             mut boot_button,
             mut rtc_interrupt,
@@ -189,13 +204,20 @@ impl SleepResources {
         candidates.sort_unstable_by_key(|(armed, _)| !*armed);
         let armed_count = candidates.iter().filter(|(armed, _)| *armed).count();
         let mut wake_pins = candidates.map(|(_, pin)| pin);
-        if armed_count == 0 {
-            delay.delay_ms(100);
-            low_power.sleep_deep(&[]);
-        }
-        let wake = Ext1WakeupSource::new(&mut wake_pins[..armed_count], WakeupLevel::Low);
+        let timer = battery_check.map(TimerWakeupSource::new);
         delay.delay_ms(100);
-        low_power.sleep_deep(&[&wake]);
+        match (armed_count, &timer) {
+            (0, None) => low_power.sleep_deep(&[]),
+            (0, Some(timer)) => low_power.sleep_deep(&[timer]),
+            (_, None) => {
+                let wake = Ext1WakeupSource::new(&mut wake_pins[..armed_count], WakeupLevel::Low);
+                low_power.sleep_deep(&[&wake]);
+            }
+            (_, Some(timer)) => {
+                let wake = Ext1WakeupSource::new(&mut wake_pins[..armed_count], WakeupLevel::Low);
+                low_power.sleep_deep(&[&wake, timer]);
+            }
+        }
     }
 }
 
