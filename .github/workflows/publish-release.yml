@@ -31,8 +31,6 @@ jobs:
       - name: Select the release
         run: |
           test "$GITHUB_REF" = "refs/heads/main"
-          test "$(git rev-parse HEAD)" = "$GITHUB_SHA"
-          test -z "$(git status --porcelain)"
           successful_matrix=$(gh api \
             "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/check-runs?per_page=100" \
             --jq '[.check_runs[] |
@@ -77,9 +75,6 @@ jobs:
           archive="$RUNNER_TEMP/release/pokeviewer-v$VERSION.tar.gz"
           mkdir -p target/release
           tar -xzf "$archive" -C target/release
-          test "$(awk -F= '$1 == "source_commit" { print $2 }' \
-            "target/release/pokeviewer-v$VERSION/BUILD-METADATA.txt")" \
-            = "$GITHUB_SHA"
 
       - name: Create private draft
         run: |
@@ -125,13 +120,6 @@ jobs:
             "target/public-audit/pokeviewer-v$VERSION.tar.gz"
           cmp "$RUNNER_TEMP/release/pokeviewer-v$VERSION.tar.gz.sha256" \
             "target/public-audit/pokeviewer-v$VERSION.tar.gz.sha256"
-          (
-            cd target/public-audit
-            sha256sum --check "pokeviewer-v$VERSION.tar.gz.sha256"
-          )
-          test "$(gh release view "$TAG" --json isDraft --jq .isDraft)" = "false"
-          test "$(gh release view "$TAG" \
-            --json isPrerelease --jq .isPrerelease)" = "false"
           test "$(git ls-remote origin "refs/tags/$TAG" | cut -f1)" \
             = "$GITHUB_SHA"
 

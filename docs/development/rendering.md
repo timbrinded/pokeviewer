@@ -1,4 +1,4 @@
-# Shared renderer
+# Renderer and visual goldens
 
 The `pokeviewer-core` renderer is the single source of framebuffer bytes for
 host screenshots and supported-board firmware. It has no board, filesystem,
@@ -13,7 +13,8 @@ writer inverts those bytes because raw PBM uses `1` for black; the one-bit PNG
 writer uses the panel bytes directly.
 
 `render_daily_card` accepts only a typed `DailyCard`: one `Weekday`, a borrowed
-English name, one or two `PokemonType` values, and a borrowed fixed-size sprite.
+English name, one or two `PokemonType` values, a borrowed fixed-size sprite,
+and one battery state: `Normal`, `Recharge`, or `Unavailable`.
 It validates the complete input before clearing or drawing. Empty, oversized,
 unsupported, duplicate-type, or over-wide input returns a bounded
 `RenderError` and leaves the prior framebuffer unchanged.
@@ -21,6 +22,11 @@ unsupported, duplicate-type, or over-wide input returns a bounded
 The fixed font covers the complete committed v1 name vocabulary, including the
 curly apostrophe and the female and male signs. An exhaustive host test renders
 all 151 committed records.
+
+The renderer does not derive battery state from voltage. `Normal` shows no
+battery text or icon, `Recharge` shows the lightning icon and `CHARGE!` at the
+bottom, and `Unavailable` shows `BAT ?` in the top-right corner. The card
+contains no battery percentage.
 
 ## Memory report
 
@@ -36,22 +42,45 @@ all 151 committed records.
 Rasterization uses only bounded scalar loop state. It never copies the font,
 name, or sprite into a temporary buffer.
 
-## Host evidence
+## Visual goldens
 
-Generate deterministic representative PBM and one-bit PNG files with:
-
-```console
-cargo xtask render-samples target/render-samples
-```
-
-The committed [baseline evidence](../evidence/renderer-baseline/README.md)
-contains Pikachu, Charizard, Farfetch’d, and Nidoran♀. These exercise
-single/dual types, short/long names, punctuation, a non-ASCII glyph, and
-different source-sprite dimensions. Visual styling is reviewed and locked by
-the separate daily-card design issue.
-
-Generate the full row-major 151-card review sheet with:
+The goldens in `tests/goldens` are raw 5,000-byte framebuffers, so a check
+compares exact panel bytes rather than screenshots. They cover every weekday,
+layout edge cases, and the `Recharge` and `Unavailable` battery states. The
+[goldens README](../../tests/goldens/README.md) lists the cases.
 
 ```console
-cargo xtask render-contact-sheet target/all-cards-contact-sheet.png
+cargo xtask golden-check target/visual-diff
 ```
+
+The check renders each case from the committed pack and fails if any pixel
+differs. For each changed case it writes `*-expected.png`, `*-actual.png`,
+`*-diff.png` (black where pixels differ), and `*-report.txt` with the changed
+coordinates and hashes. CI uploads this directory as `visual-diff`.
+
+After a reviewed design change, regenerate the goldens and review every PNG
+and the manifest diff before you commit:
+
+```console
+cargo xtask golden-update
+cargo xtask golden-check target/visual-diff
+```
+
+`cargo xtask golden-demo-failure DIR` flips one pixel to show what a failure
+looks like; the [committed example](../evidence/golden-failure/README.md) was
+made this way.
+
+## Review images
+
+These commands regenerate the committed review images:
+
+```console
+cargo xtask render-samples docs/evidence/renderer-baseline
+cargo xtask render-contact-sheet docs/evidence/daily-card-v1/all-cards-contact-sheet.png
+cargo xtask render-setup-screen docs/evidence/setup-screen/invalid-rtc-setup.png
+cargo xtask render-recovery-screens docs/evidence/recovery-screens
+```
+
+CI compares only the recovery screens byte for byte; the other images are
+review aids. The [daily-card design](../design/daily-card-v1.md) explains the
+layout.

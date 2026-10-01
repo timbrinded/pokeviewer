@@ -1,39 +1,59 @@
-# Adult troubleshooting and recovery
+# Troubleshooting and recovery
 
-Do not repeatedly reset a warm, damaged, wet, or swollen device. Disconnect
-power if safe and follow the [safety guide](safety.md).
+Do not restart a device that is warm, damaged, wet, or swollen. Disconnect
+power if it is safe to do so and follow the [safety guide](safety.md).
 
-| Screen/code | Meaning | Adult action |
+## Screens
+
+An error screen shows `POKEVIEWER ERROR`, a code, and an action.
+
+| Screen | Meaning | What to do |
 | --- | --- | --- |
-| `RTC` setup | stopped, unreadable, or invalid clock | connect USB; run `set-rtc`; require matching read-back |
-| `PACK` / `REFLASH` | compiled content is corrupt or incompatible | verify and cleanly reinstall the exact release |
-| `PANEL` / `RESET` | panel init, BUSY, or full refresh failed | disconnect battery; inspect panel connector; reset once |
-| `ALARM` / `RESET` | next 07:00 alarm could not be armed | connect USB; inspect diagnostics/RTC; reset once |
-| `WAKE` / `RESET` | unsupported wake source | reset once; qualify wiring if repeated |
+| `SET TIME` | The clock is stopped, unreadable, or invalid, or a computer session is open. | [Set the time](../README.md#change-the-time-later). If the clock is unset and the green light is off, hold `BOOT` for one second to start another two-minute wait. |
+| `PACK` / `REFLASH` | The compiled content is corrupt or incompatible. | Verify the release again and reflash it. |
+| `ALARM` / `RESET` | The next 07:00 alarm could not be set. | Hold `BOOT` for one second. If it returns, check the clock with `get-rtc`. |
+| `WAKE` / `RESET` | The device woke for an unexpected reason. | Hold `BOOT` for one second. |
+| Old card, `PWR` does nothing | Possible panel failure. A failed panel cannot show its own error. | Disconnect the battery, check the panel connector, reconnect, and hold `BOOT` for one second. |
 
-Terminal failures other than USB-capable RTC setup enter no-wake deep sleep
-after one bounded attempt. They do not automatically reset, refresh, or retry;
-use an external reset or power cycle only after completing the documented
-adult action. A panel failure leaves the prior card visible because the failed
-output path cannot reliably display its own code.
+After an error screen, the device sleeps until `BOOT` is held for one second.
+It does not retry by itself, and `PWR` does nothing. The green light flashes
+once when the restart is accepted. The restart runs the failed step once more.
 
-## Common setup failures
+If the same error returns after one restart, stop and report it in a GitHub
+issue with the screen code. Do not include photographs of a child, your home,
+or full device logs.
 
-- `failed to open selected serial device`: reconnect USB, confirm the explicit
-  path locally, and fix normal device-group membership. Do not use `chmod 666`.
-- `timed out waiting for device response`: confirm release firmware is running,
-  use a data-capable direct cable, and retry one command.
-- invalid datetime: use local `YYYY-MM-DDTHH:MM:SS` with a real date in
-  2000–2099.
-- prior card before 07:00: expected passive display-day behavior, not a fault.
-- old card after complete power loss: e-paper retention does not prove RTC
-  validity; connect USB and read/set the clock.
-- no touch response: expected; the supported SKU has no touch controller.
-- no network setup: expected; v1 is fully offline.
-- USB repeatedly disappears and returns after an attempted sleep: invalid sleep
-  behavior, not proof of a valid wake; record the interval and return to the
-  awake baseline.
+## Clock lost after the battery ran flat
 
-If a fault repeats after one reset, stop. Preserve only sanitized codes and
-hashes, then use the
-[optional hardware validation guide](hardware/validation.md).
+If the battery runs completely flat, the clock can stop. The last card stays
+visible on the e-paper, but the device will not change it. Charge the battery
+under supervision, then set the time as described in the
+[README](../README.md#change-the-time-later).
+
+## Command errors
+
+- `permission denied for selected serial device` or
+  `failed to open selected serial device`: reconnect USB, check the device
+  path, and add your account to the serial-device group as described in the
+  README. Do not use `sudo` or `chmod 666`.
+- `timed out waiting for selected serial device`: the device path did not
+  appear within 60 seconds. Start the command again, then hold `PWR` for three
+  seconds within that time.
+- `timed out waiting for device response`: use a data-capable cable connected
+  directly to the computer and run the command once more.
+- Invalid datetime: use local `YYYY-MM-DDTHH:MM:SS` with a real date from 2000
+  to 2099.
+
+## Expected behavior
+
+- The previous day's card stays visible until 07:00.
+- The board has no touchscreen and no network setup.
+- A short press of `PWR` or `BOOT` does not change the screen.
+
+## Clean reinstall
+
+Follow the [quick start](../README.md#quick-start) from step 2: verify the
+release, disconnect the battery, flash, start the firmware, and set the time.
+Connect the battery before you disconnect USB.
+
+The device has no over-the-air update.

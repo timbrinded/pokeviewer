@@ -16,6 +16,7 @@ use portable_atomic::{AtomicU32, Ordering};
 
 use crate::{
     FailureKind, LocalDateTime, Pcf85063Rtc, Rtc,
+    battery::{diagnostic_flags, load_retained_battery},
     es8311::suspend_audio_codec,
     panel::{PanelDiagnostic, refresh_panel_frame, run_panel_diagnostics},
     render_failure_screen,
@@ -96,7 +97,7 @@ pub fn run_failure_diagnostic(failure: FailureKind) -> ! {
 
     let policy = failure.policy();
     esp_println::println!(
-        "failure diagnostic; injected_code={}; display_refreshed={display_refreshed}; retained_prior_frame={}; codec_suspended={codec_suspended}; attempts={}; terminal_deep_sleep=true; wake_sources=none",
+        "failure diagnostic; injected_code={}; display_refreshed={display_refreshed}; retained_prior_frame={}; codec_suspended={codec_suspended}; attempts={}; terminal_deep_sleep=true; wake_sources=ext1_gpio0",
         policy.code,
         failure == FailureKind::Panel,
         policy.max_attempts,
@@ -105,6 +106,7 @@ pub fn run_failure_diagnostic(failure: FailureKind) -> ! {
     drop(power_latch);
     drop(audio_power);
     SleepResources {
+        boot_button: peripherals.GPIO0,
         rtc_interrupt: peripherals.GPIO5,
         power_button: peripherals.GPIO18,
         panel_power: panel_power_pin,
@@ -112,7 +114,7 @@ pub fn run_failure_diagnostic(failure: FailureKind) -> ! {
         audio_power: audio_power_pin,
         low_power: peripherals.LPWR,
     }
-    .sleep_without_wake();
+    .sleep_until_restart();
 }
 
 /// Refresh one frame, validate RTC state, and enter active-low RTC deep sleep.
@@ -181,7 +183,7 @@ pub fn run_sleep_diagnostic() -> ! {
                 report.rtc_datetime.second,
                 report.alarm_was_pending,
             );
-            resources.sleep();
+            resources.sleep_for_alarm();
         }
         Err(error) => {
             let mut delay = Delay::new();
@@ -228,6 +230,7 @@ pub fn run_timer_sleep_diagnostic() -> ! {
             drop(power_latch);
             drop(audio_power);
             SleepResources {
+                boot_button: peripherals.GPIO0,
                 rtc_interrupt: peripherals.GPIO5,
                 power_button: peripherals.GPIO18,
                 panel_power: panel_power_pin,
@@ -380,9 +383,10 @@ pub fn run_usb_provisioning() -> ! {
     }
     let mut rtc = Pcf85063Rtc::new(i2c);
     let mut transport = UsbProtocolTransport::new(peripherals.USB_DEVICE);
+    let battery = load_retained_battery();
     let mut delay = Delay::new();
     loop {
-        if block_on(transport.poll(&mut rtc, 0, false)).is_err() {
+        if block_on(transport.poll(&mut rtc, diagnostic_flags(battery), battery, false)).is_err() {
             transport.reset_partial_frame();
         }
         delay.delay_ms(1);
@@ -438,6 +442,7 @@ fn run_board_diagnostics(
         (
             report,
             SleepResources {
+                boot_button: peripherals.GPIO0,
                 rtc_interrupt: peripherals.GPIO5,
                 power_button: peripherals.GPIO18,
                 panel_power: panel_power_pin,

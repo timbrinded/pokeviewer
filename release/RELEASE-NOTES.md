@@ -1,4 +1,4 @@
-# Pokeviewer v1.1.0
+# Pokeviewer v1.2.0
 
 Pokeviewer is a battery-powered, fully offline Pokémon-of-the-day display for
 the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 development board.
@@ -8,15 +8,26 @@ canonical type or types. The selection changes deterministically at 07:00
 local time. There is no runtime internet, Wi-Fi, BLE, touch, account, location,
 SD-card, or over-the-air update dependency.
 
-This release adds a parent session. Connect USB and hold `PWR` for three
-seconds to change the time or enter storage mode. A short `PWR` press has no
-visible effect. The `BOOT` button is for service and flashing only.
+The release includes the parent session introduced in v1.1.0. Connect USB and
+hold `PWR` for three seconds to change the time or enter storage mode. A short
+`PWR` press has no visible effect. The green light now turns on when the
+three-second hold is recognized.
 
-The display shows an approximate battery value in 10 percent steps. A
-lightning icon and `CHARGE!` appear below the low threshold. The value uses a
-generic LiPo voltage curve. It is not a fuel gauge or a safety control. USB
-operation with no battery can show `100%` because the board has no dedicated
-USB-power sense input.
+A one-second `BOOT` hold now restarts the firmware and redraws the screen. This
+works from every error screen, so recovery no longer requires opening the
+device. Firmware also puts the unused SHTC3 sensor to sleep and no longer stays
+awake indefinitely when a button is held at sleep entry.
+
+The display now shows `Normal`, `Recharge`, or `Unavailable` battery state
+instead of a percentage. `Normal` has no battery text or icon, `Recharge`
+shows the existing lightning icon and `CHARGE!`, and `Unavailable` shows
+`BAT ?`. `Recharge` enters below 3,750 mV and clears at or above 3,850 mV.
+The battery is measured every three hours, at 07:00, and on a one-second
+`BOOT` hold, and the card redraws only when the state changes, so `CHARGE!`
+clears within three hours of charging. The new
+`pokeviewerctl get-battery` command reports that snapshot as state and bounded
+cell millivolts. It does not report precise capacity and does not take a new
+PWR-session sample.
 
 Storage mode clears the RTC and turns off the board. The next start requires
 time setup. Complete RTC power loss also requires an adult to connect USB and

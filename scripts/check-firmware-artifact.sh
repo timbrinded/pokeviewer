@@ -3,9 +3,9 @@ set -euo pipefail
 
 firmware=${1:?usage: check-firmware-artifact.sh FIRMWARE OUTPUT_DIR}
 output_dir=${2:?usage: check-firmware-artifact.sh FIRMWARE OUTPUT_DIR}
-text_max=${FIRMWARE_TEXT_MAX:-200000}
-data_max=${FIRMWARE_DATA_MAX:-16384}
-pack_max=${CONTENT_PACK_MAX:-65536}
+readonly text_max=200000
+readonly data_max=16384
+readonly pack_max=65536
 
 mkdir -p "$output_dir/sections"
 read -r text data _ _ _ < <(xtensa-esp-elf-size "$firmware" | tail -n 1)
@@ -14,6 +14,11 @@ entry=$(readelf -h "$firmware" | awk '/Entry point address:/ { print $4 }')
 
 if [[ "$entry" == "0x0" || -z "$entry" ]]; then
   echo "firmware has no executable entry point" >&2
+  exit 1
+fi
+# A misread size would make the budget checks below pass vacuously.
+if [[ ! "$text" =~ ^[1-9][0-9]*$ || ! "$data" =~ ^[0-9]+$ ]]; then
+  echo "could not read firmware section sizes" >&2
   exit 1
 fi
 if (( text > text_max )); then

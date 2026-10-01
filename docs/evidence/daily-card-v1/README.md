@@ -18,8 +18,8 @@ cargo xtask render-contact-sheet \
 | Cards | 151 |
 | Sheet dimensions | 2,072 × 3,320 pixels |
 | PNG format | one-bit grayscale, non-interlaced |
-| SHA-256 | `8ee884bbd856dcda64c30b8239bba42e211057f04eb4861064a9b14f85000c74` |
-| Visual inspection | content revision 2 reviewed at native pixels on 2026-07-28 |
+| SHA-256 | `bb0d6ab4646687f83105da4ceab05f0cb7a4eac216e183dbb72baba76a568e2a` |
+| Visual inspection | content revision 2 and renderer revision 3 reviewed at native pixels on 2026-08-10 |
 | Physical panel/print review | pending hardware qualification |
 
 The companion `actual-size-review.html` provides four representative cards at

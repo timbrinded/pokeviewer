@@ -3,7 +3,7 @@
 pub(crate) const WIDTH: usize = 5;
 pub(crate) const HEIGHT: usize = 7;
 
-const GLYPHS: [[u8; HEIGHT]; 46] = [
+const GLYPHS: [[u8; HEIGHT]; 45] = [
     [0x0e, 0x11, 0x11, 0x1f, 0x11, 0x11, 0x11], // A
     [0x1e, 0x11, 0x11, 0x1e, 0x11, 0x11, 0x1e], // B
     [0x0f, 0x10, 0x10, 0x10, 0x10, 0x10, 0x0f], // C
@@ -49,7 +49,6 @@ const GLYPHS: [[u8; HEIGHT]; 46] = [
     [0x0e, 0x11, 0x11, 0x0f, 0x01, 0x01, 0x0e], // 9
     [0x0e, 0x11, 0x01, 0x02, 0x04, 0x00, 0x04], // ?
     [0x04, 0x04, 0x04, 0x04, 0x04, 0x00, 0x04], // !
-    [0x18, 0x19, 0x02, 0x04, 0x08, 0x13, 0x03], // %
 ];
 
 pub(crate) fn glyph(character: char) -> Option<&'static [u8; HEIGHT]> {
@@ -66,7 +65,6 @@ pub(crate) fn glyph(character: char) -> Option<&'static [u8; HEIGHT]> {
         '0'..='9' => 33 + usize::from(character as u8 - b'0'),
         '?' => 43,
         '!' => 44,
-        '%' => 45,
         _ => return None,
     };
     GLYPHS.get(index)
@@ -78,10 +76,11 @@ mod tests {
 
     #[test]
     fn complete_v1_character_set_has_fixed_storage() {
-        assert_eq!(core::mem::size_of_val(&GLYPHS), 46 * HEIGHT);
-        for character in "ABCDEFGHIJKLMNOPQRSTUVWXYZ -.'’/♀♂0123456789?!%".chars() {
+        assert_eq!(core::mem::size_of_val(&GLYPHS), 45 * HEIGHT);
+        for character in "ABCDEFGHIJKLMNOPQRSTUVWXYZ -.'’/♀♂0123456789?!".chars() {
             assert!(glyph(character).is_some());
         }
         assert!(glyph('@').is_none());
+        assert!(glyph('%').is_none());
     }
 }

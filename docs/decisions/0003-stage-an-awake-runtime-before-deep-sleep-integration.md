@@ -133,7 +133,6 @@ sleep, RTC alarm wake, battery operation, or v1 release.
 
 ## More Information
 
-- [On-device daily-card integration](../development/on-device-integration.md)
-- [RTC wake and deep-sleep qualification](../hardware/deep-sleep-qualification.md)
+- [Sleep diagnostics](../hardware/validation.md#diagnostic-images)
 - [07:00 runtime state machine](../hardware/wake-sleep-state-machine.md)
 - [ADR 0004](0004-use-esp-idf-aligned-rtc-deep-sleep.md)

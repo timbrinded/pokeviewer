@@ -7,6 +7,11 @@ decision-makers:
 
 # Use ESP-IDF-aligned RTC deep sleep
 
+The EXT0 wake described here became EXT1 in
+[ADR 0006](0006-use-pwr-gated-parent-setup-and-storage-mode.md), and
+[ADR 0008](0008-publish-releases-from-one-verified-workflow.md) removed the
+release gates named under Confirmation. The sleep-entry decision is unchanged.
+
 ## Context and Problem Statement
 
 ADR 0003 deliberately kept production awake until each low-power boundary
@@ -119,7 +124,7 @@ the release battery-capacity calculation remain separate release gates.
 ## More Information
 
 - [ADR 0003](0003-stage-an-awake-runtime-before-deep-sleep-integration.md)
-- [RTC wake and deep-sleep qualification](../hardware/deep-sleep-qualification.md)
+- [Sleep diagnostics](../hardware/validation.md#diagnostic-images)
 - [07:00 runtime state machine](../hardware/wake-sleep-state-machine.md)
 - [ADR 0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md)
   supersedes the awake terminal-failure behavior; normal RTC wake is unchanged.

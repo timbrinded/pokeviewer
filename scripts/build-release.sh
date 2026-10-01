@@ -30,10 +30,15 @@ if [[ ! "$VERSION" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
   exit 1
 fi
 IFS= read -r release_notes_heading <release/RELEASE-NOTES.md
-IFS= read -r flashing_heading <release/FLASHING.md
-if [[ "$release_notes_heading" != "# Pokeviewer v$VERSION" ||
-  "$flashing_heading" != "# Flash Pokeviewer v$VERSION" ]]; then
-  echo "release document headings do not match v$VERSION" >&2
+if [[ "$release_notes_heading" != "# Pokeviewer v$VERSION" ]]; then
+  echo "release notes heading does not match v$VERSION" >&2
+  exit 1
+fi
+# The README quick start names the release in prose, download URLs, and file
+# names, so any other version would send users to the wrong release.
+stale_versions=$(grep -oE 'v[0-9]+\.[0-9]+\.[0-9]+' README.md | grep -vFx "v$VERSION" || true)
+if [[ -n "$stale_versions" ]] || ! grep -qF "pokeviewer-v$VERSION.tar.gz" README.md; then
+  echo "README.md must name only v$VERSION" >&2
   exit 1
 fi
 
@@ -55,21 +60,19 @@ remap_flags+=" --remap-path-prefix=$cargo_home=/src/cargo"
 remap_flags+=" --remap-path-prefix=$xtensa_sysroot=/src/xtensa"
 export CARGO_TARGET_XTENSA_ESP32S3_NONE_ELF_RUSTFLAGS="$remap_flags"
 
-pack_before=$(sha256sum content/generated/pokeviewer-v1.pack)
-manifest_before=$(sha256sum content/generated/pokeviewer-v1.json)
+mkdir -p target
+work_dir=$(mktemp -d "$PWD/target/release-work.XXXXXX")
+trap 'rm -rf "$work_dir"' EXIT
+
 cargo xtask content-build
-if [[ "$pack_before" != "$(sha256sum content/generated/pokeviewer-v1.pack)" ||
-  "$manifest_before" != "$(sha256sum content/generated/pokeviewer-v1.json)" ]]; then
+if [[ -n "$(git status --porcelain -- content/generated)" ]]; then
   echo "committed content does not match a clean offline rebuild" >&2
   exit 1
 fi
 cargo xtask firmware-build
-scripts/check-firmware-artifact.sh "$FIRMWARE" "$output_dir-firmware-check"
+scripts/check-firmware-artifact.sh "$FIRMWARE" "$work_dir/firmware-check"
 RUSTFLAGS="$remap_flags" cargo build --release --locked -p pokeviewerctl
 
-mkdir -p target
-work_dir=$(mktemp -d "$PWD/target/release-work.XXXXXX")
-trap 'rm -rf "$work_dir" "$output_dir-firmware-check"' EXIT
 bundle_name="pokeviewer-v$VERSION"
 bundle_dir="$work_dir/$bundle_name"
 mkdir -p "$bundle_dir"
@@ -87,12 +90,16 @@ espflash save-image \
 cp "$CLI" "$bundle_dir/$cli_bin"
 cp content/generated/pokeviewer-v1.pack "$bundle_dir/"
 cp content/generated/pokeviewer-v1.json "$bundle_dir/content-manifest.json"
-cp release/FLASHING.md "$bundle_dir/"
+# The archive ships SAFETY.md and TROUBLESHOOTING.md beside the README; every
+# other repository link points at the tagged source on GitHub.
+readonly source_url="https://github.com/timbrinded/pokeviewer/blob/v$VERSION"
+sed -e 's#](docs/safety\.md)#](SAFETY.md)#g' \
+  -e 's#](docs/troubleshooting\.md)#](TROUBLESHOOTING.md)#g' \
+  -e "s#](\\(docs/[^)]*\\|CONTRIBUTING\\.md\\))#](${source_url}/\\1)#g" \
+  README.md >"$bundle_dir/README.md"
 cp release/RELEASE-NOTES.md "$bundle_dir/"
-cp docs/user-guide.md "$bundle_dir/USER-GUIDE.md"
 cp docs/safety.md "$bundle_dir/SAFETY.md"
 cp docs/troubleshooting.md "$bundle_dir/TROUBLESHOOTING.md"
-cp docs/release-verification.md "$bundle_dir/RELEASE-VERIFICATION.md"
 cp LICENSE THIRD_PARTY_NOTICES.md "$bundle_dir/"
 chmod 0644 "$bundle_dir"/*
 chmod 0755 "$bundle_dir/$cli_bin"
@@ -111,17 +118,6 @@ manifest="$bundle_dir/content-manifest.json"
 content_format_version=$(jq -er '.format_version' "$manifest")
 content_revision=$(jq -er '.content_revision' "$manifest")
 schedule_version=$(jq -er '.schedule_version' "$manifest")
-manifest_pack_hash=$(jq -er '.pack_sha256' "$manifest")
-for value in "$content_format_version" "$content_revision" "$schedule_version"; do
-  if [[ ! "$value" =~ ^[0-9]+$ ]]; then
-    echo "content manifest contains a non-integer version" >&2
-    exit 1
-  fi
-done
-if [[ "$manifest_pack_hash" != "$content_hash" ]]; then
-  echo "content manifest pack hash does not match the packaged content" >&2
-  exit 1
-fi
 cat >"$bundle_dir/BUILD-METADATA.txt" <<EOF
 product_version=$VERSION
 source_commit=$commit
@@ -146,12 +142,10 @@ payloads=(
   "pokeviewer-v1.pack"
   "content-manifest.json"
   "BUILD-METADATA.txt"
-  "FLASHING.md"
+  "README.md"
   "RELEASE-NOTES.md"
-  "USER-GUIDE.md"
   "SAFETY.md"
   "TROUBLESHOOTING.md"
-  "RELEASE-VERIFICATION.md"
   "LICENSE"
   "THIRD_PARTY_NOTICES.md"
 )

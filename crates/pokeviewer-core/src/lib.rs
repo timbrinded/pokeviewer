@@ -11,14 +11,17 @@ mod render;
 mod schedule;
 
 pub use battery::{
-    BATTERY_SAMPLE_COUNT, BatteryEstimate, BatteryStatus, GENERIC_LIPO_OCV_UV, estimate_battery,
-    filtered_battery_mv,
+    BATTERY_SAMPLE_COUNT, BATTERY_SNAPSHOT_BYTES, BATTERY_SNAPSHOT_VERSION, BatteryError,
+    BatteryReading, BatteryState, CLEAR_RECHARGE_MV, ENTER_RECHARGE_MV, MAX_BATTERY_MV,
+    MIN_BATTERY_MV, decode_battery_snapshot, encode_battery_snapshot, filtered_battery_mv,
+    update_battery_reading,
 };
 pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
 pub use protocol::{
-    CAP_DIAGNOSTICS, CAP_ENTER_STORAGE, CAP_HANDSHAKE, CAP_READ_RTC, CAP_SET_RTC, CAPABILITIES,
-    Command, EncodedFrame, FIRMWARE_VERSION, FrameAccumulator, FrameError, FrameKind,
-    ProtocolFrame, Status, decode_datetime, encode_datetime,
+    BATTERY_PAYLOAD_BYTES, CAP_DIAGNOSTICS, CAP_ENTER_STORAGE, CAP_HANDSHAKE, CAP_READ_BATTERY,
+    CAP_READ_RTC, CAP_SET_RTC, CAPABILITIES, Command, EncodedFrame, FIRMWARE_VERSION,
+    FrameAccumulator, FrameError, FrameKind, ProtocolFrame, Status, decode_battery_reading,
+    decode_datetime, encode_battery_reading, encode_datetime,
 };
 pub use recovery::{RecoveryState, SetupReason, assess_rtc};
 pub use render::{

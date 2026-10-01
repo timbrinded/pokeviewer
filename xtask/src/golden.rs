@@ -39,7 +39,7 @@ pub(crate) fn update_command() -> TaskResult {
     let mut cases = Vec::with_capacity(CASES.len());
     for spec in CASES {
         let framebuffer =
-            render_record_with_battery(&pack, spec.dex_id, spec.weekday, spec.battery_status)?;
+            render_record_with_battery(&pack, spec.dex_id, spec.weekday, spec.battery_state)?;
         let raw_relative = format!("cards/{}.bin", spec.slug);
         let png_relative = format!("cards/{}.png", spec.slug);
         let raw_path = root.join(&raw_relative);
@@ -62,7 +62,7 @@ pub(crate) fn update_command() -> TaskResult {
             dex_id: spec.dex_id,
             name: record.name.to_owned(),
             weekday: weekday_label(spec.weekday).to_owned(),
-            battery_status: battery_label(spec.battery_status),
+            battery_state: battery_label(spec.battery_state).to_owned(),
             framebuffer_file: raw_relative,
             png_file: png_relative,
             framebuffer_crc32: format!("{:08x}", crc32fast::hash(framebuffer.as_bytes())),
@@ -73,8 +73,8 @@ pub(crate) fn update_command() -> TaskResult {
     write_json(
         &root.join("manifest.json"),
         &GoldenManifest {
-            schema_version: 2,
-            renderer_version: 2,
+            schema_version: 3,
+            renderer_version: 3,
             cases,
         },
     )?;
@@ -87,8 +87,8 @@ pub(crate) fn check_command(diff_dir: Option<&str>) -> TaskResult {
     let diff_dir = safe_relative_output(diff_dir.unwrap_or(DEFAULT_DIFF_DIR))?;
     clear_directory(&diff_dir)?;
     let manifest = read_manifest(&root.join("manifest.json"))?;
-    if manifest.schema_version != 2
-        || manifest.renderer_version != 2
+    if manifest.schema_version != 3
+        || manifest.renderer_version != 3
         || manifest.cases.len() != CASES.len()
     {
         return Err("golden manifest version or case count is unsupported".to_owned());
@@ -113,7 +113,7 @@ pub(crate) fn check_command(diff_dir: Option<&str>) -> TaskResult {
         validate_committed_hashes(root, committed, &expected)?;
 
         let actual =
-            render_record_with_battery(&pack, spec.dex_id, spec.weekday, spec.battery_status)?;
+            render_record_with_battery(&pack, spec.dex_id, spec.weekday, spec.battery_state)?;
         if expected != actual.as_bytes() {
             let changed_pixels = changed_pixel_count(&expected, actual.as_bytes());
             write_failure_artifacts(&diff_dir, spec.slug, &expected, actual.as_bytes())?;
@@ -144,7 +144,7 @@ pub(crate) fn demo_failure_command(output_dir: Option<&str>) -> TaskResult {
         &pack,
         CASES[0].dex_id,
         CASES[0].weekday,
-        CASES[0].battery_status,
+        CASES[0].battery_state,
     )?;
     let mut actual = expected.as_bytes().to_vec();
     actual[100 * (DISPLAY_WIDTH / 8) + 100 / 8] ^= 0x80 >> (100 % 8);
@@ -180,7 +180,7 @@ fn validate_case_metadata(
         || committed.dex_id != spec.dex_id
         || committed.name != expected_name
         || committed.weekday != weekday_label(spec.weekday)
-        || committed.battery_status != battery_label(spec.battery_status)
+        || committed.battery_state != battery_label(spec.battery_state)
         || committed.framebuffer_file != expected_raw
         || committed.png_file != expected_png
     {
@@ -195,17 +195,11 @@ fn validate_case_metadata(
     Ok(())
 }
 
-fn battery_label(status: pokeviewer_core::BatteryStatus) -> String {
-    match status {
-        pokeviewer_core::BatteryStatus::Estimated {
-            percent,
-            recharge: true,
-        } => format!("{percent}% recharge"),
-        pokeviewer_core::BatteryStatus::Estimated {
-            percent,
-            recharge: false,
-        } => format!("{percent}%"),
-        pokeviewer_core::BatteryStatus::Unavailable => "unavailable".to_owned(),
+const fn battery_label(state: pokeviewer_core::BatteryState) -> &'static str {
+    match state {
+        pokeviewer_core::BatteryState::Normal => "normal",
+        pokeviewer_core::BatteryState::Recharge => "recharge",
+        pokeviewer_core::BatteryState::Unavailable => "unavailable",
     }
 }
 

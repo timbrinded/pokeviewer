@@ -3,7 +3,6 @@
 - Status: accepted for v1
 - Design issue: [U14 / #15][issue-15]
 - Renderer: `pokeviewer-core::render_daily_card`
-- Last reviewed: 2026-07-28
 
 The selected card is a quiet, full-screen character card with exactly the four
 product-contract essentials. From top to bottom:
@@ -27,14 +26,17 @@ All coordinates are zero-based and the end value is exclusive:
 | Weekday | 3–17 | 106 pixels (`WEDNESDAY`) |
 | Sprite canvas | 21–133 | 112 pixels |
 | Name | 139–160 | 177 pixels (`FARFETCH’D`) |
-| Single type | 177–191 | 94 pixels |
-| Primary type | 166–180 | 94 pixels |
-| Secondary type | 183–197 | 94 pixels |
+| Single type | 173–187 | 94 pixels |
+| Primary type | 162–176 | 94 pixels |
+| Secondary type | 178–192 | 94 pixels |
+| `Recharge`: lightning icon and `CHARGE!` | 192–199 | 48 pixels, centered |
+| `Unavailable`: `BAT ?` | 3–10 | 29 pixels, 3 pixels from the right edge |
 
-The bands do not overlap. Each has white separation from its neighbors, and
-all content remains inside the 200 × 200 panel. The renderer tests derive these
-bounds from the production constants and audit all 151 committed records, so a
-future name, font, scale, or content change cannot silently truncate a label.
+The bands do not overlap, and all content stays inside the 200 × 200 panel.
+`BAT ?` shares rows with the weekday but sits to its right. The renderer tests
+derive these bounds from the production constants and check all 151 committed
+records, so a name, font, scale, or content change cannot silently truncate a
+label.
 
 ## Review evidence
 
@@ -45,18 +47,10 @@ The [four representative actual-pixel cards][baseline] cover:
 - Farfetch’d: the widest v1 name and punctuation; and
 - Nidoran♀: a smaller source sprite and non-ASCII symbol.
 
-The [151-card contact sheet][all-cards] places every exact 200 × 200 output in
-National Pokédex order with eight-pixel gutters. It was visually inspected at
-native pixels on 2026-07-28 after the content-revision-2 palette-split
-regeneration. No label is truncated, no bands overlap, the sprites retain crisp
-pixel edges without dither patterns, and the four required groups remain
-distinct. The sheet intentionally contains no ID or caption inside a card
-because those would be unapproved fifth elements.
-
-An [actual-size print review page][print-review] renders the representative
-cards at the panel's nominal 1.54-inch diagonal size when printed at 100%
-scale. Physical printing and panel photography remain pending hardware
-qualification evidence; desktop review is not a substitute for that sign-off.
+The [151-card contact sheet][all-cards] shows every card in Pokédex order with
+eight-pixel gutters, for checking truncation, overlap, and sprite conversion at
+a glance. The [actual-size review page][print-review] prints the
+representative cards at the panel's 1.54-inch size at 100% scale.
 
 ## Retained-card rule
 

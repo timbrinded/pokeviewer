@@ -1,21 +1,18 @@
 # Pull request
 
-## Summary
+## What and why
 
-<!-- State the user-visible or engineering outcome. -->
+<!-- The outcome and the reason. Write "Closes #N" only when the issue's acceptance criteria are fully met. -->
 
-## Issues
+## Device check
 
-<!-- Use "Closes #N" only when the full issue acceptance criteria are met. -->
+<!-- "None" for host, docs, or CI-only changes. Otherwise name the one bounded check from docs/hardware/validation.md and its result. -->
 
-## Validation
+## Reviewer notes
 
-<!-- List the checks that ran. CI also checks the merged commit. -->
+<!-- Changed goldens, contract or ADR updates, new assets, or anything else worth a closer look. Delete if none. -->
 
-## Hardware effect
+## Privacy and licensing
 
-<!-- State "none" or describe one bounded device check. -->
-
-## Privacy and licences
-
-<!-- Identify relevant privacy or third-party asset changes. -->
+- [ ] No credentials, child or household details, device identifiers, private paths, or raw logs
+- [ ] No new Pokémon media, or `THIRD_PARTY_NOTICES.md` still covers it

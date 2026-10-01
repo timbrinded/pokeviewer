@@ -8,9 +8,12 @@ outcome; a later decision supersedes them and links in both directions.
 | --- | --- | --- |
 | [0001](0001-compile-an-offline-content-pack.md) | accepted | Compile a versioned offline content pack into `no_std` firmware |
 | [0002](0002-use-a-passive-0700-display-day.md) | accepted | Use a passive card with a 07:00 local display-day boundary |
-| [0003](0003-stage-an-awake-runtime-before-deep-sleep-integration.md) | accepted | Stage an awake runtime before deep-sleep integration |
+| [0003](0003-stage-an-awake-runtime-before-deep-sleep-integration.md) | superseded by ADR-0004 | Stage an awake runtime before deep-sleep integration |
 | [0004](0004-use-esp-idf-aligned-rtc-deep-sleep.md) | accepted | Use ESP-IDF-aligned RTC deep sleep |
-| [0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md) | accepted | Use no-wake deep sleep for terminal failures |
+| [0005](0005-use-no-wake-deep-sleep-for-terminal-failures.md) | partly superseded by ADR-0010 | Use no-wake deep sleep for terminal failures |
 | [0006](0006-use-pwr-gated-parent-setup-and-storage-mode.md) | accepted | Use PWR-gated parent setup and storage mode |
-| [0007](0007-use-a-generic-lipo-ocv-battery-estimate.md) | accepted | Use a generic LiPo OCV battery estimate |
-| [0008](0008-publish-releases-from-one-verified-workflow.md) | proposed | Publish releases from one verified workflow |
+| [0007](0007-use-a-generic-lipo-ocv-battery-estimate.md) | superseded by ADR-0009 | Use a generic LiPo OCV battery estimate |
+| [0008](0008-publish-releases-from-one-verified-workflow.md) | accepted | Publish releases from one verified workflow |
+| [0009](0009-use-a-wake-gated-low-voltage-battery-state.md) | partly superseded by ADR-0011 | Use a wake-gated low-voltage battery state |
+| [0010](0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md) | accepted | Use BOOT as an adult restart and GPIO3 as a status light |
+| [0011](0011-recheck-the-battery-every-three-hours.md) | accepted | Re-check the battery every three hours and after a BOOT restart |

@@ -9,8 +9,8 @@ use std::{
 
 use jiff::Zoned;
 use pokeviewer_core::{
-    CAP_ENTER_STORAGE, Command, FrameAccumulator, FrameKind, LocalDateTime, ProtocolFrame, Status,
-    decode_datetime, encode_datetime,
+    BatteryState, CAP_ENTER_STORAGE, CAP_READ_BATTERY, Command, FrameAccumulator, FrameKind,
+    LocalDateTime, ProtocolFrame, Status, decode_battery_reading, decode_datetime, encode_datetime,
 };
 use serial2::SerialPort;
 
@@ -21,6 +21,7 @@ const STARTUP_RETRY_TIMEOUT: Duration = Duration::from_millis(500);
 const PARENT_COMMAND_RESPONSE_TIMEOUT: Duration = Duration::from_secs(12);
 const DEVICE_WAIT_TIMEOUT: Duration = Duration::from_mins(1);
 const DEVICE_WAIT_INTERVAL: Duration = Duration::from_millis(250);
+const PERMISSION_SETTLE_TIMEOUT: Duration = Duration::from_secs(2);
 const RESPONSE_TIMEOUT_ERROR: &str = "timed out waiting for device response";
 
 #[derive(Debug, Default, PartialEq, Eq)]
@@ -78,6 +79,10 @@ pub fn run(arguments: impl IntoIterator<Item = String>) -> Result<String, String
 
     let (request_command, payload) = match command {
         "get-rtc" => (Command::ReadRtc, None),
+        "get-battery" => {
+            validate_command_capability(command, handshake.capabilities)?;
+            (Command::ReadBattery, None)
+        }
         "diagnostics" => (Command::Diagnostics, None),
         "set-rtc" => {
             let datetime = if options.now {
@@ -88,9 +93,7 @@ pub fn run(arguments: impl IntoIterator<Item = String>) -> Result<String, String
             (Command::SetRtc, Some(encode_datetime(datetime)))
         }
         "enter-storage" => {
-            if handshake.capabilities & CAP_ENTER_STORAGE == 0 {
-                return Err("device firmware does not support storage mode".to_owned());
-            }
+            validate_command_capability(command, handshake.capabilities)?;
             (Command::EnterStorage, None)
         }
         _ => return Err(usage()),
@@ -140,7 +143,7 @@ fn validate_options(command: &str, options: &Options) -> Result<(), String> {
         return Err(usage());
     }
     match command {
-        "info" | "get-rtc" | "diagnostics"
+        "info" | "get-rtc" | "get-battery" | "diagnostics"
             if options.datetime.is_none() && !options.now && !options.confirm_time_loss =>
         {
             Ok(())
@@ -154,6 +157,18 @@ fn validate_options(command: &str, options: &Options) -> Result<(), String> {
             Ok(())
         }
         _ => Err(usage()),
+    }
+}
+
+fn validate_command_capability(command: &str, capabilities: u8) -> Result<(), String> {
+    match command {
+        "get-battery" if capabilities & CAP_READ_BATTERY == 0 => {
+            Err("device firmware does not support battery reporting".to_owned())
+        }
+        "enter-storage" if capabilities & CAP_ENTER_STORAGE == 0 => {
+            Err("device firmware does not support storage mode".to_owned())
+        }
+        _ => Ok(()),
     }
 }
 
@@ -172,10 +187,29 @@ fn list_devices() -> Result<String, String> {
 }
 
 fn open_device(device: &str, wait_for_device: bool) -> Result<SerialPort, String> {
+    open_device_with_grace(device, wait_for_device, PERMISSION_SETTLE_TIMEOUT)
+}
+
+fn open_device_with_grace(
+    device: &str,
+    wait_for_device: bool,
+    permission_grace: Duration,
+) -> Result<SerialPort, String> {
     let deadline = Instant::now() + DEVICE_WAIT_TIMEOUT;
+    let mut first_denied = None;
     loop {
         match SerialPort::open(device, BAUD_RATE) {
             Ok(port) => return Ok(port),
+            // A newly created device node can deny access until udev applies
+            // its group, so a waiting command gives it a short grace period.
+            Err(error)
+                if wait_for_device
+                    && error.kind() == io::ErrorKind::PermissionDenied
+                    && first_denied.get_or_insert_with(Instant::now).elapsed()
+                        < permission_grace =>
+            {
+                thread::sleep(DEVICE_WAIT_INTERVAL);
+            }
             Err(error) if error.kind() == io::ErrorKind::PermissionDenied => {
                 return Err("permission denied for selected serial device".to_owned());
             }
@@ -184,6 +218,8 @@ fn open_device(device: &str, wait_for_device: bool) -> Result<SerialPort, String
                     && error.kind() == io::ErrorKind::NotFound
                     && Instant::now() < deadline =>
             {
+                // A later device node gets its own permission grace period.
+                first_denied = None;
                 thread::sleep(DEVICE_WAIT_INTERVAL);
             }
             Err(error)
@@ -358,6 +394,23 @@ fn format_command_response(response: ProtocolFrame, request_id: u16) -> Result<S
                 u16::from_le_bytes([payload[0], payload[1]])
             ))
         }
+        Command::ReadBattery => {
+            let reading = decode_battery_reading(payload)
+                .map_err(|_| "device returned invalid battery data".to_owned())?;
+            match reading.state() {
+                BatteryState::Normal => Ok(format!(
+                    "battery_state=normal cell_mv={}",
+                    reading.cell_mv()
+                )),
+                BatteryState::Recharge => Ok(format!(
+                    "battery_state=recharge cell_mv={}",
+                    reading.cell_mv()
+                )),
+                BatteryState::Unavailable => {
+                    Ok("battery_state=unavailable cell_mv=unavailable".to_owned())
+                }
+            }
+        }
         Command::EnterStorage if payload.is_empty() => {
             Ok("storage mode accepted; RTC time was cleared".to_owned())
         }
@@ -438,7 +491,7 @@ fn format_datetime(value: LocalDateTime) -> String {
 }
 
 fn usage() -> String {
-    "usage: pokeviewerctl --version | list | <info|get-rtc|diagnostics> --device PATH [--wait-for-device] | set-rtc --device PATH <--now|--datetime YYYY-MM-DDTHH:MM:SS> [--wait-for-device] | enter-storage --device PATH --confirm-time-loss [--wait-for-device]".to_owned()
+    "usage: pokeviewerctl --version | list | <info|get-rtc|get-battery|diagnostics> --device PATH [--wait-for-device] | set-rtc --device PATH <--now|--datetime YYYY-MM-DDTHH:MM:SS> [--wait-for-device] | enter-storage --device PATH --confirm-time-loss [--wait-for-device]".to_owned()
 }
 
 #[cfg(test)]
@@ -450,14 +503,16 @@ mod tests {
     };
 
     use pokeviewer_core::{
-        CAPABILITIES, Command, FIRMWARE_VERSION, FrameKind, ProtocolFrame, Status,
+        BatteryReading, BatteryState, CAP_READ_BATTERY, CAPABILITIES, Command, FIRMWARE_VERSION,
+        FrameKind, ProtocolFrame, Status, encode_battery_reading,
     };
     use serial2::SerialPort;
 
     use super::{
-        Options, RESPONSE_TIMEOUT, exchange_command, format_command_response, parse_datetime,
-        parse_handshake, parse_options, read_matching_response, read_response, run, start_session,
-        validate_options,
+        Options, PERMISSION_SETTLE_TIMEOUT, RESPONSE_TIMEOUT, exchange_command,
+        format_command_response, open_device_with_grace, parse_datetime, parse_handshake,
+        parse_options, read_matching_response, read_response, run, start_session,
+        validate_command_capability, validate_options,
     };
 
     const NOW: &str = "2026-07-27T19:05:09";
@@ -473,7 +528,7 @@ mod tests {
         );
         assert_eq!(
             run(["--version".to_owned()]).unwrap(),
-            "pokeviewerctl 1.1.0"
+            "pokeviewerctl 1.2.0"
         );
     }
 
@@ -687,6 +742,64 @@ mod tests {
         );
     }
 
+    #[test]
+    fn old_firmware_keeps_old_commands_but_rejects_battery_locally() {
+        let old_capabilities = CAPABILITIES & !CAP_READ_BATTERY;
+        validate_command_capability("get-rtc", old_capabilities).unwrap();
+        validate_command_capability("diagnostics", old_capabilities).unwrap();
+        assert_eq!(
+            validate_command_capability("get-battery", old_capabilities).unwrap_err(),
+            "device firmware does not support battery reporting"
+        );
+    }
+
+    #[test]
+    fn battery_response_formats_all_states_exactly() {
+        for (reading, expected) in [
+            (
+                BatteryReading::new(BatteryState::Normal, 3_920).unwrap(),
+                "battery_state=normal cell_mv=3920",
+            ),
+            (
+                BatteryReading::new(BatteryState::Recharge, 3_720).unwrap(),
+                "battery_state=recharge cell_mv=3720",
+            ),
+            (
+                BatteryReading::UNAVAILABLE,
+                "battery_state=unavailable cell_mv=unavailable",
+            ),
+        ] {
+            let payload = encode_battery_reading(reading);
+            let response = ProtocolFrame::new(
+                2,
+                FrameKind::Response,
+                Command::ReadBattery,
+                &[Status::Ok as u8, payload[0], payload[1], payload[2]],
+            )
+            .unwrap();
+            assert_eq!(format_command_response(response, 2).unwrap(), expected);
+        }
+    }
+
+    #[test]
+    fn battery_response_rejects_malformed_or_invalid_data() {
+        for payload in [
+            &[Status::Ok as u8, BatteryState::Normal as u8, 0x50][..],
+            &[Status::Ok as u8, BatteryState::Normal as u8, 0x50, 0x0f, 0],
+            &[Status::Ok as u8, 3, 0x50, 0x0f],
+            &[Status::Ok as u8, BatteryState::Unavailable as u8, 1, 0],
+            &[Status::Ok as u8, BatteryState::Normal as u8, 0xc4, 0x09],
+            &[Status::Ok as u8, BatteryState::Recharge as u8, 0x94, 0x11],
+        ] {
+            let response =
+                ProtocolFrame::new(2, FrameKind::Response, Command::ReadBattery, payload).unwrap();
+            assert_eq!(
+                format_command_response(response, 2).unwrap_err(),
+                "device returned invalid battery data"
+            );
+        }
+    }
+
     struct TimeoutReader;
 
     impl Read for TimeoutReader {
@@ -701,5 +814,33 @@ mod tests {
             read_response(&mut TimeoutReader, RESPONSE_TIMEOUT).unwrap_err(),
             "timed out waiting for device response"
         );
+    }
+
+    #[test]
+    fn waiting_open_allows_only_a_short_permission_grace_period() {
+        use std::os::unix::fs::PermissionsExt;
+
+        let path =
+            std::env::temp_dir().join(format!("pokeviewerctl-denied-{}", std::process::id()));
+        std::fs::write(&path, []).unwrap();
+        std::fs::set_permissions(&path, std::fs::Permissions::from_mode(0o000)).unwrap();
+        if std::fs::File::open(&path).is_ok() {
+            // Privileged users bypass file modes, so this host cannot exercise EACCES.
+            std::fs::remove_file(&path).unwrap();
+            return;
+        }
+        let device = path.to_str().unwrap();
+        let grace = Duration::from_millis(300);
+
+        let started = std::time::Instant::now();
+        let waited = open_device_with_grace(device, true, grace).unwrap_err();
+        let elapsed = started.elapsed();
+        let immediate = open_device_with_grace(device, false, grace).unwrap_err();
+        std::fs::remove_file(&path).unwrap();
+
+        assert_eq!(waited, "permission denied for selected serial device");
+        assert_eq!(immediate, waited);
+        assert!(elapsed >= grace);
+        assert!(elapsed < PERMISSION_SETTLE_TIMEOUT);
     }
 }

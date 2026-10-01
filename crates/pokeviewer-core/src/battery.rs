@@ -1,61 +1,120 @@
-//! Deterministic generic `LiPo` voltage estimate and display policy.
+//! Deterministic battery filtering, state transitions, and retention codec.
 
 /// Number of calibrated divider samples used by one battery observation.
 pub const BATTERY_SAMPLE_COUNT: usize = 16;
+/// Minimum plausible single-cell voltage.
+pub const MIN_BATTERY_MV: u16 = 2_500;
+/// Maximum plausible single-cell voltage.
+pub const MAX_BATTERY_MV: u16 = 4_500;
+/// Voltage below which a normal battery enters recharge state.
+pub const ENTER_RECHARGE_MV: u16 = 3_750;
+/// Voltage at or above which a recharge battery returns to normal state.
+pub const CLEAR_RECHARGE_MV: u16 = 3_850;
+/// Version of the retained battery snapshot format.
+pub const BATTERY_SNAPSHOT_VERSION: u8 = 1;
+/// Encoded retained battery snapshot length.
+pub const BATTERY_SNAPSHOT_BYTES: usize = 4;
+// Twelve retained tag bits derived from the ASCII `BT` marker (0x4254).
+const BATTERY_SNAPSHOT_MAGIC: u16 = 0x0254;
+// The version occupies the low two tag bits.
+const _: () = assert!(BATTERY_SNAPSHOT_VERSION < 4);
+const BATTERY_SNAPSHOT_TAG: u16 =
+    (BATTERY_SNAPSHOT_MAGIC << 2) | u16::from_be_bytes([0, BATTERY_SNAPSHOT_VERSION]);
 
-const MIN_PLAUSIBLE_MV: u16 = 2_500;
-const MAX_PLAUSIBLE_MV: u16 = 4_500;
-const ENTER_RECHARGE_PER_MILLE: u16 = 150;
-const CLEAR_RECHARGE_PER_MILLE: u16 = 200;
-
-/// Generic `LiPo` open-circuit-voltage points from Zephyr's default battery
-/// profile. Each entry is `(state_of_charge_percent, microvolts)`.
-pub const GENERIC_LIPO_OCV_UV: [(u8, u32); 11] = [
-    (0, 3_305_545),
-    (10, 3_686_654),
-    (20, 3_741_018),
-    (30, 3_775_129),
-    (40, 3_793_250),
-    (50, 3_820_965),
-    (60, 3_884_009),
-    (70, 3_945_074),
-    (80, 4_008_118),
-    (90, 4_085_934),
-    (100, 4_177_454),
-];
-
-/// Battery information shown on a daily card.
+/// Coarse battery state used by the application and renderer.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum BatteryStatus {
-    /// Approximate battery state in coarse 10% steps.
-    Estimated {
-        /// Display percentage. Valid values are 0, 10, through 100.
-        percent: u8,
-        /// Whether the persistent recharge warning is active.
-        recharge: bool,
-    },
-    /// No plausible calibrated battery observation was available.
-    Unavailable,
+#[repr(u8)]
+pub enum BatteryState {
+    /// The last valid voltage does not require a recharge warning.
+    Normal = 0,
+    /// The recharge warning is latched.
+    Recharge = 1,
+    /// No valid voltage is available.
+    Unavailable = 2,
 }
 
-impl BatteryStatus {
-    /// Report whether this value satisfies the renderer contract.
-    #[must_use]
-    pub const fn is_valid(self) -> bool {
+impl BatteryState {
+    pub(crate) const fn to_wire(self) -> u8 {
         match self {
-            Self::Estimated { percent, .. } => percent <= 100 && percent % 10 == 0,
-            Self::Unavailable => true,
+            Self::Normal => 0,
+            Self::Recharge => 1,
+            Self::Unavailable => 2,
+        }
+    }
+
+    pub(crate) const fn from_wire(value: u8) -> Result<Self, BatteryError> {
+        match value {
+            0 => Ok(Self::Normal),
+            1 => Ok(Self::Recharge),
+            2 => Ok(Self::Unavailable),
+            _ => Err(BatteryError::InvalidState),
         }
     }
 }
 
-/// Result of one voltage estimate, including the next retained hysteresis bit.
+/// A validated battery state and its associated cell voltage.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub struct BatteryEstimate {
-    /// Status to render.
-    pub status: BatteryStatus,
-    /// Recharge state to retain for the next valid observation.
-    pub recharge_latched: bool,
+pub struct BatteryReading {
+    state: BatteryState,
+    cell_mv: u16,
+}
+
+impl BatteryReading {
+    /// Canonical value used when no plausible reading is available.
+    pub const UNAVAILABLE: Self = Self {
+        state: BatteryState::Unavailable,
+        cell_mv: 0,
+    };
+
+    /// Construct a reading that satisfies the battery contract.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`BatteryError::InvalidMillivolts`] unless the state and voltage
+    /// satisfy the exact normal, recharge, or unavailable ranges.
+    pub const fn new(state: BatteryState, cell_mv: u16) -> Result<Self, BatteryError> {
+        let valid = match state {
+            BatteryState::Normal => cell_mv >= ENTER_RECHARGE_MV && cell_mv <= MAX_BATTERY_MV,
+            BatteryState::Recharge => cell_mv >= MIN_BATTERY_MV && cell_mv < CLEAR_RECHARGE_MV,
+            BatteryState::Unavailable => cell_mv == 0,
+        };
+        if valid {
+            Ok(Self { state, cell_mv })
+        } else {
+            Err(BatteryError::InvalidMillivolts)
+        }
+    }
+
+    /// Return the coarse battery state.
+    #[must_use]
+    pub const fn state(self) -> BatteryState {
+        self.state
+    }
+
+    /// Return the validated cell voltage, or zero when unavailable.
+    #[must_use]
+    pub const fn cell_mv(self) -> u16 {
+        self.cell_mv
+    }
+}
+
+impl Default for BatteryReading {
+    fn default() -> Self {
+        Self::UNAVAILABLE
+    }
+}
+
+/// Retained battery snapshot validation failures.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum BatteryError {
+    /// The snapshot length is not the fixed v1 length.
+    InvalidLength,
+    /// The retained snapshot version is unsupported.
+    UnsupportedVersion,
+    /// The encoded battery state is unknown.
+    InvalidState,
+    /// State and millivolts do not form a valid reading.
+    InvalidMillivolts,
 }
 
 /// Apply the board's 2:1 divider to the median of 16 calibrated ADC readings.
@@ -70,86 +129,72 @@ pub fn filtered_battery_mv(mut divider_samples_mv: [u16; BATTERY_SAMPLE_COUNT]) 
     u16::try_from(divider_mv.saturating_mul(2)).unwrap_or(u16::MAX)
 }
 
-/// Convert one filtered cell voltage into a coarse display estimate.
+/// Apply the battery range and recharge hysteresis contract to one sample.
 ///
-/// The input is rejected only when it is outside a broad physically plausible
-/// single-cell range. Voltages outside the generic OCV table are clamped to
-/// its 0% and 100% endpoints.
+/// An invalid sample preserves a prior recharge reading, including its last
+/// valid millivolts. Other invalid samples become unavailable.
 #[must_use]
-pub fn estimate_battery(battery_mv: u16, recharge_was_latched: bool) -> BatteryEstimate {
-    if !(MIN_PLAUSIBLE_MV..=MAX_PLAUSIBLE_MV).contains(&battery_mv) {
-        return BatteryEstimate {
-            status: BatteryStatus::Unavailable,
-            recharge_latched: recharge_was_latched,
+pub fn update_battery_reading(cell_mv: u16, previous: BatteryReading) -> BatteryReading {
+    if !(MIN_BATTERY_MV..=MAX_BATTERY_MV).contains(&cell_mv) {
+        return if previous.state == BatteryState::Recharge {
+            previous
+        } else {
+            BatteryReading::UNAVAILABLE
         };
     }
 
-    let raw_per_mille = interpolate_per_mille(u32::from(battery_mv) * 1_000);
-    let recharge_latched = if recharge_was_latched {
-        raw_per_mille < CLEAR_RECHARGE_PER_MILLE
+    let state = if previous.state == BatteryState::Recharge {
+        if cell_mv >= CLEAR_RECHARGE_MV {
+            BatteryState::Normal
+        } else {
+            BatteryState::Recharge
+        }
+    } else if cell_mv < ENTER_RECHARGE_MV {
+        BatteryState::Recharge
     } else {
-        raw_per_mille < ENTER_RECHARGE_PER_MILLE
+        BatteryState::Normal
     };
-    let mut percent = u8::try_from(((raw_per_mille + 50) / 100) * 10).unwrap_or(100);
-    if recharge_latched && percent > 10 {
-        percent = 10;
-    }
-    BatteryEstimate {
-        status: BatteryStatus::Estimated {
-            percent,
-            recharge: recharge_latched,
-        },
-        recharge_latched,
-    }
+    BatteryReading { state, cell_mv }
 }
 
-fn interpolate_per_mille(battery_uv: u32) -> u16 {
-    let first = GENERIC_LIPO_OCV_UV[0];
-    if battery_uv <= first.1 {
-        return u16::from(first.0) * 10;
-    }
-    let last = GENERIC_LIPO_OCV_UV[GENERIC_LIPO_OCV_UV.len() - 1];
-    if battery_uv >= last.1 {
-        return u16::from(last.0) * 10;
-    }
+/// Encode one validated reading for retained memory.
+#[must_use]
+pub fn encode_battery_snapshot(reading: BatteryReading) -> [u8; BATTERY_SNAPSHOT_BYTES] {
+    let packed = u32::from(reading.cell_mv)
+        | (u32::from(reading.state.to_wire()) << 16)
+        | (u32::from(BATTERY_SNAPSHOT_TAG) << 18);
+    packed.to_le_bytes()
+}
 
-    for points in GENERIC_LIPO_OCV_UV.windows(2) {
-        let lower = points[0];
-        let upper = points[1];
-        if battery_uv <= upper.1 {
-            let voltage_offset = u64::from(battery_uv - lower.1);
-            let voltage_span = u64::from(upper.1 - lower.1);
-            let state_offset = u64::from(upper.0 - lower.0) * 10;
-            let interpolated = u64::from(lower.0) * 10
-                + (voltage_offset * state_offset + voltage_span / 2) / voltage_span;
-            return u16::try_from(interpolated).expect("table estimate fits u16");
-        }
+/// Decode and validate one retained battery snapshot.
+///
+/// # Errors
+///
+/// Returns a [`BatteryError`] for invalid length, version, state, or voltage.
+pub fn decode_battery_snapshot(bytes: &[u8]) -> Result<BatteryReading, BatteryError> {
+    if bytes.len() != BATTERY_SNAPSHOT_BYTES {
+        return Err(BatteryError::InvalidLength);
     }
-    unreachable!("the endpoint checks cover the complete table")
+    let tag = u16::from(bytes[2] >> 2) | (u16::from(bytes[3]) << 6);
+    if tag != BATTERY_SNAPSHOT_TAG {
+        return Err(BatteryError::UnsupportedVersion);
+    }
+    BatteryReading::new(
+        BatteryState::from_wire(bytes[2] & 0x03)?,
+        u16::from_le_bytes([bytes[0], bytes[1]]),
+    )
 }
 
 #[cfg(test)]
 mod tests {
     use super::{
-        BATTERY_SAMPLE_COUNT, BatteryStatus, GENERIC_LIPO_OCV_UV, estimate_battery,
-        filtered_battery_mv, interpolate_per_mille,
+        BATTERY_SAMPLE_COUNT, BATTERY_SNAPSHOT_TAG, BatteryError, BatteryReading, BatteryState,
+        decode_battery_snapshot, encode_battery_snapshot, filtered_battery_mv,
+        update_battery_reading,
     };
 
-    #[test]
-    fn every_published_ocv_point_maps_to_its_exact_state() {
-        for (percent, voltage_uv) in GENERIC_LIPO_OCV_UV {
-            assert_eq!(interpolate_per_mille(voltage_uv), u16::from(percent) * 10);
-        }
-    }
-
-    #[test]
-    fn interpolation_and_endpoints_are_bounded() {
-        assert_eq!(interpolate_per_mille(0), 0);
-        assert_eq!(interpolate_per_mille(u32::MAX), 1_000);
-        assert_eq!(
-            interpolate_per_mille(u32::midpoint(3_820_965, 3_884_009)),
-            550
-        );
+    fn reading(state: BatteryState, cell_mv: u16) -> BatteryReading {
+        BatteryReading::new(state, cell_mv).unwrap()
     }
 
     #[test]
@@ -163,55 +208,111 @@ mod tests {
     }
 
     #[test]
-    fn estimate_rejects_implausible_samples() {
-        for voltage in [0, 2_499, 4_501, u16::MAX] {
+    fn recharge_thresholds_are_exact_and_hysteretic() {
+        let unavailable = BatteryReading::UNAVAILABLE;
+        assert_eq!(
+            update_battery_reading(3_749, unavailable),
+            reading(BatteryState::Recharge, 3_749)
+        );
+        assert_eq!(
+            update_battery_reading(3_750, unavailable),
+            reading(BatteryState::Normal, 3_750)
+        );
+
+        let recharge = reading(BatteryState::Recharge, 3_700);
+        assert_eq!(
+            update_battery_reading(3_849, recharge),
+            reading(BatteryState::Recharge, 3_849)
+        );
+        assert_eq!(
+            update_battery_reading(3_850, recharge),
+            reading(BatteryState::Normal, 3_850)
+        );
+    }
+
+    #[test]
+    fn invalid_sample_preserves_only_a_prior_recharge_reading() {
+        let recharge = reading(BatteryState::Recharge, 3_700);
+        for cell_mv in [0, 2_499, 4_501, u16::MAX] {
+            assert_eq!(update_battery_reading(cell_mv, recharge), recharge);
             assert_eq!(
-                estimate_battery(voltage, true),
-                super::BatteryEstimate {
-                    status: BatteryStatus::Unavailable,
-                    recharge_latched: true,
-                }
+                update_battery_reading(cell_mv, reading(BatteryState::Normal, 4_000)),
+                BatteryReading::UNAVAILABLE
+            );
+            assert_eq!(
+                update_battery_reading(cell_mv, BatteryReading::UNAVAILABLE),
+                BatteryReading::UNAVAILABLE
             );
         }
     }
 
     #[test]
-    fn recharge_hysteresis_is_conservative_and_coarse() {
-        let low = estimate_battery(3_700, false);
+    fn reading_validation_enforces_state_voltage_pairs() {
         assert_eq!(
-            low.status,
-            BatteryStatus::Estimated {
-                percent: 10,
-                recharge: true,
-            }
+            BatteryReading::new(BatteryState::Normal, 3_749),
+            Err(BatteryError::InvalidMillivolts)
         );
-        assert!(low.recharge_latched);
-
-        let retained = estimate_battery(3_720, true);
+        assert!(BatteryReading::new(BatteryState::Normal, 3_750).is_ok());
+        assert!(BatteryReading::new(BatteryState::Normal, 4_500).is_ok());
         assert_eq!(
-            retained.status,
-            BatteryStatus::Estimated {
-                percent: 10,
-                recharge: true,
-            }
+            BatteryReading::new(BatteryState::Normal, 4_501),
+            Err(BatteryError::InvalidMillivolts)
         );
 
-        let cleared = estimate_battery(3_742, true);
         assert_eq!(
-            cleared.status,
-            BatteryStatus::Estimated {
-                percent: 20,
-                recharge: false,
-            }
+            BatteryReading::new(BatteryState::Recharge, 2_499),
+            Err(BatteryError::InvalidMillivolts)
         );
-        assert!(!cleared.recharge_latched);
+        assert!(BatteryReading::new(BatteryState::Recharge, 2_500).is_ok());
+        assert!(BatteryReading::new(BatteryState::Recharge, 3_849).is_ok());
+        assert_eq!(
+            BatteryReading::new(BatteryState::Recharge, 3_850),
+            Err(BatteryError::InvalidMillivolts)
+        );
+        assert_eq!(
+            BatteryReading::new(BatteryState::Unavailable, 1),
+            Err(BatteryError::InvalidMillivolts)
+        );
+        assert_eq!(
+            BatteryReading::new(BatteryState::Unavailable, 0),
+            Ok(BatteryReading::UNAVAILABLE)
+        );
     }
 
     #[test]
-    fn normal_display_uses_ten_percent_steps() {
-        for voltage in 2_500..=4_500 {
-            let status = estimate_battery(voltage, false).status;
-            assert!(status.is_valid());
+    fn retained_snapshot_is_versioned_and_validated() {
+        let normal = reading(BatteryState::Normal, 4_123);
+        let recharge = reading(BatteryState::Recharge, 3_700);
+        assert_eq!(encode_battery_snapshot(normal), [0x1b, 0x10, 0x44, 0x25]);
+        assert_eq!(
+            encode_battery_snapshot(BatteryReading::UNAVAILABLE),
+            [0, 0, 0x46, 0x25]
+        );
+        for reading in [normal, recharge, BatteryReading::UNAVAILABLE] {
+            let encoded = encode_battery_snapshot(reading);
+            assert_eq!(decode_battery_snapshot(&encoded), Ok(reading));
         }
+
+        assert_eq!(
+            decode_battery_snapshot(&[1, 0, 0]),
+            Err(BatteryError::InvalidLength)
+        );
+        for stale in [0_u32, 0x4254_0000, u32::MAX] {
+            assert_eq!(
+                decode_battery_snapshot(&stale.to_le_bytes()),
+                Err(BatteryError::UnsupportedVersion)
+            );
+        }
+
+        let invalid_state = (3_u32 << 16) | (u32::from(BATTERY_SNAPSHOT_TAG) << 18) | 0x0e74;
+        assert_eq!(
+            decode_battery_snapshot(&invalid_state.to_le_bytes()),
+            Err(BatteryError::InvalidState)
+        );
+        let invalid_unavailable = (2_u32 << 16) | (u32::from(BATTERY_SNAPSHOT_TAG) << 18) | 1;
+        assert_eq!(
+            decode_battery_snapshot(&invalid_unavailable.to_le_bytes()),
+            Err(BatteryError::InvalidMillivolts)
+        );
     }
 }

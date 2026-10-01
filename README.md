@@ -8,12 +8,10 @@ the canonical type or types. The device does not use Wi-Fi or BLE.
 
 ## Quick start
 
-These instructions install Pokeviewer v1.1.0 from the official
+These instructions install Pokeviewer v1.2.0 from the official
 [Pokeviewer releases](https://github.com/timbrinded/pokeviewer/releases) page.
-They require an x86-64 Linux computer.
-
-The ESP32-S3 ROM contains the factory download bootloader. This procedure
-writes Pokeviewer firmware to flash memory.
+They require an x86-64 Linux computer. The release archive contains a copy of
+this guide as `README.md`.
 
 ### 1. Prepare the equipment
 
@@ -24,7 +22,8 @@ Get these items:
 - a compatible protected battery; and
 - an x86-64 Linux computer with `curl`, `tar`, `sha256sum`, and Cargo.
 
-Read the [safety guide](docs/safety.md) before you connect the battery.
+Read the [safety guide](docs/safety.md) (`SAFETY.md` in the release archive)
+before you connect the battery.
 
 Install the pinned flash utility:
 
@@ -42,21 +41,22 @@ Open a terminal.
 Run these commands:
 
 ```console
-mkdir pokeviewer-v1.1.0-install
-cd pokeviewer-v1.1.0-install
+mkdir pokeviewer-v1.2.0-install
+cd pokeviewer-v1.2.0-install
 
 curl --fail --location --remote-name \
-  https://github.com/timbrinded/pokeviewer/releases/download/v1.1.0/pokeviewer-v1.1.0.tar.gz
+  https://github.com/timbrinded/pokeviewer/releases/download/v1.2.0/pokeviewer-v1.2.0.tar.gz
 curl --fail --location --remote-name \
-  https://github.com/timbrinded/pokeviewer/releases/download/v1.1.0/pokeviewer-v1.1.0.tar.gz.sha256
+  https://github.com/timbrinded/pokeviewer/releases/download/v1.2.0/pokeviewer-v1.2.0.tar.gz.sha256
 
-sha256sum --check pokeviewer-v1.1.0.tar.gz.sha256
-tar -xzf pokeviewer-v1.1.0.tar.gz
-cd pokeviewer-v1.1.0
+sha256sum --check pokeviewer-v1.2.0.tar.gz.sha256
+tar -xzf pokeviewer-v1.2.0.tar.gz
+cd pokeviewer-v1.2.0
 sha256sum --check SHA256SUMS
 ```
 
-Stop if a checksum command reports a failure.
+Stop if a checksum command reports a failure. Install only files from the
+official release page, not copies from an issue, chat, or mirror.
 
 ### 3. Start download mode
 
@@ -79,12 +79,17 @@ Set `DEVICE` to the path that the command shows:
 export DEVICE=/dev/ttyACM0
 ```
 
-**Troubleshooting: battery connected.** If `ls` finds no board, the installed
-firmware is in deep sleep. Prepare the bundled CLI and wait for the device:
+**Troubleshooting: battery connected.** If `ls` finds no board, the battery is
+probably still connected and the installed firmware is in deep sleep. `BOOT`
+cannot start download mode while the battery powers the board. Disconnect the
+battery and repeat this step.
+
+To reach the installed firmware instead, for example to read it with `info`,
+prepare the bundled CLI and wait for the device:
 
 ```console
-chmod u+x ./pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu
-./pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu info \
+chmod u+x ./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu
+./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu info \
   --device "$DEVICE" \
   --wait-for-device
 ```
@@ -144,7 +149,7 @@ espflash write-bin \
   --port "$DEVICE" \
   --before no-reset \
   --after no-reset \
-  0x0 pokeviewer-v1.1.0-esp32s3-v2.bin
+  0x0 pokeviewer-v1.2.0-esp32s3-v2.bin
 ```
 
 Wait for the command to report a successful write.
@@ -156,16 +161,18 @@ Wait for the command to report a successful write.
 3. Wait ten seconds.
 4. Make sure that you do not press `BOOT`.
 5. Connect the USB cable normally.
-6. Wait for the screen to show `SET TIME`.
+6. Wait for the screen to show `SET TIME`. The green light turns on.
 
 This power cycle stops download mode and starts the installed firmware.
+The device waits two minutes for the time. If the green light turns off
+first, hold `BOOT` for one second to start another two-minute wait.
 
 ### 6. Set the local time
 
 Set the command path:
 
 ```console
-export CLI=./pokeviewerctl-v1.1.0-x86_64-unknown-linux-gnu
+export CLI=./pokeviewerctl-v1.2.0-x86_64-unknown-linux-gnu
 chmod u+x "$CLI"
 ```
 
@@ -220,14 +227,15 @@ You do not have to flash the firmware again. Keep the battery connected.
      --wait-for-device
    ```
 
-3. Press and hold `PWR` for at least three seconds.
+3. Press and hold `PWR`. After three seconds, the green light turns on.
 4. Release `PWR` when the screen shows `SET TIME`.
 5. Wait for the command to show the RTC read-back.
 
 The command waits for the exact device path for up to 60 seconds. It also
 allows time for the `SET TIME` screen to refresh before it sends the time.
-A `PWR` press or hold without an active command has no visible effect. The
-`BOOT` button is for service and flashing only.
+If no command is waiting, the green light turns off after 15 seconds and the
+screen does not change. [Controls and lights](#controls-and-lights) describes
+every button and light.
 
 ## Prepare the device for storage
 
@@ -243,7 +251,7 @@ Storage mode clears the RTC. The next start shows `SET TIME`.
      --wait-for-device
    ```
 
-3. Press and hold `PWR` for at least three seconds.
+3. Press and hold `PWR`. After three seconds, the green light turns on.
 4. Release `PWR` when the screen shows `SET TIME`.
 5. Wait for the command to confirm storage mode.
 
@@ -254,17 +262,90 @@ power-off. A later `PWR` press starts the device.
 
 At 07:00 local time, the device wakes and shows the card for the new day.
 The device then enters deep sleep. The e-paper panel keeps the card visible
-without panel power.
+without panel power. Before 07:00, the previous day's card stays, including
+its weekday. This is intended.
 
 The firmware contains all 151 Generation I entries.
 The device does not require an account, an SD card, or internet access.
 The supported board does not have a touchscreen.
 
-The top corner shows a coarse battery estimate in 10 percent steps. The
-estimate is not a fuel gauge. At a low estimate, the screen also shows the
-lightning icon and `CHARGE!`. If the ADC reading is not plausible, the screen
-shows `?%`. The board has no dedicated USB-power sense input. USB operation
-with no battery can therefore show `100%`.
+The card shows one battery state. `Normal` shows no battery text or icon.
+`Recharge` shows the lightning icon and `CHARGE!` at the bottom.
+`Unavailable` shows `BAT ?` in the top-right corner. The device measures the
+battery every three hours, at 07:00, and when you hold `BOOT` for one second.
+It redraws the card only when the battery state changes. The display does not
+show a battery percentage or estimate runtime.
+
+The USB CLI reports the last reading without taking a new one:
+
+```console
+"$CLI" get-battery --device "$DEVICE" --wait-for-device
+```
+
+Start the command, then press and hold `PWR` until the green light turns on.
+Release `PWR` when `SET TIME` appears.
+
+It reports the state and the cell voltage in millivolts. The voltage is a
+diagnostic value, not a measure of remaining charge.
+
+Battery runtime is not guaranteed. The battery state does not replace the
+battery's protection circuit, the charger, or adult supervision.
+
+## Controls and lights
+
+The device has two buttons, `PWR` and `BOOT`, and one light that can show
+green or orange. A child does not need to use them. A short press of either
+button does not change the screen.
+
+### `PWR` button
+
+| What you do | What happens |
+| --- | --- |
+| Press briefly | Nothing visible. The device stays asleep. |
+| Hold for three seconds | The green light turns on. The device listens for a computer for 15 seconds. |
+| Hold for three seconds while a `pokeviewerctl` command waits | The screen shows `SET TIME`. The command runs. The green light stays on for up to two minutes, then the day's card returns. |
+| Press when the device is off after storage mode | The device starts and shows `SET TIME`. |
+
+`PWR` does nothing while the screen shows `POKEVIEWER ERROR`. Use `BOOT`.
+
+### `BOOT` button
+
+| What you do | What happens |
+| --- | --- |
+| Press briefly | Nothing visible. |
+| Hold for one second | The green light flashes once. The device restarts, reads the clock, and redraws the screen. |
+| Hold while you connect USB with the battery disconnected | The device enters flashing mode. The screen does not change. Use this only to [flash the firmware](#4-flash-the-firmware). |
+
+Hold `BOOT` for one second after any error screen that says `RESET`, or if
+the screen looks wrong. A restart measures the battery and redraws the current
+day's card. It does not change the clock.
+
+### Lights
+
+| Light | Meaning |
+| --- | --- |
+| Green flashes once | The device accepted a `BOOT` restart. |
+| Green stays on | The device is listening for, or connected to, a computer. |
+| Green off | Normal. The device is asleep or working without a computer. |
+| Orange on | The battery is charging from USB. The charger controls this light. |
+| Orange off | The battery is not charging, or it is full. |
+
+### Screen messages
+
+| Screen | Meaning | What to do |
+| --- | --- | --- |
+| Weekday, Pokémon, name, and type | Normal daily card. | Nothing. It changes at 07:00. |
+| `BAT ?` in the top-right corner | The last battery reading was not valid. | Charge the battery. The next reading, within three hours, replaces it. |
+| Lightning icon and `CHARGE!` at the bottom | The battery is low. | Charge until the orange light goes out, then unplug. `CHARGE!` clears within three hours, or hold `BOOT` for one second to clear it now. |
+| `SET TIME` | The clock is not set, or a computer session is open. | [Change the time](#change-the-time-later). |
+| `POKEVIEWER ERROR` with `RESET` | A bounded failure stopped the device. | Hold `BOOT` for one second. If it returns, read [troubleshooting](docs/troubleshooting.md). |
+| `POKEVIEWER ERROR` with `REFLASH` | The firmware content is damaged. | [Flash the firmware](#4-flash-the-firmware) again. |
+
+After a new clock setting or battery connection, the card can show `BAT ?`
+until the next battery reading, at most three hours later. A reading taken
+while USB is connected shows the charger's voltage, so the card can clear
+`CHARGE!` before the battery is full. The orange light is the reliable sign
+that charging has finished.
 
 ## Important notices
 
@@ -282,15 +363,20 @@ An adult must assemble, inspect, charge, and supervise the device.
 
 ## Documentation
 
-- [Setup and operation](docs/user-guide.md)
+For parents:
+
 - [Safety](docs/safety.md)
 - [Troubleshooting and recovery](docs/troubleshooting.md)
-- [Release verification](docs/release-verification.md)
-- [Product contract](docs/product-contract.md)
-- [Architecture decisions](docs/decisions/README.md)
 - [Third-party notices](THIRD_PARTY_NOTICES.md)
 
-## Local development
+For maintainers and reviewers:
 
-For local development information, read
-[CONTRIBUTING.md](CONTRIBUTING.md).
+- [Contributing](CONTRIBUTING.md)
+- [Product contract](docs/product-contract.md)
+- [Firmware runtime](docs/hardware/wake-sleep-state-machine.md)
+- [V2 board contract](docs/hardware/v2-board-contract.md)
+- [USB protocol](docs/usb-protocol-v1.md)
+- [Content pack format](docs/content-pack-v1.md)
+- [Toolchain and source builds](docs/development/toolchain.md)
+- [CI](docs/development/ci.md) and [publishing a release](docs/development/publishing.md)
+- [Architecture decisions](docs/decisions/README.md)

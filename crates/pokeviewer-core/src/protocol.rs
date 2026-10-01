@@ -1,6 +1,6 @@
 //! Bounded version-1 USB provisioning wire protocol.
 
-use crate::LocalDateTime;
+use crate::{BatteryReading, BatteryState, LocalDateTime};
 
 const MAGIC: &[u8; 4] = b"PKVW";
 const HEADER_BYTES: usize = 10;
@@ -11,7 +11,7 @@ pub const MAX_FRAME_BYTES: usize = HEADER_BYTES + MAX_PAYLOAD_BYTES + CHECKSUM_B
 /// Supported USB protocol version.
 pub const PROTOCOL_VERSION: u8 = 1;
 /// Product version reported by v1 firmware over USB.
-pub const FIRMWARE_VERSION: [u8; 3] = [1, 1, 0];
+pub const FIRMWARE_VERSION: [u8; 3] = [1, 2, 0];
 /// Firmware can negotiate protocol metadata.
 pub const CAP_HANDSHAKE: u8 = 1 << 0;
 /// Firmware can read the RTC.
@@ -22,9 +22,17 @@ pub const CAP_SET_RTC: u8 = 1 << 2;
 pub const CAP_DIAGNOSTICS: u8 = 1 << 3;
 /// Firmware can invalidate the RTC and enter storage mode.
 pub const CAP_ENTER_STORAGE: u8 = 1 << 4;
+/// Firmware can report the retained scheduled battery state and cell voltage.
+pub const CAP_READ_BATTERY: u8 = 1 << 5;
 /// Capabilities implemented by this firmware version.
-pub const CAPABILITIES: u8 =
-    CAP_HANDSHAKE | CAP_READ_RTC | CAP_SET_RTC | CAP_DIAGNOSTICS | CAP_ENTER_STORAGE;
+pub const CAPABILITIES: u8 = CAP_HANDSHAKE
+    | CAP_READ_RTC
+    | CAP_SET_RTC
+    | CAP_DIAGNOSTICS
+    | CAP_ENTER_STORAGE
+    | CAP_READ_BATTERY;
+/// Encoded battery response data length, excluding the response status byte.
+pub const BATTERY_PAYLOAD_BYTES: usize = 3;
 
 /// Direction encoded in a protocol frame.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -50,6 +58,8 @@ pub enum Command {
     Diagnostics = 4,
     /// Invalidate the RTC and enter no-wake storage mode.
     EnterStorage = 5,
+    /// Read the retained scheduled battery state and cell voltage.
+    ReadBattery = 6,
 }
 
 /// Stable response status codes.
@@ -267,6 +277,32 @@ pub enum FrameError {
     InvalidChecksum,
     /// RTC payload is malformed or invalid.
     InvalidDateTime,
+    /// Battery payload is malformed or invalid.
+    InvalidBatteryReading,
+}
+
+/// Encode battery state and cell millivolts for a successful response.
+#[must_use]
+pub const fn encode_battery_reading(reading: BatteryReading) -> [u8; BATTERY_PAYLOAD_BYTES] {
+    let millivolts = reading.cell_mv().to_le_bytes();
+    [reading.state().to_wire(), millivolts[0], millivolts[1]]
+}
+
+/// Decode and validate battery state and little-endian cell millivolts.
+///
+/// # Errors
+///
+/// Returns [`FrameError::InvalidBatteryReading`] for invalid length, state, or
+/// state-voltage combinations.
+pub fn decode_battery_reading(payload: &[u8]) -> Result<BatteryReading, FrameError> {
+    if payload.len() != BATTERY_PAYLOAD_BYTES {
+        return Err(FrameError::InvalidBatteryReading);
+    }
+    BatteryReading::new(
+        BatteryState::from_wire(payload[0]).map_err(|_| FrameError::InvalidBatteryReading)?,
+        u16::from_le_bytes([payload[1], payload[2]]),
+    )
+    .map_err(|_| FrameError::InvalidBatteryReading)
 }
 
 /// Encode seven explicit local-wall-clock fields.
@@ -321,6 +357,7 @@ fn decode_command(value: u8) -> Result<Command, FrameError> {
         3 => Ok(Command::SetRtc),
         4 => Ok(Command::Diagnostics),
         5 => Ok(Command::EnterStorage),
+        6 => Ok(Command::ReadBattery),
         _ => Err(FrameError::InvalidCommand),
     }
 }

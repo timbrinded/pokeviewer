@@ -1,44 +1,24 @@
-# Privacy and public evidence
+# Privacy
 
-Pokeviewer is intended for a child, but the public repository must contain no
-information about that child. Evidence should prove device behavior while
-revealing as little personal or device-identifying information as possible.
+Pokeviewer is made for a child, so nothing in the public repository, its
+issues, CI artifacts, or releases may identify that child or household. Prefer
+generated screenshots and synthetic test values to photographs and real logs.
 
 ## Never publish
 
-- the child's name, face, voice, school, routine, or account information;
-- home address, precise location, identifiable interiors, or location metadata;
-- credentials, tokens, Wi-Fi details, private repository URLs, or private host
-  paths;
-- USB serial identifiers, device MAC addresses, or full unredacted device
-  enumeration output;
-- raw logs when a smaller sanitized excerpt proves the requirement; or
-- photographs containing unrelated people, documents, screens, or reflections.
+- the child's name, face, voice, school, routine, or accounts;
+- a home address, precise location, recognizable room, or photo location
+  metadata;
+- credentials, tokens, Wi-Fi details, private repository URLs, or home
+  directory paths;
+- USB serial numbers, MAC addresses, or full device enumeration output; or
+- photographs that show other people, documents, screens, or reflections.
 
-## Evidence procedure
+When a log or photo is needed, publish only the lines or the area that show the
+behavior, and redact identifiers in the file itself. A box drawn over text in
+an editable document is not redaction. Documentation examples use placeholders
+such as `DEVICE` or `/dev/ttyACM0`.
 
-1. Capture only the screen, board area, measurement, or terminal lines needed.
-2. Disable location metadata when taking a photograph.
-3. Redact identifiers at the source before saving or uploading the artifact.
-4. Give each artifact the firmware commit, content-pack hash, hardware revision,
-   test case, and local timestamp only when those fields are required.
-5. Review the rendered artifact and its metadata before committing or uploading.
-6. Prefer synthetic test inputs and generated screenshots over household
-   photographs.
-
-Redaction must be irreversible in the published artifact. Overlaying a box in
-an editable document is not sufficient.
-
-## Repository checks
-
-Pull-request review must check:
-
-- documentation examples use placeholders rather than real identifiers;
-- CI logs and uploaded artifacts do not collect prohibited fields;
-- screenshots and photographs have been visually reviewed;
-- image metadata has been removed where applicable; and
-- diagnostics default to the minimum data needed for recovery.
-
-If prohibited information is published, remove the public artifact, rotate any
-exposed credential, and replace the evidence with a sanitized version. Do not
-preserve sensitive material merely to keep a stable link.
+If something on this list is published, remove it, rotate any exposed
+credential, and replace it with a redacted version. Do not keep sensitive
+material to preserve a link.
