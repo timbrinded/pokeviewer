@@ -26,6 +26,8 @@ mod protocol;
 mod rtc;
 #[cfg(target_arch = "xtensa")]
 mod runtime;
+#[cfg(any(target_arch = "xtensa", test))]
+mod shtc3;
 #[cfg(target_arch = "xtensa")]
 mod sleep;
 #[cfg(test)]

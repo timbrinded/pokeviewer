@@ -24,6 +24,7 @@ use crate::{
     es8311::suspend_audio_codec,
     panel::refresh_panel_frame,
     plan_wake, render_failure_screen,
+    shtc3::sleep_humidity_sensor,
     sleep::{
         POWER_BUTTON_WAKE_BIT, RTC_INTERRUPT_WAKE_BIT, SleepResources, ext1_wake_status,
         restore_panel_power, restore_power_latch, restore_wake_pin,
@@ -141,6 +142,9 @@ pub fn run_pokeviewer() -> ! {
     if block_on(suspend_audio_codec(&mut i2c)).is_err() {
         display_terminal!(FailureKind::InvalidRtc);
     }
+    // A sleeping sensor may reject the repeated command; it is already in the
+    // low-power state this call requests.
+    let _ = block_on(sleep_humidity_sensor(&mut i2c));
     let mut rtc = Pcf85063Rtc::new(i2c);
     let alarm_pending = block_on(rtc.alarm_pending()).unwrap_or(false);
     let decision = if parent_after_daily {
