@@ -33,7 +33,8 @@ not lost when USB powers down again.
 
 The binary snapshots `EXT_WAKEUP1_STATUS` before it configures the next sleep.
 It rejects an RTC `Ext1` wake without both the GPIO5 status bit and a matching
-PCF85063 alarm flag. It also refuses to sleep while GPIO5 or GPIO18 is low.
+PCF85063 alarm flag. Before sleep, it waits a bounded time for GPIO0, GPIO5,
+and GPIO18 to rise.
 Audio capture and playback, Wi-Fi, BLE, SD, touch, and the environment sensor
 are never initialized. The powered ES8311 receives only its vendor
 software-suspend sequence.

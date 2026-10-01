@@ -13,7 +13,7 @@ pub enum FailureKind {
     Panel,
     /// The next daily RTC alarm could not be armed.
     Alarm,
-    /// A wake source other than cold/reset or RTC EXT0 was observed.
+    /// A wake source other than cold/reset or the configured EXT1 pins was observed.
     UnexpectedWake,
 }
 

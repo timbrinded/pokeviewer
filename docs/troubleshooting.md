@@ -7,15 +7,17 @@ power if safe and follow the [safety guide](safety.md).
 | --- | --- | --- |
 | `RTC` setup | stopped, unreadable, or invalid clock | connect USB; run `set-rtc`; require matching read-back |
 | `PACK` / `REFLASH` | compiled content is corrupt or incompatible | verify and cleanly reinstall the exact release |
-| `PANEL` / `RESET` | panel init, BUSY, or full refresh failed | disconnect battery; inspect panel connector; reset once |
-| `ALARM` / `RESET` | next 07:00 alarm could not be armed | connect USB; inspect diagnostics/RTC; reset once |
-| `WAKE` / `RESET` | unsupported wake source | reset once; qualify wiring if repeated |
+| `PANEL` / `RESET` | panel init, BUSY, or full refresh failed | disconnect battery; inspect panel connector; hold `BOOT` for one second once |
+| `ALARM` / `RESET` | next 07:00 alarm could not be armed | hold `BOOT` for one second once; if it returns, connect USB and inspect diagnostics |
+| `WAKE` / `RESET` | unsupported wake source | hold `BOOT` for one second once; qualify wiring if repeated |
 
-Terminal failures other than USB-capable RTC setup enter no-wake deep sleep
-after one bounded attempt. They do not automatically reset, refresh, or retry;
-use an external reset or power cycle only after completing the documented
-adult action. A panel failure leaves the prior card visible because the failed
-output path cannot reliably display its own code.
+Terminal failures other than USB-capable RTC setup enter deep sleep after one
+bounded attempt. They do not automatically reset, refresh, or retry. Only a
+one-second `BOOT` hold wakes the device; `PWR` does nothing in this state. The
+green light flashes once when the restart is accepted. A panel failure leaves
+the prior card visible because the failed output path cannot reliably display
+its own code, so an unresponsive `PWR` with an old card can also mean a panel
+failure.
 
 ## Common setup failures
 

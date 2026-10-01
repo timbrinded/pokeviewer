@@ -2,7 +2,7 @@
 
 - Status: implemented; hardware injection evidence pending
 - Delivery issue: [Q20 / #21][issue-21]
-- Last reviewed: 2026-07-28
+- Last reviewed: 2026-10-01
 
 Every expected failure has a stable adult-facing code, one wired diagnostic
 bit, at most one automatic hardware attempt per wake, and a terminal action.
@@ -10,27 +10,28 @@ bit, at most one automatic hardware attempt per wake, and a terminal action.
 | Failure | Code | Flag | Attempts | Screen | Terminal recovery |
 | --- | --- | ---: | ---: | --- | --- |
 | invalid/stopped/unreadable RTC | `RTC` | `0x0001` | 0 | setup instructions | wired `pokeviewerctl set`, verified read-back, software restart |
-| corrupt/incompatible pack | `PACK` | `0x0002` | 1 | `REFLASH` | no-wake deep sleep; external reset after reinstall |
-| panel init/refresh/BUSY | `PANEL` | `0x0004` | 1 | prior frame retained | no-wake deep sleep; inspect, then external reset |
-| daily alarm arm | `ALARM` | `0x0008` | 1 | `RESET` | no-wake deep sleep; external reset |
-| unsupported wake source | `WAKE` | `0x0010` | 0 | `RESET` | no-wake deep sleep; external reset |
+| corrupt/incompatible pack | `PACK` | `0x0002` | 1 | `REFLASH` | `BOOT`-only deep sleep; reinstall |
+| panel init/refresh/BUSY | `PANEL` | `0x0004` | 1 | prior frame retained | `BOOT`-only deep sleep; inspect, then hold `BOOT` |
+| daily alarm arm | `ALARM` | `0x0008` | 1 | `RESET` | `BOOT`-only deep sleep; hold `BOOT` |
+| unsupported wake source | `WAKE` | `0x0010` | 0 | `RESET` | `BOOT`-only deep sleep; hold `BOOT` |
 
 Invalid RTC exposes `RTC` through the bounded wired diagnostics command and
 accepts only the versioned provisioning protocol when the RTC bus is available.
 Every other terminal failure logs code, bit, attempt count, and rail state
-once, retains GPIO6/GPIO17 high and GPIO42 low, and enters deep sleep with no
-wake source. The ESP32-S3 remains asleep until external reset or power cycling;
-there is no timer, RTC wake, automatic refresh, or application retry.
+once, retains GPIO6/GPIO17 high and GPIO42 low, and enters deep sleep with
+GPIO0 (`BOOT`) as the only EXT1 wake source. A one-second `BOOT` hold restarts
+the firmware, which runs the failed path once more. There is no timer, RTC
+wake, `PWR` wake, automatic refresh, or application retry
+([ADR 0010](../decisions/0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md)).
 
 The panel adapter already bounds BUSY waits to 500 ten-millisecond polls. The
 runtime invokes initialization/full refresh once. A panel failure cannot
 reliably render its own diagnostic, so the prior e-paper frame remains visible.
-Production also rejects wake sources other than cold/reset and RTC `Ext0`
-before it can render a plausible daily card.
-
-The no-wake terminal follows ESP-IDF's documented
-[`esp_deep_sleep_start()` behavior][idf-no-wake]. The pinned ESP-HAL
-`Rtc::sleep_deep(&[])` takes the same empty wake-source configuration.
+Production also rejects wake sources other than cold/reset and EXT1 GPIO0,
+GPIO5, or GPIO18 before it can render a plausible daily card. If the `BOOT`
+line stays low through the ten-second release wait, the terminal sleep arms no
+wake source and follows ESP-IDF's documented
+[`esp_deep_sleep_start()` behavior][idf-no-wake].
 
 ## Fault-injection evidence
 

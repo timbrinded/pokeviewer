@@ -156,9 +156,11 @@ Wait for the command to report a successful write.
 3. Wait ten seconds.
 4. Make sure that you do not press `BOOT`.
 5. Connect the USB cable normally.
-6. Wait for the screen to show `SET TIME`.
+6. Wait for the screen to show `SET TIME`. The green light turns on.
 
 This power cycle stops download mode and starts the installed firmware.
+The device waits two minutes for the time. If the green light turns off
+first, hold `BOOT` for one second to start another two-minute wait.
 
 ### 6. Set the local time
 
@@ -220,14 +222,15 @@ You do not have to flash the firmware again. Keep the battery connected.
      --wait-for-device
    ```
 
-3. Press and hold `PWR` for at least three seconds.
+3. Press and hold `PWR`. After three seconds, the green light turns on.
 4. Release `PWR` when the screen shows `SET TIME`.
 5. Wait for the command to show the RTC read-back.
 
 The command waits for the exact device path for up to 60 seconds. It also
 allows time for the `SET TIME` screen to refresh before it sends the time.
-A `PWR` press or hold without an active command has no visible effect. The
-`BOOT` button is for service and flashing only.
+If no command is waiting, the green light turns off after 15 seconds and the
+screen does not change. [Controls and lights](#controls-and-lights) describes
+every button and light.
 
 ## Prepare the device for storage
 
@@ -243,7 +246,7 @@ Storage mode clears the RTC. The next start shows `SET TIME`.
      --wait-for-device
    ```
 
-3. Press and hold `PWR` for at least three seconds.
+3. Press and hold `PWR`. After three seconds, the green light turns on.
 4. Release `PWR` when the screen shows `SET TIME`.
 5. Wait for the command to confirm storage mode.
 
@@ -260,9 +263,9 @@ The firmware contains all 151 Generation I entries.
 The device does not require an account, an SD card, or internet access.
 The supported board does not have a touchscreen.
 
-The top corner shows one battery state. `Normal` shows no battery text or icon.
-`Recharge` shows the lightning icon and `CHARGE!`. `Unavailable` shows
-`BAT ?`. If an invalid scheduled observation follows `Recharge`, the complete
+The card shows one battery state. `Normal` shows no battery text or icon.
+`Recharge` shows the lightning icon and `CHARGE!` at the bottom.
+`Unavailable` shows `BAT ?` in the top-right corner. If an invalid scheduled observation follows `Recharge`, the complete
 prior recharge snapshot remains. Otherwise, it commits `Unavailable` with
 `0` mV. The display does not show battery percentage or make a precise
 capacity claim.
@@ -274,12 +277,66 @@ display:
 "$CLI" get-battery --device "$DEVICE" --wait-for-device
 ```
 
-Start the command, then press and hold `PWR` for three seconds. Release `PWR`
-when `SET TIME` appears.
+Start the command, then press and hold `PWR` until the green light turns on.
+Release `PWR` when `SET TIME` appears.
 
 It reports the state and bounded cell millivolts. Millivolts are diagnostic
 data, not a state-of-charge measurement. The board has no dedicated USB-power
 sense input, so a USB-powered reading does not identify the cell's capacity.
+
+## Controls and lights
+
+The device has two buttons, `PWR` and `BOOT`, and one light that can show
+green or orange. A child does not need to use them. A short press of either
+button does not change the screen.
+
+### `PWR` button
+
+| What you do | What happens |
+| --- | --- |
+| Press briefly | Nothing visible. The device stays asleep. |
+| Hold for three seconds | The green light turns on. The device listens for a computer for 15 seconds. |
+| Hold for three seconds while a `pokeviewerctl` command waits | The screen shows `SET TIME`. The command runs. The green light stays on for up to two minutes, then the day's card returns. |
+| Press when the device is off after storage mode | The device starts and shows `SET TIME`. |
+
+`PWR` does nothing while the screen shows `POKEVIEWER ERROR`. Use `BOOT`.
+
+### `BOOT` button
+
+| What you do | What happens |
+| --- | --- |
+| Press briefly | Nothing visible. |
+| Hold for one second | The green light flashes once. The device restarts, reads the clock, and redraws the screen. |
+| Hold while you connect USB with the battery disconnected | The device enters flashing mode. The screen does not change. Use this only to [flash the firmware](#4-flash-the-firmware). |
+
+Hold `BOOT` for one second after any error screen that says `RESET`, or if
+the screen looks wrong. A restart redraws the current day's card. It does not
+change the clock or the battery state.
+
+### Lights
+
+| Light | Meaning |
+| --- | --- |
+| Green flashes once | The device accepted a `BOOT` restart. |
+| Green stays on | The device is listening for, or connected to, a computer. |
+| Green off | Normal. The device is asleep or working without a computer. |
+| Orange on | The battery is charging from USB. The charger controls this light. |
+| Orange off | The battery is not charging, or it is full. |
+
+### Screen messages
+
+| Screen | Meaning | What to do |
+| --- | --- | --- |
+| Weekday, Pokémon, name, and type | Normal daily card. | Nothing. It changes at 07:00. |
+| `BAT ?` in the top-right corner | The last scheduled battery reading was not valid. | Charge the battery. The next 07:00 reading replaces it. |
+| Lightning icon and `CHARGE!` at the bottom | The battery is low. | Charge the battery. |
+| `SET TIME` | The clock is not set, or a computer session is open. | [Change the time](#change-the-time-later). |
+| `POKEVIEWER ERROR` with `RESET` | A bounded failure stopped the device. | Hold `BOOT` for one second. If it returns, read [troubleshooting](docs/troubleshooting.md). |
+| `POKEVIEWER ERROR` with `REFLASH` | The firmware content is damaged. | [Flash the firmware](#4-flash-the-firmware) again. |
+
+After a new clock setting or battery connection, the card can show `BAT ?`
+until the first 07:00 update. Only the scheduled 07:00 wake measures the
+battery.
 
 ## Important notices
 

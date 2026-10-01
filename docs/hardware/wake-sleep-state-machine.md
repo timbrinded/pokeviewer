@@ -1,10 +1,11 @@
 # Wake, parent-session, and 07:00 state machine
 
-- Status: v1.2.0 implementation complete; battery device confirmation pending
-- Last reviewed: 2026-08-10
+- Status: v1.2.0 implementation complete; BOOT, PWR, alarm, and battery commit gate device-verified; DMM comparison pending
+- Last reviewed: 2026-10-01
 
 Release firmware uses one ESP32-S3 EXT1 `ANY_LOW` wake source:
 
+- GPIO0: active-low BOOT button;
 - GPIO5: active-low PCF85063 daily alarm; and
 - GPIO18: active-low PWR button.
 
@@ -18,6 +19,7 @@ wake intent from reset history or USB enumeration.
 reset or EXT1 wake
   -> restore GPIO5 and GPIO18 from RTC control
   -> hold the shared-bus audio rail low and suspend the ES8311
+  -> send the SHTC3 sleep command
   -> validate the RTC and wake evidence
   -> derive the current display day and the next strict 07:00
   -> sample the GPIO4 battery divider only after a validated RTC alarm wake
@@ -28,13 +30,15 @@ reset or EXT1 wake
   -> re-read the RTC
   -> restart once if refresh or alarm setup crossed the boundary
   -> retain GPIO6 high, GPIO17 high, and GPIO42 low
-  -> configure GPIO5 and GPIO18 with RTC pull-ups
+  -> wait up to ten seconds for GPIO0, GPIO5, and GPIO18 to rise
+  -> configure the armed lines with RTC pull-ups
   -> enter active-low EXT1 deep sleep
 ```
 
-The PCF alarm flag is cleared and configured before sleep. GPIO5 and GPIO18
-must both be high. Firmware refuses sleep if a configured wake input remains
-low. GPIO6 and GPIO17 use RTC per-pin holds. GPIO42 uses only its documented
+The PCF alarm flag is cleared and configured before sleep. Firmware waits up
+to ten seconds for every requested wake line to rise. EXT1 `ANY_LOW` would wake
+immediately from a line that is still low, so `select_sleep_wake_sources`
+decides which lines to arm after the wait. Firmware never waits indefinitely. GPIO6 and GPIO17 use RTC per-pin holds. GPIO42 uses only its documented
 digital per-pin hold bit, which matches ESP-IDF `gpio_hold_en`.
 
 Before 07:00, the selection remains the prior calendar date, including its
@@ -54,7 +58,8 @@ complete prior snapshot remains. Otherwise, the scheduled observation commits
 A PWR tap wakes the ESP but does not refresh the panel. Firmware waits for the
 button release and returns to the normal EXT1 sleep.
 
-A continuous three-second PWR hold opens a 15-second USB frame gate. A valid
+A continuous three-second PWR hold turns the green LED on and opens a
+15-second USB frame gate. A valid
 protocol frame starts a two-minute parent session. USB power without a valid
 frame does not start the session.
 
@@ -74,13 +79,22 @@ command returns the retained scheduled state and millivolts, so USB power
 cannot replace the value used by the retained card.
 
 If GPIO5 and GPIO18 assert together, the daily refresh completes first.
-Firmware then evaluates the continued PWR hold.
+Firmware then evaluates the continued PWR hold. The green LED turns off before
+the device sleeps or restarts.
+
+## BOOT restart path
+
+A BOOT wake must stay held for one second. A shorter press returns to sleep
+without a refresh. A recognized hold flashes the green LED once, waits for
+release, and runs the reset path: it reads the RTC and refreshes the card,
+`SET TIME`, or recovery screen. It does not sample the battery. An alarm
+refresh or PWR parent session in the same wake takes precedence.
 
 ## Invalid RTC path
 
-An invalid RTC always refreshes `SET TIME` and serves USB for two minutes. A
-successful RTC write restarts normal operation. A timeout enters deep sleep
-with GPIO18 as the only wake source. An invalid clock cannot cause an RTC alarm
+An invalid RTC always refreshes `SET TIME`, turns the green LED on, and serves
+USB for two minutes. A successful RTC write restarts normal operation. A
+timeout enters deep sleep with GPIO18 and GPIO0 as wake sources. An invalid clock cannot cause an RTC alarm
 wake.
 
 ## Storage path
@@ -100,7 +114,8 @@ the board power-off. The next PWR start shows `SET TIME`.
 ## Failure path
 
 Pack, panel, alarm, and unexpected-wake failures make one bounded display
-attempt and then enter no-wake deep sleep. They do not retry automatically.
+attempt and then enter deep sleep with only GPIO0 armed. They do not retry
+automatically. A one-second BOOT hold runs the failed path once more.
 The retained e-paper card or recovery screen remains visible.
 
 ## Test boundary

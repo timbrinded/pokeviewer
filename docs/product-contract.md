@@ -32,7 +32,9 @@ and V2 examples are not interchangeable.
   when needed, and returns to deep sleep.
 - E-paper retains the complete prior card until a successful refresh.
 - A normal PWR tap does not change the display.
-- BOOT is used only for service flashing with the battery disconnected.
+- BOOT enters service flashing when held at power-up with the battery
+  disconnected. A one-second BOOT hold during operation restarts the firmware.
+- The green LED shows adult USB-session and restart feedback only.
 
 ## Daily card
 

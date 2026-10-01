@@ -76,15 +76,18 @@ installed:
 
 1. Connect a data-capable USB cable.
 2. Start `pokeviewerctl set-rtc --device DEVICE --now --wait-for-device`.
-3. Press and hold `PWR` for three seconds.
+3. Press and hold `PWR` until the green light turns on, about three seconds.
 4. Release `PWR` when `SET TIME` appears.
 5. Wait for the RTC read-back.
 
 The firmware requires a continuous three-second hold and a valid USB protocol
 frame. It then keeps the parent session open for two minutes. The device path
 wait is 60 seconds. The command allows time for the `SET TIME` screen to
-refresh before it sends the time. A PWR hold without an active command does
-not change the screen. The `BOOT` button is service-only.
+refresh before it sends the time. A PWR hold without an active command turns
+the green light on for 15 seconds and does not change the screen. A one-second
+`BOOT` hold restarts the firmware and redraws the screen. The README's
+[controls and lights](../README.md#controls-and-lights) section describes every
+button and light.
 
 To enter storage mode, start this command before the PWR hold:
 

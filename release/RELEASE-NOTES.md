@@ -10,8 +10,13 @@ SD-card, or over-the-air update dependency.
 
 The release includes the parent session introduced in v1.1.0. Connect USB and
 hold `PWR` for three seconds to change the time or enter storage mode. A short
-`PWR` press has no visible effect. The `BOOT` button is for service and flashing
-only.
+`PWR` press has no visible effect. The green light now turns on when the
+three-second hold is recognized.
+
+A one-second `BOOT` hold now restarts the firmware and redraws the screen. This
+works from every error screen, so recovery no longer requires opening the
+device. Firmware also puts the unused SHTC3 sensor to sleep and no longer stays
+awake indefinitely when a button is held at sleep entry.
 
 The display now shows `Normal`, `Recharge`, or `Unavailable` battery state
 instead of a percentage. `Normal` has no battery text or icon, `Recharge`

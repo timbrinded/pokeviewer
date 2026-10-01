@@ -3,7 +3,7 @@
 - Status: accepted for implementation; physical evidence incomplete
 - Hardware issue: [H02 / #3][issue-3]
 - Vendor source revision: [`3f96beedd2e8`][vendor-commit]
-- Last reviewed: 2026-08-10
+- Last reviewed: 2026-10-01
 
 Pokeviewer supports only the non-touch
 `ESP32-S3-ePaper-1.54-EN` V2 board, Waveshare SKU 32299. V1 firmware and pin
@@ -39,10 +39,10 @@ or making the touch and non-touch SKUs behave differently.
 
 | GPIO | Signal | Direction/active level | Pokeviewer use |
 | ---: | --- | --- | --- |
-| 0 | BOOT button | input, active low | adult recovery wake only |
-| 3 | onboard LED | output | off in release firmware |
+| 0 | BOOT button | input, active low; 10 kΩ pull-up | ROM download mode at power-up; EXT1 restart wake |
+| 3 | green LED (`LED_G`) | output, low enables; 24 kΩ to 3V3 | adult session and restart feedback |
 | 4 | `BAT_ADC` | ADC1 channel 3; 2:1 divider | bounded battery-state sample |
-| 5 | `RTC_INT` | input, active low | `Ext0` wake; RTC-domain pull-up enabled |
+| 5 | `RTC_INT` | input, active low | EXT1 wake; RTC-domain pull-up enabled |
 | 6 | `EPD3V3_EN` | output, low enables | panel power |
 | 7 | touch reset | touch SKU only | reserved, never driven |
 | 8 | `EPD_BUSY` | input; high means busy | panel state |
@@ -81,7 +81,7 @@ The schematic and V2 examples place these devices on GPIO47/GPIO48:
 | ---: | --- | --- |
 | `0x18` | ES8311 audio codec | rail remains powered; vendor software-suspend applied |
 | `0x51` | PCF85063ATL RTC | yes |
-| `0x70` | SHTC3 temperature/humidity sensor | no |
+| `0x70` | SHTC3 temperature/humidity sensor | sleep command only; unused otherwise |
 | `0x38` | FT6336 touch controller | must be absent on SKU 32299 |
 
 An I²C scan is supporting evidence only. Firmware binds directly to the
@@ -101,11 +101,23 @@ required RTC address and must not infer board identity from a scan.
   sleep. Firmware applies the vendor ES8311 software-suspend sequence; the
   audio rail remains powered while the panel rail is off. The rail is not
   described as suspended; only the codec is software-suspended.
-- The PCF85063 interrupt on GPIO5 is an open-drain, active-low `Ext0` wake
+- The PCF85063 interrupt on GPIO5 is an open-drain, active-low EXT1 wake
   source. Before sleep, firmware must enable GPIO5's RTC-domain pull-up and
   disable its RTC-domain pull-down; configuring only the digital IO-mux pull-up
   is insufficient after the pin switches to RTC_IO.
-- The PWR/BOOT inputs are reserved adult wake inputs.
+- PWR (GPIO18) and BOOT (GPIO0) are adult EXT1 wake inputs. PWR also turns on
+  the battery path in hardware through D9, T2, and Q4, so it starts a board
+  whose GPIO17 latch is low.
+- The SHTC3 is powered from the always-on 3V3 rail. It draws about 45 µA in
+  its power-up idle state and 0.3 µA asleep, so firmware sends its sleep
+  command at every boot.
+- The speaker amplifier enable (GPIO46) has a 10 kΩ pull-down (R69), so the
+  NS4150B stays in shutdown without firmware control.
+- The orange LED is driven by the ETA6098 `STAT` output and shows charging.
+  Firmware cannot control it.
+- Hardware loads that firmware cannot remove: the 200 kΩ + 200 kΩ battery
+  divider (about 9 µA), the MP1605 regulator quiescent current, and its
+  feedback divider.
 - The e-paper keeps its image after the panel rail and MCU are inactive.
 - Battery voltage is the calibrated GPIO4 reading multiplied by two. Values
   from 2,500 mV through 4,500 mV are plausible. The retained value is bounded
@@ -136,7 +148,8 @@ adult integration responsibilities.
 | GPIO5 RTC-domain pull-up | verified | alarm-driven EXT0 wake passed at a synthetic 07:00 boundary |
 | Scheduled RTC wake/reboot | verified | retained verdict reported `Ext0` with the PCF alarm flag asserted |
 | Battery millivolt accuracy | pending | one final retained USB value versus DMM comparison required |
-| RTC-versus-PWR battery commit gate | pending | one bounded scheduled-wake and parent-session comparison required |
+| RTC-versus-PWR battery commit gate | verified | 2026-10-01: retained 3,902 mV through PWR and BOOT wakes; a synthetic 07:00 alarm wake committed 4,080 mV |
+| BOOT restart and status LED | verified | 2026-10-01: tap ignored, one-second hold flashed and refreshed, 30-second hold slept with BOOT unarmed |
 | Non-touch I²C population | pending | sanitized full-bus probe required |
 
 Serial access is operational through the host's normal device group; device

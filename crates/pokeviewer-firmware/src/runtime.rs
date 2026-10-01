@@ -4,8 +4,9 @@ use embassy_futures::block_on;
 use embedded_hal::delay::DelayNs;
 use esp_hal::{
     delay::Delay,
-    gpio::{Input, InputConfig, Level, Output, OutputConfig, Pull},
+    gpio::{Input, InputConfig, InputPin, Level, Output, OutputConfig, Pull},
     i2c::master::{Config as I2cConfig, I2c},
+    peripherals::GPIO3,
     rtc_cntl::wakeup_cause,
     system::SleepSource,
     time::Rate,
@@ -26,8 +27,8 @@ use crate::{
     plan_wake, render_failure_screen,
     shtc3::sleep_humidity_sensor,
     sleep::{
-        POWER_BUTTON_WAKE_BIT, RTC_INTERRUPT_WAKE_BIT, SleepResources, ext1_wake_status,
-        restore_panel_power, restore_power_latch, restore_wake_pin,
+        BOOT_BUTTON_WAKE_BIT, POWER_BUTTON_WAKE_BIT, RTC_INTERRUPT_WAKE_BIT, SleepResources,
+        ext1_wake_status, restore_panel_power, restore_power_latch, restore_wake_pin,
     },
     usb_protocol::UsbProtocolTransport,
 };
@@ -36,15 +37,18 @@ type BoardI2c = esp_hal::i2c::master::I2c<'static, esp_hal::Async>;
 type BoardRtc = Pcf85063Rtc<BoardI2c>;
 
 const PARENT_AFTER_DAILY_MAGIC: u32 = 0x5057_5201;
+const BUTTON_POLL_MS: u32 = 50;
 const POWER_HOLD_POLLS: usize = 60;
-const POWER_HOLD_POLL_MS: u32 = 50;
+const RESTART_HOLD_POLLS: usize = 20;
+const BUTTON_RELEASE_POLLS: usize = 200;
+const RESTART_LIGHT_MS: u32 = 300;
 const USB_FRAME_GATE_POLLS: usize = 15_000;
 const PARENT_SESSION_POLLS: usize = 120_000;
 
 #[esp_hal::ram(unstable(rtc_fast, persistent))]
 static PARENT_AFTER_DAILY: AtomicU32 = AtomicU32::new(0);
 
-/// Render one frame, then deep-sleep until the RTC alarm or PWR wakes the board.
+/// Render one frame, then deep-sleep until the RTC alarm, PWR, or BOOT wakes the board.
 pub fn run_pokeviewer() -> ! {
     let cause = wakeup_cause();
     let wake_status = ext1_wake_status();
@@ -64,13 +68,19 @@ pub fn run_pokeviewer() -> ! {
     );
     release_audio_power_pad();
 
+    let mut status_light_pin = peripherals.GPIO3;
+    set_status_light(&mut status_light_pin, false);
+
+    let mut boot_button_pin = peripherals.GPIO0;
     let mut rtc_interrupt_pin = peripherals.GPIO5;
     let mut power_button_pin = peripherals.GPIO18;
+    restore_wake_pin(&mut boot_button_pin);
     restore_wake_pin(&mut rtc_interrupt_pin);
     restore_wake_pin(&mut power_button_pin);
     macro_rules! sleep_resources {
         () => {
             SleepResources {
+                boot_button: boot_button_pin,
                 rtc_interrupt: rtc_interrupt_pin,
                 power_button: power_button_pin,
                 panel_power: panel_power_pin,
@@ -155,6 +165,7 @@ pub fn run_pokeviewer() -> ! {
             SleepSource::Ext1 => WakeInput::Ext1 {
                 rtc_pin: wake_status & RTC_INTERRUPT_WAKE_BIT != 0,
                 power_pin: wake_status & POWER_BUTTON_WAKE_BIT != 0,
+                boot_pin: wake_status & BOOT_BUTTON_WAKE_BIT != 0,
                 alarm_pending,
             },
             _ => WakeInput::Other,
@@ -167,22 +178,35 @@ pub fn run_pokeviewer() -> ! {
     let mut battery = load_retained_battery();
     let mut battery_diagnostic_flags = diagnostic_flags(battery);
 
+    if decision.check_restart {
+        if !button_held(boot_button_pin.reborrow(), RESTART_HOLD_POLLS) {
+            sleep_current_rtc!(rtc);
+        }
+        // Acknowledge the restart before the slower panel refresh begins.
+        set_status_light(&mut status_light_pin, true);
+        Delay::new().delay_ms(RESTART_LIGHT_MS);
+        set_status_light(&mut status_light_pin, false);
+        wait_for_release(boot_button_pin.reborrow());
+    }
+
     if decision.check_parent_session && !decision.refresh_daily {
-        if !power_held_for_parent_session(&mut power_button_pin) {
-            wait_for_power_release(&mut power_button_pin);
+        if !button_held(power_button_pin.reborrow(), POWER_HOLD_POLLS) {
             sleep_current_rtc!(rtc);
         }
 
+        // The light stays on while the device listens for, or serves, a computer.
+        set_status_light(&mut status_light_pin, true);
         let Some((mut transport, first_action)) = wait_for_valid_usb_frame(
             &mut rtc,
             peripherals.USB_DEVICE,
             battery_diagnostic_flags,
             battery,
         ) else {
-            wait_for_power_release(&mut power_button_pin);
+            set_status_light(&mut status_light_pin, false);
             sleep_current_rtc!(rtc);
         };
         if first_action == ProtocolAction::RtcSet {
+            set_status_light(&mut status_light_pin, false);
             Delay::new().delay_ms(100);
             esp_hal::system::software_reset();
         }
@@ -204,11 +228,15 @@ pub fn run_pokeviewer() -> ! {
         .is_err()
         {
             panel_power.set_high();
+            set_status_light(&mut status_light_pin, false);
             terminal!(FailureKind::Panel);
         }
         panel_power.set_high();
 
-        match serve_parent_session(&mut rtc, &mut transport, battery_diagnostic_flags, battery) {
+        let action =
+            serve_parent_session(&mut rtc, &mut transport, battery_diagnostic_flags, battery);
+        set_status_light(&mut status_light_pin, false);
+        match action {
             ProtocolAction::RtcSet => {
                 Delay::new().delay_ms(100);
                 esp_hal::system::software_reset();
@@ -226,7 +254,7 @@ pub fn run_pokeviewer() -> ! {
                 sleep_resources!().power_off_for_storage();
             }
             ProtocolAction::None => {
-                wait_for_power_release(&mut power_button_pin);
+                wait_for_release(power_button_pin.reborrow());
                 if block_on(rtc.read_datetime()).is_ok() {
                     Delay::new().delay_ms(100);
                     esp_hal::system::software_reset();
@@ -289,12 +317,14 @@ pub fn run_pokeviewer() -> ! {
             "RTC setup required; framebuffer_crc32={:08x}; awake=true; timeout_seconds=120",
             rendered.crc32
         );
+        set_status_light(&mut status_light_pin, true);
         let action = serve_initial_setup(
             &mut rtc,
             peripherals.USB_DEVICE,
             FailureKind::InvalidRtc.policy().diagnostic_flag | battery_diagnostic_flags,
             battery,
         );
+        set_status_light(&mut status_light_pin, false);
         if action == ProtocolAction::RtcSet {
             Delay::new().delay_ms(100);
             esp_hal::system::software_reset();
@@ -337,19 +367,15 @@ pub fn run_pokeviewer() -> ! {
     sleep_resources!().sleep();
 }
 
-fn power_held_for_parent_session(
-    power_button_pin: &mut esp_hal::peripherals::GPIO18<'static>,
-) -> bool {
-    let input = Input::new(
-        power_button_pin.reborrow(),
-        InputConfig::default().with_pull(Pull::Up),
-    );
+/// Report whether an active-low button stays pressed for `polls` intervals.
+fn button_held<'a>(pin: impl InputPin + 'a, polls: usize) -> bool {
+    let input = Input::new(pin, InputConfig::default().with_pull(Pull::Up));
     if input.is_high() {
         return false;
     }
     let mut delay = Delay::new();
-    for _ in 0..POWER_HOLD_POLLS {
-        delay.delay_ms(POWER_HOLD_POLL_MS);
+    for _ in 0..polls {
+        delay.delay_ms(BUTTON_POLL_MS);
         if input.is_high() {
             return false;
         }
@@ -357,15 +383,23 @@ fn power_held_for_parent_session(
     true
 }
 
-fn wait_for_power_release(power_button_pin: &mut esp_hal::peripherals::GPIO18<'static>) {
-    let input = Input::new(
-        power_button_pin.reborrow(),
-        InputConfig::default().with_pull(Pull::Up),
-    );
+/// Wait a bounded time for an active-low button to be released.
+fn wait_for_release<'a>(pin: impl InputPin + 'a) {
+    let input = Input::new(pin, InputConfig::default().with_pull(Pull::Up));
     let mut delay = Delay::new();
-    while input.is_low() {
-        delay.delay_ms(50);
+    for _ in 0..BUTTON_RELEASE_POLLS {
+        if input.is_high() {
+            return;
+        }
+        delay.delay_ms(BUTTON_POLL_MS);
     }
+}
+
+/// Drive the active-low green LED on GPIO3. The level persists after the
+/// temporary driver is dropped.
+fn set_status_light(pin: &mut GPIO3<'static>, on: bool) {
+    let level = if on { Level::Low } else { Level::High };
+    let _light = Output::new(pin.reborrow(), level, OutputConfig::default());
 }
 
 fn wait_for_valid_usb_frame(
@@ -449,7 +483,7 @@ fn prepare_sleep(rtc: &mut BoardRtc) -> RtcSleepMode {
 
 fn log_daily_ready(crc32: u32, next_wake: pokeviewer_core::LocalDateTime, battery: BatteryReading) {
     esp_println::println!(
-        "daily card ready; framebuffer_crc32={crc32:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; battery_state={:?}; battery_cell_mv={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true; wake_sources=ext1_gpio5_gpio18",
+        "daily card ready; framebuffer_crc32={crc32:08x}; refreshed=true; next_rollover={:04}-{:02}-{:02} 07:00:00; battery_state={:?}; battery_cell_mv={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; audio_codec_suspended=true; deep_sleep=true; wake_sources=ext1_gpio0_gpio5_gpio18",
         next_wake.year,
         next_wake.month,
         next_wake.day,
@@ -461,12 +495,12 @@ fn log_daily_ready(crc32: u32, next_wake: pokeviewer_core::LocalDateTime, batter
 fn sleep_after_failure(failure: FailureKind, resources: SleepResources) -> ! {
     let policy = failure.policy();
     esp_println::println!(
-        "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; deep_sleep=true; wake_sources=none",
+        "terminal failure; code={}; diagnostic_flag={:04x}; attempts={}; panel_rail_off=true; power_latch_high=true; audio_power_low=true; deep_sleep=true; wake_sources=ext1_gpio0",
         policy.code,
         policy.diagnostic_flag,
         policy.max_attempts,
     );
-    resources.sleep_without_wake();
+    resources.sleep_until_restart();
 }
 
 fn map_rtc_error<BusError>(error: Pcf85063RtcError<BusError>) -> SetupReason {

@@ -1,11 +1,15 @@
 ---
-status: accepted
+status: partly superseded by ADR-0010
 date: 2026-07-28
 decision-makers:
   - Project maintainer
 ---
 
 # Use no-wake deep sleep for terminal failures
+
+[ADR 0010](0010-use-boot-as-an-adult-restart-and-gpio3-as-a-status-light.md)
+supersedes the no-wake outcome: terminal sleep now arms the BOOT button. The
+one bounded display attempt and the no-automatic-retry rules remain active.
 
 ## Context and Problem Statement
 

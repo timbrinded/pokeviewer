@@ -54,7 +54,7 @@ pub use rtc::{FakeRtc, FakeRtcError, Rtc};
 pub use runtime::run_pokeviewer;
 #[cfg(target_arch = "xtensa")]
 pub use usb_protocol::{UsbProtocolError, UsbProtocolTransport};
-pub use wake::{WakeDecision, WakeInput, decide_wake};
+pub use wake::{SleepWakeSources, WakeDecision, WakeInput, decide_wake, select_sleep_wake_sources};
 
 /// Exact hardware target supported by release firmware.
 pub const BOARD_TARGET: &str = "Waveshare ESP32-S3-ePaper-1.54-EN V2";
