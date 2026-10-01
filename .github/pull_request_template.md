@@ -14,5 +14,5 @@
 
 ## Privacy and licensing
 
-- [ ] No child or household details, device identifiers, private paths, or raw logs
+- [ ] No credentials, child or household details, device identifiers, private paths, or raw logs
 - [ ] No new Pokémon media, or `THIRD_PARTY_NOTICES.md` still covers it
