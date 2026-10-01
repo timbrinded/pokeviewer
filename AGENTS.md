@@ -7,7 +7,8 @@ Linux USB CLI for adult RTC setup, and a content pack compiled into the image.
 ## Commands
 
 Cargo is the only entry point. Repository automation belongs in `xtask`, not
-in a Makefile, Justfile, or shell wrapper.
+in a Makefile or Justfile; the release packaging scripts in `scripts/` are the
+only shell exception.
 
 ```sh
 cargo fmt --all --check
@@ -69,6 +70,6 @@ defect needs a board, a battery, and often a 07:00 wake to reproduce.
 - Wake, sleep, PWR, BOOT, and 07:00: [state machine](docs/hardware/wake-sleep-state-machine.md)
 - Pins and power rails: [V2 board contract](docs/hardware/v2-board-contract.md)
 - USB protocol: [protocol v1](docs/usb-protocol-v1.md)
-- Renderer and goldens: [rendering](docs/development/rendering.md), [visual testing](docs/development/visual-testing.md)
+- Renderer and goldens: [rendering](docs/development/rendering.md)
 - Content pipeline: [content tooling](docs/development/content-tooling.md)
 - Review and release: [CONTRIBUTING.md](CONTRIBUTING.md), [publishing](docs/development/publishing.md)

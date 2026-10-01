@@ -43,7 +43,7 @@ the hard rules. It applies to human contributors as well as coding agents.
   not.
 - A visual change must update the goldens deliberately with
   `cargo xtask golden-update`. The pull request names the changed cards. See
-  [visual testing](docs/development/visual-testing.md).
+  [rendering](docs/development/rendering.md).
 - When a change alters hardware behaviour, run the one bounded device check
   listed in [hardware validation](docs/hardware/validation.md). Documentation,
   workflow, and host-tool-only changes need no device flash.
