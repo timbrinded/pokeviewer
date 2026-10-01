@@ -16,14 +16,14 @@ releases.
 | | `cargo deny check` | disallowed licenses, advisories, and sources |
 | | `actionlint` | invalid workflow syntax and shell errors in workflows |
 | `Offline content integrity` | `cargo xtask content-build`, then `git diff --exit-code -- content/generated` | committed pack, manifest, or contact sheet that does not match the cache and converter |
-| `Visual and recovery goldens` | `cargo xtask golden-check`, and `render-recovery-screens` compared with `docs/evidence/recovery-screens` | any changed pixel on a daily card or recovery screen |
+| `Visual and recovery goldens` | `cargo xtask golden-check`, `render-recovery-screens` compared with `docs/evidence/recovery-screens`, and `render-device-views` compared with `docs/images/device` | any changed pixel on a daily card or recovery screen, or a stale README device view |
 | `ESP32-S3 release` | release firmware built twice and checked with `scripts/check-firmware-artifact.sh` | missing entry point, text over 200,000 bytes, data over 16,384 bytes, pack over 65,536 bytes, or nondeterministic loaded sections |
 | | the eight diagnostic images built once | target-only compile errors in diagnostic binaries |
 
 On failure, the visual job uploads `visual-diff`. It holds, for each changed
 case, `*-expected.png`, `*-actual.png`, `*-diff.png` (black where pixels
 differ), and `*-report.txt` with the changed coordinates and hashes, plus the
-rendered recovery screens.
+rendered recovery screens and device views.
 
 The firmware job uploads `esp32s3-release` with all nine ELF files, so a
 reviewer can flash exactly what CI built. It also writes the size budgets to
