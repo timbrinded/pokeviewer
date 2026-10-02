@@ -91,7 +91,7 @@ jobs:
                 --max-concurrency 32 \
                 --max-retries 6 \
                 --retry-wait-time 2 \
-                --remap 'https://github\.com/([^/]+)/([^/]+)/blob/(.+) https://raw.githubusercontent.com/$1/$2/$3'
+                --remap "https://github\.com/([^/]+)/([^/]+)/blob/(.+) https://raw.githubusercontent.com/\$1/\$2/\$3"
             then
               exit 0
             fi
