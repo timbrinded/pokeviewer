@@ -1,58 +1,36 @@
-# Pokeviewer v2.0.0
+# Pokeviewer v2.1.0
 
 Pokeviewer is a battery-powered, fully offline Pokémon-of-the-day display for
 the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 development board. It shows
-the weekday, a Pokémon Yellow sprite, the English name, and the canonical type
+the weekday, a Pokémon Crystal sprite, the English name, and the canonical type
 or types, and changes the card at 07:00 local time. It has no Wi-Fi, BLE,
 account, SD card, or over-the-air update.
 
-This is a major release: the battery display, the button behaviour, and the
-recovery steps change from v1.1.0.
+## Pokémon
 
-## Battery
-
-- The percentage is gone. The card shows one of three states: `Normal` (no
-  battery text), `Recharge` (lightning icon and `CHARGE!` at the bottom), or
-  `Unavailable` (`BAT ?` in the top-right corner). `Recharge` starts below
-  3,750 mV and clears at or above 3,850 mV.
-- The battery is measured every three hours, at 07:00, and on a `BOOT`
-  restart. The card redraws only when the state changes, so `CHARGE!` clears
-  within three hours of charging, or at once after a `BOOT` restart.
-- The orange charger light is the reliable sign that charging has finished. A
-  reading taken while USB is connected sees the charger's voltage.
-- New `pokeviewerctl get-battery` reports the retained state and cell
-  millivolts. Millivolts are diagnostic data, not a capacity measurement.
-
-## Buttons and lights
-
-- `PWR`: a short press does nothing visible. A three-second hold turns the
-  green light on and opens the parent session for `pokeviewerctl`.
-- `BOOT`: a one-second hold now restarts the firmware and redraws the screen,
-  including after any error screen. Recovery no longer requires opening the
-  device or disconnecting the battery. Holding `BOOT` at power-up with the
-  battery disconnected still enters flashing mode.
-- Green light: steady while the device listens for or serves a computer; one
-  flash when a `BOOT` restart is accepted.
-
-## Power and reliability
-
-- The unused SHTC3 sensor is put to sleep at every boot, removing about 45 µA
-  of idle current.
-- The device no longer stays awake indefinitely when a button or the RTC line
-  is held low at sleep entry. A stuck RTC interrupt is reported as `ALARM`.
-- `pokeviewerctl --wait-for-device` tolerates the short moment when a new
-  serial device has not yet received its permissions.
+- The device now shows all 251 Generation I and II Pokémon, National Pokédex
+  IDs 1 to 251.
+- Sprites come from Pokémon Crystal instead of Pokémon Yellow. Each sprite
+  pixel is drawn as one of four shades (white, light, dark, or black) using
+  black-and-white dot patterns, with the normal full refresh. Outlines stay
+  solid black, and large black bodies keep their detail.
+- The daily order is new. Every Pokémon appears once in each 251-day cycle,
+  and any seven consecutive days show Pokémon at least 31 Pokédex numbers
+  apart. The cycle still counts from 2026-01-01 and still changes at 07:00.
 
 ## Upgrading
 
 Follow the README quick start. Flashing does not change the RTC, so the time
-is kept. Use the v2.0.0 `pokeviewerctl` with v2.0.0 firmware.
+is kept. After flashing, the card shows the Pokémon the new order assigns to
+the current day, which can differ from the one v2.0.0 showed. Use the v2.1.0
+`pokeviewerctl` with v2.1.0 firmware. The USB protocol, buttons, lights, and
+battery display are unchanged from v2.0.0.
 
 ## Contents
 
 One merged firmware image flashable at offset `0x0`, one Linux x86-64
-`pokeviewerctl`, the compiled offline content pack, SHA-256 checksums, and
-setup, safety, and troubleshooting documentation.
+`pokeviewerctl`, the compiled offline content pack (`pokeviewer-v2.pack`),
+SHA-256 checksums, and setup, safety, and troubleshooting documentation.
 
 Pokeviewer is an adult-built, child-adjacent development-board project, not a
 certified finished toy. No board, enclosure, battery, charger, or cable is

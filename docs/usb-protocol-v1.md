@@ -62,7 +62,7 @@ The handshake capability bits are:
 | 5 | read retained battery snapshot |
 
 Commands 1 to 5 keep their existing wire IDs and response shapes. Firmware
-reports product version `2.0.0` and capability mask `0x3f`. Older v1.1.0
+reports product version `2.1.0` and capability mask `0x3f`. Older v1.1.0
 firmware reports `0x1f` and does not implement command 6.
 
 The storage command is accepted only in a PWR-gated parent session, which
