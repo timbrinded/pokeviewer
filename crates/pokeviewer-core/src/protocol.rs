@@ -11,7 +11,7 @@ pub const MAX_FRAME_BYTES: usize = HEADER_BYTES + MAX_PAYLOAD_BYTES + CHECKSUM_B
 /// Supported USB protocol version.
 pub const PROTOCOL_VERSION: u8 = 1;
 /// Product version reported by v1 firmware over USB.
-pub const FIRMWARE_VERSION: [u8; 3] = [2, 0, 0];
+pub const FIRMWARE_VERSION: [u8; 3] = [2, 1, 0];
 /// Firmware can negotiate protocol metadata.
 pub const CAP_HANDSHAKE: u8 = 1 << 0;
 /// Firmware can read the RTC.
