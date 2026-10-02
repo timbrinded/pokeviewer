@@ -76,14 +76,31 @@ jobs:
             'content/**/*.md' \
             'release/**/*.md'
 
+      # github.com answers blob pages requested from Actions runners with 503,
+      # and lychee's GitHub token only checks that a repository exists. The
+      # raw file at the same ref proves the same thing a blob page does.
+      # lychee retries only timeouts and 429, not a rejected 503 or 504, so
+      # one transient github.com error would fail the run. Each attempt
+      # rechecks only links that returned 5xx; a 4xx stays failed.
       - name: Check Markdown links
         run: |
-          git ls-files -z '*.md' \
-            | xargs -0 lychee \
-              --no-progress \
-              --max-concurrency 32 \
-              --max-retries 6 \
-              --retry-wait-time 2
+          for attempt in 1 2 3 4 5; do
+            if git ls-files -z '*.md' \
+              | xargs -0 lychee \
+                --no-progress \
+                --max-concurrency 32 \
+                --max-retries 6 \
+                --retry-wait-time 2 \
+                --cache \
+                --cache-exclude-status '500..' \
+                --remap "https://github\.com/([^/]+)/([^/]+)/blob/(.+) https://raw.githubusercontent.com/\$1/\$2/\$3"
+            then
+              exit 0
+            fi
+            echo "Link check attempt $attempt failed"
+            sleep 30
+          done
+          exit 1
 
       - name: Check dependency policy
         run: cargo deny --locked check
