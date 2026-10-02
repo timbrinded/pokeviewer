@@ -76,6 +76,9 @@ jobs:
             'content/**/*.md' \
             'release/**/*.md'
 
+      # github.com answers blob pages requested from Actions runners with 503,
+      # and lychee's GitHub token only checks that a repository exists. The
+      # raw file at the same ref proves the same thing a blob page does.
       - name: Check Markdown links
         run: |
           git ls-files -z '*.md' \
@@ -83,7 +86,8 @@ jobs:
               --no-progress \
               --max-concurrency 32 \
               --max-retries 6 \
-              --retry-wait-time 2
+              --retry-wait-time 2 \
+              --remap 'https://github\.com/([^/]+)/([^/]+)/blob/(.+) https://raw.githubusercontent.com/$1/$2/$3'
 
       - name: Check dependency policy
         run: cargo deny --locked check
