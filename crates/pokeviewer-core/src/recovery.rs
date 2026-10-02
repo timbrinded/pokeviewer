@@ -94,7 +94,7 @@ mod tests {
                 selection.cycle_index,
                 selection.dex_id
             ),
-            (2025, 12, 31, 150, 79)
+            (2025, 12, 31, 250, 158)
         );
     }
 

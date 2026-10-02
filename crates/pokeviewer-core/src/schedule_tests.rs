@@ -4,12 +4,12 @@ use std::collections::BTreeSet;
 use time::{Date, Duration};
 
 use super::{
-    CYCLE_LENGTH, DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, Weekday,
-    next_rollover, select_daily_pokemon,
+    DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, Weekday, next_rollover,
+    select_daily_pokemon,
 };
-use crate::ContentPack;
+use crate::{ContentPack, POKEMON_COUNT};
 
-const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
+const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
 const EPOCH_ROLLOVER: LocalDateTime = LocalDateTime {
     year: 2026,
     month: 1,
@@ -125,8 +125,8 @@ fn contract_vectors_are_exact() {
                 day: 31,
                 weekday: Weekday::Wednesday,
             },
-            150,
-            79,
+            250,
+            158,
         ),
         (
             LocalDateTime {
@@ -141,8 +141,8 @@ fn contract_vectors_are_exact() {
                 day: 31,
                 weekday: Weekday::Wednesday,
             },
-            150,
-            79,
+            250,
+            158,
         ),
         (
             EPOCH_ROLLOVER,
@@ -158,17 +158,17 @@ fn contract_vectors_are_exact() {
         (
             LocalDateTime {
                 year: 2026,
-                month: 6,
-                day: 1,
+                month: 9,
+                day: 9,
                 hour: 7,
                 minute: 0,
                 second: 0,
             },
             DisplayDate {
                 year: 2026,
-                month: 6,
-                day: 1,
-                weekday: Weekday::Monday,
+                month: 9,
+                day: 9,
+                weekday: Weekday::Wednesday,
             },
             0,
             1,
@@ -235,9 +235,10 @@ fn rollover_uses_one_atomic_display_date_across_boundaries() {
 fn every_cycle_is_a_permutation_and_matches_the_committed_pack() {
     let pack = ContentPack::parse(PACK).unwrap();
     let epoch = EPOCH_ROLLOVER.to_primitive().unwrap().date();
+    let cycle_length = i64::from(POKEMON_COUNT);
     for cycle in -20..=20 {
-        let start = epoch + Duration::days(cycle * CYCLE_LENGTH);
-        let ids: BTreeSet<_> = (0..CYCLE_LENGTH)
+        let start = epoch + Duration::days(cycle * cycle_length);
+        let ids: BTreeSet<_> = (0..cycle_length)
             .map(|offset| {
                 let selected = selection(at_noon(start + Duration::days(offset)));
                 assert_eq!(
@@ -247,10 +248,10 @@ fn every_cycle_is_a_permutation_and_matches_the_committed_pack() {
                 selected.dex_id
             })
             .collect();
-        assert_eq!(ids.len(), usize::try_from(CYCLE_LENGTH).unwrap());
+        assert_eq!(ids.len(), usize::from(POKEMON_COUNT));
         assert_eq!(
             selection(at_noon(start)).dex_id,
-            selection(at_noon(start + Duration::days(CYCLE_LENGTH))).dex_id
+            selection(at_noon(start + Duration::days(cycle_length))).dex_id
         );
     }
 }
@@ -267,7 +268,7 @@ fn rtc_range_extremes_and_large_offsets_are_exact() {
                 minute: 0,
                 second: 0,
             },
-            (1999, 12, 31, 15, 39),
+            (1999, 12, 31, 40, 247),
         ),
         (
             LocalDateTime {
@@ -278,7 +279,7 @@ fn rtc_range_extremes_and_large_offsets_are_exact() {
                 minute: 59,
                 second: 59,
             },
-            (2099, 12, 31, 149, 6),
+            (2099, 12, 31, 170, 168),
         ),
     ];
 

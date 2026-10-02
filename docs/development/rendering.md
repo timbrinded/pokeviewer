@@ -19,22 +19,50 @@ It validates the complete input before clearing or drawing. Empty, oversized,
 unsupported, duplicate-type, or over-wide input returns a bounded
 `RenderError` and leaves the prior framebuffer unchanged.
 
-The fixed font covers the complete committed v1 name vocabulary, including the
-curly apostrophe and the female and male signs. An exhaustive host test renders
-all 151 committed records.
+The fixed font covers the complete committed name vocabulary, including the
+curly apostrophe, the female and male signs, the hyphen, and digits. An
+exhaustive host test renders all 251 committed records.
 
 The renderer does not derive battery state from voltage. `Normal` shows no
 battery text or icon, `Recharge` shows the lightning icon and `CHARGE!` at the
 bottom, and `Unavailable` shows `BAT ?` in the top-right corner. The card
 contains no battery percentage.
 
+## Sprite shading
+
+Pack sprites hold four shades, from `0` white to `3` black. Mapping two shades
+to black and two to white would leave 39 of the 251 Crystal sprites more than
+80 % ink inside their outline: Vileplume's body and face, Gengar, Umbreon, and
+Murkrow become solid black, and Snorlax loses its belly. The renderer therefore
+draws each sprite pixel as a 2 × 2 cell of panel pixels and blackens part of
+the cell.
+
+Shades 0–3 blacken 0, 1, 2, or 4 of the cell's panel pixels: white, 25 %,
+50 %, and black. A panel pixel is black when the cell's ink exceeds its entry
+in the threshold matrix `[[0, 2], [3, 1]]`, indexed `[row][column]`. So 25 %
+is the top-left dot, 50 % is a checkerboard, and adjacent cells tile without
+seams.
+
+One exception keeps large black areas readable. A black sprite pixel that is
+one of the four centre pixels of an all-black 4 × 4 block of sprite pixels,
+lying entirely within the 56 × 56 sprite, gets 3 of 4 (75 %); its bottom-left
+panel pixel stays white. Black detail up to three sprite pixels wide, such as
+outlines, eyes, and spots, stays solid. With this table, only Murkrow is above
+80 % ink, at 80.4 %, and light bodies such as Pikachu read as a 25 % stipple
+instead of disappearing into the white background.
+
+Every panel pixel is black or white, and the panel uses its normal full
+refresh. `SHADE_INK`, `SOLID_INTERIOR_INK`, `SOLID_BLOCK`, and
+`DITHER_THRESHOLDS` in `render.rs` are the reviewed tone table; changing any of
+them is a visual change that needs `golden-update`.
+
 ## Memory report
 
 | Item | Storage | Allocation |
 | --- | ---: | --- |
 | Panel framebuffer | 5,000 bytes RAM | fixed value |
-| Font bitmaps | 231 bytes read-only program data | fixed value |
-| Current sprite | borrowed 392-byte pack slice | none |
+| Font bitmaps | 322 bytes read-only program data: 45 glyphs and the lightning icon | fixed value |
+| Current sprite | borrowed 784-byte pack slice | none |
 | `DailyCard` strings and sprite | borrowed views | none |
 | Renderer work buffer | 0 bytes | none |
 | Heap | 0 bytes | none |

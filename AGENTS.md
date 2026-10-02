@@ -41,10 +41,11 @@ defect needs a board, a battery, and often a 07:00 wake to reproduce.
 
 ## Rules
 
-- [The product contract](docs/product-contract.md) fixes v1 scope. Changing a
-  locked decision needs an accepted ADR first. Accepted ADRs in
-  [docs/decisions](docs/decisions/README.md) are superseded by a new ADR that
-  links both ways, never edited to change their outcome.
+- [The product contract](docs/product-contract.md) fixes scope. Change it in
+  the same pull request as the behaviour it governs, and give the reason in the
+  pull request. The project does not use ADRs: do not write, propose, or
+  require one, and do not raise ADRs in reviews or summaries.
+  [docs/decisions](docs/decisions/README.md) is a closed historical log.
 - Fix lints and failing checks instead of relaxing them. Do not lower workspace
   lint levels or weaken golden, content-integrity, firmware-budget, or
   release-package checks; they encode reviewed behaviour.

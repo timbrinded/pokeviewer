@@ -1,6 +1,6 @@
 # Content-pack and daily-schedule contract v1
 
-- Status: accepted
+- Status: superseded by [contract v2](content-pack-v2.md)
 - Contract issue: [D09 / #10][issue-10]
 - Binary format version: 1
 - Content revision: 2

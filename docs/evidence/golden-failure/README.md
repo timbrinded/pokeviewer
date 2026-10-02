@@ -1,7 +1,7 @@
 # Visual-golden failure demonstration
 
 This evidence deliberately changes only pixel `(100,100)` in the approved
-Monday/Bulbasaur renderer-v3 framebuffer. It uses the production
+Monday/Bulbasaur renderer-v4 framebuffer. It uses the production
 comparison-artifact writer without altering the committed golden.
 
 Regenerate it with:

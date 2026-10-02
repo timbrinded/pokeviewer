@@ -241,13 +241,13 @@ COMMANDS:
     usb-provisioning-flash
                       Build, flash, and monitor wired provisioning firmware
     content-fetch [CACHE_DIR]
-                      Explicitly fetch IDs 1-151 into a new review cache
+                      Explicitly fetch IDs 1-251 into a new review cache
     content-build [CACHE_DIR] [PACK_FILE] [MANIFEST_FILE]
                       Build a deterministic pack without network access
     render-samples [OUTPUT_DIR]
                       Render representative panel-native PBM and PNG evidence
     render-contact-sheet [OUTPUT_FILE]
-                      Render all 151 cards into one actual-pixel PNG
+                      Render all 251 cards into one actual-pixel PNG
     render-setup-screen [OUTPUT_FILE]
                       Render the adult invalid-RTC recovery screen
     render-recovery-screens [OUTPUT_DIR]

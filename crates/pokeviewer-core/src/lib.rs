@@ -9,6 +9,7 @@ mod protocol;
 mod recovery;
 mod render;
 mod schedule;
+mod sprite;
 
 pub use battery::{
     BATTERY_SAMPLE_COUNT, BATTERY_SNAPSHOT_BYTES, BATTERY_SNAPSHOT_VERSION, BatteryError,
@@ -16,7 +17,10 @@ pub use battery::{
     MIN_BATTERY_MV, decode_battery_snapshot, encode_battery_snapshot, filtered_battery_mv,
     update_battery_reading,
 };
-pub use content::{CONTENT_SPRITE_BYTES, ContentPack, PackError, PokemonRecord, PokemonType};
+pub use content::{
+    CONTENT_FORMAT_VERSION, CONTENT_REVISION, ContentPack, POKEMON_COUNT, PackError, PokemonRecord,
+    PokemonType,
+};
 pub use protocol::{
     BATTERY_PAYLOAD_BYTES, CAP_DIAGNOSTICS, CAP_ENTER_STORAGE, CAP_HANDSHAKE, CAP_READ_BATTERY,
     CAP_READ_RTC, CAP_SET_RTC, CAPABILITIES, Command, EncodedFrame, FIRMWARE_VERSION,
@@ -30,7 +34,10 @@ pub use render::{
 };
 pub use schedule::{
     DailySelection, DisplayDate, InvalidDateTime, LocalDateTime, SCHEDULE_VERSION, Weekday,
-    next_rollover, select_daily_pokemon,
+    next_rollover, scheduled_dex_id, select_daily_pokemon,
+};
+pub use sprite::{
+    BLACK_SHADE, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, set_sprite_shade, sprite_shade,
 };
 
 /// Width of the supported e-paper panel in pixels.

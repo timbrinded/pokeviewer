@@ -60,8 +60,8 @@ explains why GPIO42 must stay low.
 Before 07:00, the display day is the previous calendar date, including its
 weekday. At exactly 07:00, the current date is selected. `next_rollover`
 returns the first 07:00 strictly after the current reading, across month,
-year, leap-day, and 151-day schedule boundaries. The
-[content-pack contract](../content-pack-v1.md#schedule-v1) defines the
+year, leap-day, and 251-day schedule boundaries. The
+[content-pack contract](../content-pack-v2.md#schedule-v2) defines the
 schedule.
 
 ## Battery state
@@ -172,7 +172,7 @@ exact images for the other codes.
 
 Host tests cover schedule boundaries, wake classification, RTC read-back,
 storage authorization, battery filtering, hysteresis, commit gating,
-invalid-sample retention, failure policies, all 151 cards, and the reviewed
+invalid-sample retention, failure policies, all 251 cards, and the reviewed
 framebuffer goldens.
 
 The [board contract](v2-board-contract.md#physical-verification-status)

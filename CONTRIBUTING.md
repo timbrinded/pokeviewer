@@ -1,9 +1,9 @@
 # Contributing
 
-Pokeviewer has a deliberately fixed v1 scope, set by the
+Pokeviewer has a deliberately fixed scope, set by the
 [product contract](docs/product-contract.md). Read it before proposing a
-feature. Behaviour outside it needs an accepted
-[decision record](docs/decisions/README.md) before any code.
+feature. A change outside it updates the contract in the same pull request,
+with the reason in the pull request description.
 
 [AGENTS.md](AGENTS.md) is the short reference for commands, crate layout, and
 the hard rules. It applies to human contributors as well as coding agents.
@@ -20,7 +20,7 @@ the hard rules. It applies to human contributors as well as coding agents.
 1. Branch from `main` with a conventional prefix, such as `feat/daily-card` or
    `fix/rtc-alarm`.
 2. Keep each pull request to one concern and link its issue.
-3. Update the contract, ADR, or user documentation in the same pull request
+3. Update the contract or user documentation in the same pull request
    when behaviour changes.
 4. Before pushing, run:
 

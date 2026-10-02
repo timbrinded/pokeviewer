@@ -1,8 +1,9 @@
-# Architecture decision log
+# Architecture decision log (closed)
 
-Architecture decisions use Markdown Architectural Decision Record structure and
-four-digit sequence numbers. Accepted records are not rewritten to change their
-outcome; a later decision supersedes them and links in both directions.
+This log is closed: the project no longer writes ADRs. The records below are
+kept as history for the documents that link to them, and they may be out of
+date. The current behaviour is defined by the
+[product contract](../product-contract.md) and the documents it links.
 
 | ADR | Status | Decision |
 | --- | --- | --- |

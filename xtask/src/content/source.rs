@@ -1,14 +1,15 @@
 use std::io::Cursor;
 
 use png::{BitDepth, ColorType, Transformations};
+use pokeviewer_core::{CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, set_sprite_shade};
 use serde::Deserialize;
 use unicode_normalization::UnicodeNormalization;
 
 use super::TaskResult;
 
-pub(super) const SPRITE_WIDTH: usize = 56;
-pub(super) const SPRITE_HEIGHT: usize = 56;
-pub(super) const SPRITE_BYTES: usize = SPRITE_WIDTH * SPRITE_HEIGHT / 8;
+pub(super) const SPRITE_WIDTH: usize = CONTENT_SPRITE_SIZE;
+pub(super) const SPRITE_HEIGHT: usize = CONTENT_SPRITE_SIZE;
+pub(super) const SPRITE_BYTES: usize = CONTENT_SPRITE_BYTES;
 pub(super) const NO_SECONDARY_TYPE: u8 = 0xff;
 const MAX_NAME_BYTES: usize = 16;
 const SOURCE_PALETTE_COLORS: usize = 4;
@@ -39,17 +40,17 @@ struct Sprites {
 
 #[derive(Deserialize)]
 struct Versions {
-    #[serde(rename = "generation-i")]
-    generation_one: GenerationOne,
+    #[serde(rename = "generation-ii")]
+    generation_two: GenerationTwo,
 }
 
 #[derive(Deserialize)]
-struct GenerationOne {
-    yellow: YellowSprites,
+struct GenerationTwo {
+    crystal: CrystalSprites,
 }
 
 #[derive(Deserialize)]
-struct YellowSprites {
+struct CrystalSprites {
     front_default: String,
 }
 
@@ -73,7 +74,7 @@ pub(super) struct ConvertedRecord {
     pub(super) secondary_type: u8,
     pub(super) source_width: usize,
     pub(super) source_height: usize,
-    pub(super) sprite: Vec<u8>,
+    pub(super) sprite: [u8; SPRITE_BYTES],
 }
 
 #[derive(Debug)]
@@ -110,13 +111,13 @@ pub(super) fn parse_source(
     if !pokemon
         .sprites
         .versions
-        .generation_one
-        .yellow
+        .generation_two
+        .crystal
         .front_default
         .ends_with(&sprite_suffix)
     {
         return Err(format!(
-            "Pokémon ID {id}: Pokémon schema: Yellow front sprite URL has an unexpected file"
+            "Pokémon ID {id}: Pokémon schema: Crystal front sprite URL has an unexpected file"
         ));
     }
     let (primary_type, secondary_type) = parse_types(id, pokemon.types)?;
@@ -210,20 +211,30 @@ fn validate_name(id: u16, name: &str) -> TaskResult {
     Ok(())
 }
 
-fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<(Vec<u8>, usize, usize)> {
+fn convert_sprite(id: u16, bytes: &[u8]) -> TaskResult<([u8; SPRITE_BYTES], usize, usize)> {
     let decoded = decode_sprite(id, bytes)?;
     let palette = source_palette(id, &decoded.pixels)?;
-    let mut output = vec![0; SPRITE_BYTES];
+    let mut output = [0; SPRITE_BYTES];
     let x_offset = (SPRITE_WIDTH - decoded.width) / 2;
     let y_offset = (SPRITE_HEIGHT - decoded.height) / 2;
     for (source_index, [red, green, blue, alpha]) in decoded.pixels.into_iter().enumerate() {
-        let color = [red, green, blue];
-        if alpha == 255 && palette[..SOURCE_PALETTE_COLORS / 2].contains(&color) {
-            let source_x = source_index % decoded.width;
-            let source_y = source_index / decoded.width;
-            let output_index = (source_y + y_offset) * SPRITE_WIDTH + source_x + x_offset;
-            output[output_index / 8] |= 1 << (7 - output_index % 8);
+        if alpha != 255 {
+            continue;
         }
+        // The palette runs from darkest to lightest, so its reverse runs from
+        // shade 0 (white) to shade 3 (black).
+        let shade = palette
+            .iter()
+            .rev()
+            .zip(0..)
+            .find_map(|(color, shade)| (*color == [red, green, blue]).then_some(shade))
+            .expect("the palette holds every opaque colour");
+        set_sprite_shade(
+            &mut output,
+            source_index % decoded.width + x_offset,
+            source_index / decoded.width + y_offset,
+            shade,
+        );
     }
     Ok((output, decoded.width, decoded.height))
 }
@@ -353,7 +364,7 @@ mod tests {
         {"slot": 2, "type": {"name": "poison"}},
         {"slot": 1, "type": {"name": "grass"}}
       ],
-      "sprites": {"versions": {"generation-i": {"yellow": {
+      "sprites": {"versions": {"generation-ii": {"crystal": {
         "front_default": "https://example.invalid/1.png"
       }}}}
     }"#;
@@ -371,7 +382,7 @@ mod tests {
         assert_eq!(record.primary_type, 4);
         assert_eq!(record.secondary_type, 7);
         assert_eq!(record.sprite.len(), SPRITE_BYTES);
-        assert_eq!(record.sprite[0], 0b1100_1100);
+        assert_eq!(record.sprite[0], 0b1110_0100);
     }
 
     #[test]
@@ -396,8 +407,10 @@ mod tests {
         let record =
             parse_source(1, POKEMON, SPECIES, &fixture_png_with_dimensions(40, 40)).unwrap();
 
-        assert!(record.sprite[..57].iter().all(|byte| *byte == 0));
-        assert_eq!(record.sprite[57], 0b1100_1100);
+        // A 40 × 40 source starts eight rows and eight columns in.
+        let first = (8 * SPRITE_WIDTH + 8) / 4;
+        assert!(record.sprite[..first].iter().all(|byte| *byte == 0));
+        assert_eq!(record.sprite[first], 0b1110_0100);
     }
 
     #[test]

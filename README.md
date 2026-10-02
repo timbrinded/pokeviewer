@@ -3,7 +3,7 @@
 Pokeviewer is a battery-powered, fully offline Pokémon-of-the-day display.
 It supports only the non-touch Waveshare ESP32-S3-ePaper-1.54-EN V2 board.
 
-The device shows the weekday, a Pokémon Yellow sprite, the English name, and
+The device shows the weekday, a Pokémon Crystal sprite, the English name, and
 the canonical type or types. The device does not use Wi-Fi or BLE.
 
 ![Seven Pokeviewer devices, one for each weekday from Monday to Sunday](docs/images/device/week.svg)
@@ -275,7 +275,7 @@ The device then enters deep sleep. The e-paper panel keeps the card visible
 without panel power. Before 07:00, the previous day's card stays, including
 its weekday. This is intended.
 
-The firmware contains all 151 Generation I entries.
+The firmware contains all 251 Generation I and II entries.
 The device does not require an account, an SD card, or internet access.
 The supported board does not have a touchscreen.
 
@@ -388,7 +388,7 @@ For maintainers and reviewers:
 - [Firmware runtime](docs/hardware/wake-sleep-state-machine.md)
 - [V2 board contract](docs/hardware/v2-board-contract.md)
 - [USB protocol](docs/usb-protocol-v1.md)
-- [Content pack format](docs/content-pack-v1.md)
+- [Content pack format](docs/content-pack-v2.md)
 - [Toolchain and source builds](docs/development/toolchain.md)
 - [CI](docs/development/ci.md) and [publishing a release](docs/development/publishing.md)
 - [Architecture decisions](docs/decisions/README.md)

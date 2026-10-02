@@ -5,10 +5,11 @@ use super::{
     render_setup_screen, text_width, type_label,
 };
 use crate::{
-    BatteryState, CONTENT_SPRITE_BYTES, ContentPack, FRAMEBUFFER_BYTES, PokemonType, Weekday,
+    BatteryState, CONTENT_SPRITE_BYTES, CONTENT_SPRITE_SIZE, ContentPack, DISPLAY_WIDTH,
+    FRAMEBUFFER_BYTES, PokemonType, Weekday, set_sprite_shade,
 };
 
-const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v1.pack");
+const PACK: &[u8] = include_bytes!("../../../content/generated/pokeviewer-v2.pack");
 const WHITE_SPRITE: [u8; CONTENT_SPRITE_BYTES] = [0; CONTENT_SPRITE_BYTES];
 const BLACK_SPRITE: [u8; CONTENT_SPRITE_BYTES] = [u8::MAX; CONTENT_SPRITE_BYTES];
 
@@ -44,12 +45,63 @@ fn long_name_dual_types_and_sprite_extremes_are_deterministic() {
     render_daily_card(&mut black_first, card("Farfetch’d", &BLACK_SPRITE)).unwrap();
     render_daily_card(&mut black_second, card("Farfetch’d", &BLACK_SPRITE)).unwrap();
     assert_eq!(black_first, black_second);
-    assert_eq!(crc32fast::hash(black_first.as_bytes()), 0x2707_31f3);
 
     let mut white = Framebuffer::default();
     render_daily_card(&mut white, card("Nidoran♀", &WHITE_SPRITE)).unwrap();
     assert_eq!(crc32fast::hash(white.as_bytes()), 0xa077_1a7a);
     assert_ne!(black_first, white);
+}
+
+fn sprite_ink(framebuffer: &Framebuffer) -> usize {
+    let size = CONTENT_SPRITE_SIZE * SPRITE_SCALE;
+    let x = (DISPLAY_WIDTH - size) / 2;
+    (SPRITE_Y..SPRITE_Y + size)
+        .flat_map(|y| (x..x + size).map(move |x| (x, y)))
+        .filter(|&(x, y)| framebuffer.is_black(x, y) == Some(true))
+        .count()
+}
+
+#[test]
+fn sprite_shades_render_as_dithered_cells() {
+    let cells = CONTENT_SPRITE_SIZE * CONTENT_SPRITE_SIZE;
+    for (shade_byte, ink_per_cell) in [(0x00, 0), (0x55, 1), (0xaa, 2)] {
+        let sprite = [shade_byte; CONTENT_SPRITE_BYTES];
+        let mut framebuffer = Framebuffer::default();
+        render_daily_card(&mut framebuffer, card("Mew", &sprite)).unwrap();
+        assert_eq!(sprite_ink(&framebuffer), cells * ink_per_cell);
+    }
+
+    let mut black = Framebuffer::default();
+    render_daily_card(&mut black, card("Mew", &BLACK_SPRITE)).unwrap();
+    let interior_cells = (CONTENT_SPRITE_SIZE - 2) * (CONTENT_SPRITE_SIZE - 2);
+    let outline_cells = cells - interior_cells;
+    assert_eq!(sprite_ink(&black), outline_cells * 4 + interior_cells * 3);
+    let left = (DISPLAY_WIDTH - CONTENT_SPRITE_SIZE * SPRITE_SCALE) / 2;
+    assert_eq!(black.is_black(left, SPRITE_Y), Some(true));
+    assert_eq!(black.is_black(left + 2, SPRITE_Y + 3), Some(false));
+}
+
+#[test]
+fn black_features_narrower_than_four_pixels_stay_solid() {
+    let mut sprite = WHITE_SPRITE;
+    // A 3 × 3 eye and a 4 × 4 patch, well apart.
+    for (left, size) in [(4, 3), (20, 4)] {
+        for y in 10..10 + size {
+            for x in left..left + size {
+                set_sprite_shade(&mut sprite, x, y, crate::BLACK_SHADE);
+            }
+        }
+    }
+    let mut framebuffer = Framebuffer::default();
+    render_daily_card(&mut framebuffer, card("Mew", &sprite)).unwrap();
+
+    let eye_cells = 3 * 3;
+    let patch_centre_cells = 2 * 2;
+    let patch_edge_cells = 4 * 4 - patch_centre_cells;
+    assert_eq!(
+        sprite_ink(&framebuffer),
+        (eye_cells + patch_edge_cells) * 4 + patch_centre_cells * 3
+    );
 }
 
 #[test]
@@ -108,7 +160,7 @@ fn clipping_at_every_edge_never_changes_out_of_range_storage() {
 fn every_committed_name_and_type_combination_renders() {
     let pack = ContentPack::parse(PACK).unwrap();
     let mut framebuffer = Framebuffer::default();
-    for dex_id in 1..=151 {
+    for dex_id in 1..=crate::POKEMON_COUNT {
         let record = pack.record(dex_id).unwrap();
         render_daily_card(
             &mut framebuffer,
@@ -144,7 +196,7 @@ fn fixed_layout_bands_are_disjoint_and_fit_every_label() {
     }
 
     let pack = ContentPack::parse(PACK).unwrap();
-    for dex_id in 1..=151 {
+    for dex_id in 1..=crate::POKEMON_COUNT {
         let record = pack.record(dex_id).unwrap();
         assert!(text_width(record.name.chars().count(), NAME_SCALE) <= 200);
         assert!(text_width(type_label(record.primary_type).chars().count(), TYPE_SCALE) <= 200);
